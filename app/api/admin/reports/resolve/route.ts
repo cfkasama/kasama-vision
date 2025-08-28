@@ -15,8 +15,8 @@ export async function POST(req: Request) {
   if (action === "DISMISS" || action === "MARK_RESOLVED") {
     await prisma.abuseReport.updateMany({ where: { id: { in: reportIds } }, data: { status:"RESOLVED", resolvedAt: new Date(), resolver, note }});
   } else if (action === "REMOVE_POST" || action === "RESTORE_POST") {
-    const rep = await prisma.abuseReport.findMany({ where: { id: { in: reportIds } }, select: { postId:true }});
-    const ids = [...new Set(rep.map(r=>r.postId))];
+    const rep:{postId:string}[] = await prisma.abuseReport.findMany({ where: { id: { in: reportIds } }, select: { postId:true }});
+    const ids = [...new Set(rep.map(r:{postId:string}[]=>r.postId))];
     await prisma.post.updateMany({ where: { id: { in: ids } }, data: { status: action==="REMOVE_POST" ? "REMOVED" : "PUBLISHED" }});
     await prisma.abuseReport.updateMany({ where: { id: { in: reportIds } }, data: { status:"RESOLVED", resolvedAt: new Date(), resolver, note }});
   }
