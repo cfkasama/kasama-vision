@@ -24,6 +24,7 @@ export async function POST(req: Request) {
     });
     await prisma.$transaction(updates, { timeout: 30000 });
 
+    type TopRow={tag_id:string;tag_name:string;cnt:number};
     const rows = await prisma.$queryRaw<{ tag_id: string; tag_name: string; cnt: number }[]>`
       SELECT t.id as tag_id, t.name as tag_name, COUNT(*)::int as cnt
       FROM "PostTag" pt
