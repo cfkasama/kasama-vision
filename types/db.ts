@@ -1,6 +1,8 @@
-// 共通で使う最小限の型定義（Prismaのselect結果に合わせた軽量タイプ）
+// =======================
+// 共通 型定義ファイル
+// =======================
 
-// ==== AbuseReport 系 ====
+// ==== AbuseReport rows ====
 
 // select: { postId: true }
 export type AbusePostIdRow = { postId: string };
@@ -8,7 +10,7 @@ export type AbusePostIdRow = { postId: string };
 // select: { identityId: true }
 export type AbuseIdentityRow = { identityId: string | null };
 
-// ==== Post（Hot再計算で使う軽量版） ====
+// ==== Post (Hot再計算用の軽量版) ====
 // select: { id, createdAt, likeCount, recCount, cmtCount }
 export type PostLite = {
   id: string;
@@ -18,18 +20,51 @@ export type PostLite = {
   cmtCount: number;
 };
 
-// ==== タグTop5のRAW結果 ====
-// $queryRaw で返す { tag_id, tag_name, cnt }
+// ==== Tag top5 raw ====
+// $queryRaw: { tag_id, tag_name, cnt }
 export type TopTagRow = {
   tag_id: string;
   tag_name: string;
   cnt: number;
 };
 
-// ==== コメント軽量（必要なら） ====
+// ==== Comment lite ====
 // select: { id, content, likeCount }
 export type CommentLite = {
   id: string;
+  content: string;
+  likeCount: number;
+};
+
+// =======================
+// フロント表示用 (トップページなど)
+// =======================
+
+// Vision (いいね数上位3件)
+export type VisionLite = {
+  id: string;
+  title: string;
+  likeCount: number;
+};
+
+// Catchphrase (キャッチフレーズ1位)
+export type CatchphraseLite = {
+  id: string;
+  title: string;
+  likeCount: number;
+};
+
+// Proposal (いいね100件以上 or 実現済み)
+export type ProposalLite = {
+  id: string;
+  title: string;
+  likeCount: number;
+};
+
+// Consultation (相談一覧用)
+export type ConsultationLite = {
+  id: string;
+  title: string;
   content: string;
   likeCount: number;
 };
