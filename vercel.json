@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/jobs/recalc?key=__CRON_SECRET__",
+      "schedule": "*/10 * * * *"
+    }
+  ]
+}

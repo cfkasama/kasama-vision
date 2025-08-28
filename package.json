@@ -1,0 +1,27 @@
+{
+  "name": "kasama-future",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "prisma:gen": "prisma generate",
+    "prisma:migrate": "prisma migrate dev"
+  },
+  "dependencies": {
+    "next": "14.2.5",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "next-auth": "^5.0.0-beta.20",
+    "clsx": "^2.1.0",
+    "@prisma/client": "^5.17.0"
+  },
+  "devDependencies": {
+    "prisma": "^5.17.0",
+    "tailwindcss": "^3.4.8",
+    "postcss": "^8.4.41",
+    "autoprefixer": "^10.4.20",
+    "typescript": "^5.5.4"
+  }
+}

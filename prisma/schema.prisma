@@ -1,0 +1,122 @@
+datasource db { provider = "postgresql"; url = env("DATABASE_URL") }
+generator client { provider = "prisma-client-js" }
+
+enum PostType { CATCHPHRASE VISION CONSULTATION PROPOSAL REPORT_LIVE REPORT_WORK REPORT_TOURISM }
+enum PostStatus { PUBLISHED REMOVED REALIZED }
+enum ReactionType { LIKE RECOMMEND }
+enum ReportStatus { OPEN RESOLVED DISMISSED }
+
+model Identity {
+  id        String   @id
+  createdAt DateTime @default(now())
+  reactions Reaction[]
+  comments  Comment[]
+  abuseReports AbuseReport[]
+}
+
+model Post {
+  id          String     @id @default(cuid())
+  type        PostType
+  status      PostStatus @default(PUBLISHED)
+  title       String
+  content     String
+  tags        PostTag[]
+  comments    Comment[]
+  reactions   Reaction[]
+  likeCount   Int        @default(0)
+  recCount    Int        @default(0)
+  cmtCount    Int        @default(0)
+  hotScore    Float      @default(0)
+  realizedAt  DateTime?
+  deleteKey   String     // salt:hash
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // moderation flags
+  lowExposureActive Boolean   @default(false)
+  lowExposureAt     DateTime?
+  tempHiddenActive  Boolean   @default(false)
+  tempHiddenAt      DateTime?
+
+  abuseReports AbuseReport[]
+  modLogs     ModLog[]
+}
+
+model Comment {
+  id         String   @id @default(cuid())
+  post       Post     @relation(fields: [postId], references: [id])
+  postId     String
+  identity   Identity @relation(fields: [identityId], references: [id])
+  identityId String
+  content    String
+  likeCount  Int      @default(0)
+  createdAt  DateTime @default(now())
+}
+
+model Reaction {
+  id         String       @id @default(cuid())
+  post       Post         @relation(fields: [postId], references: [id])
+  postId     String
+  identity   Identity     @relation(fields: [identityId], references: [id])
+  identityId String
+  type       ReactionType
+  createdAt  DateTime     @default(now())
+  @@unique([postId, identityId, type])
+}
+
+model Tag { id String @id @default(cuid()); name String @unique; posts PostTag[] }
+model PostTag {
+  post  Post @relation(fields: [postId], references: [id])
+  postId String
+  tag   Tag  @relation(fields: [tagId], references: [id])
+  tagId String
+  @@id([postId, tagId])
+}
+
+model AbuseReport {
+  id          String       @id @default(cuid())
+  post        Post         @relation(fields: [postId], references: [id])
+  postId      String
+  identity    Identity?    @relation(fields: [identityId], references: [id])
+  identityId  String?
+  reason      String
+  status      ReportStatus @default(OPEN)
+  createdAt   DateTime     @default(now())
+  resolvedAt  DateTime?
+  resolver    String?
+  note        String?
+  @@index([status, createdAt])
+}
+
+model ModLog {
+  id        String   @id @default(cuid())
+  post      Post     @relation(fields: [postId], references: [id])
+  postId    String
+  action    String
+  reason    String?
+  actor     String
+  createdAt DateTime @default(now())
+}
+
+model AdminLog {
+  id         String   @id @default(cuid())
+  actor      String
+  action     String
+  targetType String
+  targetId   String?
+  meta       Json?
+  ip         String?
+  ua         String?
+  createdAt  DateTime @default(now())
+  @@index([createdAt])
+  @@index([actor, createdAt])
+  @@index([action, createdAt])
+}
+
+model TagTop5 {
+  id        Int      @id @default(autoincrement())
+  tagId     String
+  tagName   String
+  count     Int
+  createdAt DateTime @default(now())
+}
