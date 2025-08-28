@@ -18,7 +18,7 @@ export async function POST(req: Request) {
       where: { status: "PUBLISHED", createdAt: { gte: since } },
       select: { id: true, createdAt: true, likeCount: true, recCount: true, cmtCount: true }
     });
-    const updates = posts.map((p{id:string;createdAt:Date;likeCount:number;recCount:number;cmtCount:number}) => {
+    const updates = posts.map((p:{id:string;createdAt:Date;likeCount:number;recCount:number;cmtCount:number}) => {
       const score = (p.likeCount * 2 + p.recCount * 4 + p.cmtCount) / Math.pow(hoursSince(p.createdAt), 1.5);
       return prisma.post.update({ where: { id: p.id }, data: { hotScore: score } });
     });
