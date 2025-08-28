@@ -3,7 +3,6 @@ import Link from "next/link";
 import { Card, Pill, Chip } from "@/components/ui";
 import IntentButtons from "@/components/IntentButtons";
 
-
 async function getHero() {
   const [catchphrase] = await prisma.post.findMany({
     where: { type: "CATCHPHRASE", status: "PUBLISHED" }, orderBy: { likeCount: "desc" }, take: 1,
