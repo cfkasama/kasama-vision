@@ -28,11 +28,8 @@ export default async function PostDetail({ params }:{ params:{ id:string }}) {
         <p>{post.content}</p>
       </article>
 
-      {/* @ts-expect-error server/client */}
       <ReactionBar postId={post.id} likeCount={post.likeCount} recCount={post.recCount} />
-      {/* @ts-expect-error server/client */}
       <CommentList postId={post.id} />
-      {/* @ts-expect-error server/client */}
       <ReportButton postId={post.id} />
     </div>
   );
