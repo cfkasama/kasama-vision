@@ -16,7 +16,7 @@ export async function POST(req: Request) {
 
   // count uniques for threshold
   const reports = await prisma.abuseReport.findMany({ where: { postId, createdAt: { gte: since } }, select: { identityId: true } });
-  const uniques = new Set(reports.map(r => r.identityId || "anon")).size;
+  const uniques = new Set(reports.map((r:{identityId:string|null}) => r.identityId || "anon")).size;
   const post = await prisma.post.findUnique({ where:{ id: postId }, select:{ lowExposureActive:true, tempHiddenActive:true }});
 
   if (uniques >= 3 && !post?.lowExposureActive) {
