@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     await prisma.$transaction(updates, { timeout: 30000 });
 
     type TopRow={tag_id:string;tag_name:string;cnt:number};
-    const rows = await prisma.$queryRaw<{ tag_id: string; tag_name: string; cnt: number }[]>`
+    const rows = await prisma.$queryRaw<TopRow[]>`
       SELECT t.id as tag_id, t.name as tag_name, COUNT(*)::int as cnt
       FROM "PostTag" pt
       JOIN "Post" p ON p.id = pt."postId" AND p.status = 'PUBLISHED'
@@ -33,10 +33,10 @@ export async function POST(req: Request) {
       GROUP BY t.id, t.name
       ORDER BY cnt DESC, t.name ASC
       LIMIT 5
-    `;
+    ` as TopRow[];
     await prisma.tagTop5.deleteMany({});
     if (rows.length) {
-      await prisma.tagTop5.createMany({ data: rows.map(r => ({ tagId: r.tag_id, tagName: r.tag_name, count: r.cnt })) });
+      await prisma.tagTop5.createMany({ data: rows.map((r) => ({ tagId: r.tag_id, tagName: r.tag_name, count: r.cnt })) });
     }
     return NextResponse.json({ ok: true, hotUpdated: posts.length, topTags: rows.length });
   } catch (e:any) {
