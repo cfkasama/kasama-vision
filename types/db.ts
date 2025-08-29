@@ -14,7 +14,16 @@ export type AbuseIdentityRow = { identityId: string | null };
 // select: { id, createdAt, likeCount, recCount, cmtCount }
 export type PostLite = {
   id: string;
+  createdAt: Date;
+  likeCount: number;
+  recCount: number;
+  cmtCount: number;
+};
+
+export type PostA = {
+  id: string;
   title:string;
+  realizedAt: Date;
   createdAt: Date;
   likeCount: number;
   recCount: number;
