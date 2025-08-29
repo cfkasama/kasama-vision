@@ -20,7 +20,7 @@ export default async function PostDetail({ params }:{ params:{ id:string }}) {
         const status = post.status as PostStatus;
         return(
           <>
-        {post.status=== PostStatus.REALIZED && <Pill color="green">実現</Pill>}
+        {status=== PostStatus.REALIZED && <Pill color="green">実現</Pill>}
             </>
           );
     })()}
