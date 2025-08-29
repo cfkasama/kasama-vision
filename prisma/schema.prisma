@@ -137,3 +137,17 @@ model TagTop5 {
   count     Int      @default(0)
   updatedAt DateTime @default(now())
 }
+
+model AdminLog {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  actor     String                    // 例: 管理者メール/GitHubアカウント
+  action    String                    // 例: "REMOVE_POST" / "DISMISS" など
+  target    String?                   // 例: "post:abc123" や "report:xyz"
+  note      String?
+  meta      Json?                     // 任意の追加情報（diffなど）
+
+  @@index([createdAt])
+  @@index([actor])
+  @@index([action])
+}
