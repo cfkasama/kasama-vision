@@ -69,6 +69,7 @@ model Post {
   comments         Comment[]
   tags             PostTag[]
 abuseReports     AbuseReport[]
+adminLogs AdminLog[]
 }
 
 model Reaction {
