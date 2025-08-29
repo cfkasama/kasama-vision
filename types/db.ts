@@ -23,7 +23,7 @@ export type PostLite = {
 export type PostA = {
   id: string;
   title:string;
-  realizedAt: Date;
+  realizedAt: Date | null;
   createdAt: Date;
   likeCount: number;
   recCount: number;
