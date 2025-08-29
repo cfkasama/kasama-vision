@@ -1,4 +1,7 @@
-datasource db { provider = "postgresql"; url = env("DATABASE_URL") }
+datasource db { 
+provider = "postgresql"
+url = env("DATABASE_URL")
+}
 generator client { provider = "prisma-client-js" }
 
 enum PostType { CATCHPHRASE VISION CONSULTATION PROPOSAL REPORT_LIVE REPORT_WORK REPORT_TOURISM }
