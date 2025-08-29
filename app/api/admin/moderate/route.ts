@@ -35,7 +35,6 @@ export async function POST(req: Request) {
   await writeAdminLog({
     actor: (session as any).login ?? session.user?.email ?? "admin",
     action,
-    targetType: "POST",
     targetId: postIds,
     meta: { count: postIds.length },
   });
