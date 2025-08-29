@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { writeAuditLog } from "@/lib/audit";
+import { writeAdminLog } from "@/lib/audit";
 
 type ModerateBody = {
   action: "REMOVE" | "REALIZE" | "RESTORE";
@@ -32,7 +32,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "bad_action" }, { status: 400 });
   }
 
-  await writeAuditLog({
+  await writeAdminLog({
     actor: (session as any).login ?? session.user?.email ?? "admin",
     action,
     targetType: "POST",
