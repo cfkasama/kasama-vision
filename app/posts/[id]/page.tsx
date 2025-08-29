@@ -3,6 +3,7 @@ import ReactionBar from "@/components/ReactionBar";
 import CommentList from "@/components/CommentList";
 import { Pill, Chip } from "@/components/ui";
 import ReportButton from "@/components/ReportButton";
+import {PostStatus}from "@prisma/client";
 
 export default async function PostDetail({ params }:{ params:{ id:string }}) {
   const post = await prisma.post.findUnique({ where: { id: params.id }, include: { tags: { include: { tag:true } } } });
