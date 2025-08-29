@@ -146,6 +146,8 @@ model AdminLog {
   target    String?                   // 例: "post:abc123" や "report:xyz"
   note      String?
   meta      Json?                     // 任意の追加情報（diffなど）
+postId      String?
+post      Post? @relation(fields:[postId],references:[id])
 
   @@index([createdAt])
   @@index([actor])
