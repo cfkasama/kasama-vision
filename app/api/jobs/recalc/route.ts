@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { Prisma } from "@prisma/client";                 // ★ 追加
-import type { PostLite } from "@/type/db";         // db-shapes派なら
+import type { PostLite } from "@/types/db";         // db-shapes派なら
 
 type TopTagRow = { tag_id: string; tag_name: string; cnt: number };
 
