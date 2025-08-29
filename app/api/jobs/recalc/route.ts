@@ -2,8 +2,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { Prisma } from "@prisma/client";                 // ★ 追加
-import type { PostLite } from "@/lib/db-shapes";         // db-shapes派なら
-// import type { PostLite, TopTagRow } from "@/types/db"; // types派ならこっち
+import type { PostLite } from "@/type/db";         // db-shapes派なら
+
 type TopTagRow = { tag_id: string; tag_name: string; cnt: number };
 
 function assertCronAuth(req: Request) {
