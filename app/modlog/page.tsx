@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/db";
 
 export default async function ModLogPage() {
-  const logs = await prisma.AdminLog.findMany({
+  const logs = await prisma.adminLog.findMany({
     orderBy: { createdAt: "desc" },
     take: 100,
     include: { post: { select: { id:true, title:true } } }
