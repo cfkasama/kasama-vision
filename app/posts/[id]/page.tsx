@@ -16,7 +16,9 @@ export default async function PostDetail({ params }:{ params:{ id:string }}) {
       <div className="mt-2 flex items-center gap-2">
         <Pill>{post.type}</Pill>
         {post.likeCount>=100 && <Pill color="gold">100いいね</Pill>}
+        {post.status=== PostStatus.PUBLISHED && <Pill color="blue">公開</Pill>}
         {post.status=== PostStatus.REALIZED && <Pill color="green">実現</Pill>}
+        {post.status=== PostStatus.REMOVED && <Pill color="red">削除</Pill>}
       </div>
 
       <h2 className="mt-2 text-xl font-bold">{post.title}</h2>
