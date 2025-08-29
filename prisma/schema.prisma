@@ -147,7 +147,7 @@ model AdminLog {
   note      String?
   meta      Json?                     // 任意の追加情報（diffなど）
 postId      String?
-post      Post? @relation(fields:[postId],references:[id])
+post      Post? @relation(fields:[postId],references:[id],onDelete:SetNull)
 
   @@index([createdAt])
   @@index([actor])
