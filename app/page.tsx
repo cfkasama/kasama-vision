@@ -4,6 +4,10 @@ import { Card, Pill, Chip } from "@/components/ui";
 import IntentButtons from "@/components/IntentButtons";
 import type { VisionLite, CatchphraseLite, ProposalLite } from "@/types/db";
 
+  const visions: VisionLite[] = [];
+  const catchphrases: CatchphraseLite[] = [];
+  const proposals: ProposalLite[] = [];
+
 async function getHero() {
   const [catchphrase] = await prisma.post.findMany({
     where: { type: "CATCHPHRASE", status: "PUBLISHED" }, orderBy: { likeCount: "desc" }, take: 1,
@@ -43,13 +47,13 @@ export default async function Home({ searchParams }:{ searchParams:{ sort?:strin
         <div className="mt-4 grid gap-4 md:grid-cols-3">
           <Card>
             <div className="mb-2"><Pill>キャッチフレーズ</Pill></div>
-            {catchphrase ? (
+             {catchphrases.map((c) => (
               <>
-                <h3 className="font-semibold">{catchphrase.title}</h3>
-                <p className="mt-1 text-sm text-gray-600">{catchphrase.content?.slice(0,120)}{catchphrase.content?.length>120?"…":""}</p>
-                <Link href={`/posts/${catchphrase.id}`} className="mt-3 inline-block text-sm text-blue-600 hover:underline">見る</Link>
+                <h3 className="font-semibold">{c.title}</h3>
+                <p className="mt-1 text-sm text-gray-600">{c.content?.slice(0,120)}{c.content?.length>120?"…":""}</p>
+                <Link href={`/posts/${c.id}`} className="mt-3 inline-block text-sm text-blue-600 hover:underline">見る</Link>
               </>
-            ) : <p className="text-sm">まだありません。<Link href="/new?type=CATCHPHRASE" className="text-blue-600 hover:underline">最初の1件を投稿</Link></p>}
+            ))} : <p className="text-sm">まだありません。<Link href="/new?type=CATCHPHRASE" className="text-blue-600 hover:underline">最初の1件を投稿</Link></p>
           </Card>
 
           <Card>
