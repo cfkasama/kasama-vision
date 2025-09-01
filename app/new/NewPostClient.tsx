@@ -1,8 +1,7 @@
-// app/new/NewPostClient.tsx
+// components/NewPostClient.tsx
 "use client";
-
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 
 const TYPES: [string, string][] = [
   ["CONSULTATION", "相談"],
@@ -14,101 +13,87 @@ const TYPES: [string, string][] = [
   ["REPORT_TOURISM", "不満がある報告"],
 ];
 
-type Props = {
-  initialType: string;
-  initialTitle: string;
-  initialTags: string;
-};
-
-export default function NewPostClient({
-  initialType,
-  initialTitle,
-  initialTags,
-}: Props) {
+export default function NewPostClient() {
+  const sp = useSearchParams();
   const router = useRouter();
 
-  const [type, setType] = useState(initialType || "CONSULTATION");
-  const [title, setTitle] = useState(initialTitle || "");
+  const [type, setType] = useState(sp.get("type") || "CONSULTATION");
+  const [title, setTitle] = useState(sp.get("draft") || "");
   const [content, setContent] = useState("");
-  const [tags, setTags] = useState(initialTags || "");
+  const [tags, setTags] = useState(sp.get("tags") || "");
   const [deleteKey, setDeleteKey] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // reCAPTCHA スクリプト読込
+  // reCAPTCHA スクリプト読み込み
   useEffect(() => {
-    const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
-    if (!siteKey) return;
-
-    const s = document.createElement("script");
-    s.src = `https://www.google.com/recaptcha/api.js?render=${siteKey}`;
-    s.async = true;
-    document.body.appendChild(s);
-    return () => {
-      document.body.removeChild(s);
-    };
+    const src = `https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`;
+    if (!document.querySelector(`script[src="${src}"]`)) {
+      const s = document.createElement("script");
+      s.async = true;
+      s.src = src;
+      document.body.appendChild(s);
+      return () => {
+        if (s.parentNode) s.parentNode.removeChild(s);
+      };
+    }
   }, []);
 
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError("");
 
-    try {
-      // @ts-ignore
-      const grecaptcha = (window as any).grecaptcha;
-      if (!grecaptcha?.ready) {
-        setError("reCAPTCHA読み込み中。少し待って再試行してください。");
-        setLoading(false);
-        return;
-      }
-
-      const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
-      if (!siteKey) {
-        setError("reCAPTCHAの設定が見つかりません（環境変数未設定）。");
-        setLoading(false);
-        return;
-      }
-
-      // @ts-ignore
-      const token = await grecaptcha.execute(siteKey, { action: "submit" });
-
-      const res = await fetch("/api/posts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type,
-          title,
-          content,
-          tags: tags
-            .split(",")
-            .map((s) => s.trim())
-            .filter(Boolean),
-          deleteKey,
-          recaptchaToken: token,
-        }),
-      });
-
-      const json = await res.json();
-      if (!json.ok) {
-        setError("投稿に失敗しました。");
-        setLoading(false);
-        return;
-      }
-      router.push(`/posts/${json.id}`);
-    } catch (err) {
-      console.error(err);
-      setError("エラーが発生しました。時間をおいて再試行してください。");
+    // @ts-ignore
+    const grecaptcha = (window as any).grecaptcha;
+    if (!grecaptcha || typeof grecaptcha.ready !== "function") {
+      setError("reCAPTCHA読み込み中です。少し待ってから試してください。");
       setLoading(false);
+      return;
     }
+
+    let token = "";
+    try {
+      await new Promise<void>((resolve) => grecaptcha.ready(resolve));
+      token = await grecaptcha.execute(
+        process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY,
+        { action: "submit" }
+      );
+      if (!token) throw new Error("empty token");
+    } catch {
+      setError("reCAPTCHAの取得に失敗しました。");
+      setLoading(false);
+      return;
+    }
+
+    const res = await fetch("/api/posts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        type,
+        title,
+        content,
+        tags: tags.split(",").map((s) => s.trim()).filter(Boolean),
+        deleteKey,
+        recaptchaToken: token,
+      }),
+    });
+
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok || !json?.ok) {
+      setError("投稿に失敗しました");
+      setLoading(false);
+      return;
+    }
+
+    router.push(`/posts/${json.id}`);
   }
 
   return (
     <div className="mx-auto max-w-2xl">
       <h2 className="mb-2 text-xl font-bold">投稿する</h2>
       <p className="mb-4 text-sm text-gray-600">
-        ニックネーム不要、<b>3行からOK</b>。荒らし対策で<strong>削除用パスワード</strong>
-        が必須です。
+        ニックネーム不要、<b>3行からOK</b>。荒らし対策で<strong>削除用パスワード</strong>が必須です。
       </p>
 
       <form onSubmit={onSubmit} className="space-y-4">
@@ -134,7 +119,7 @@ export default function NewPostClient({
             onChange={(e) => setTitle(e.target.value)}
             required
             placeholder="例：雨の日でも楽しい『〇〇パス』を作ろう"
-            className="mt-1 w-full rounded-md border p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="mt-1 w-full rounded-md border p-2 focus:ring-2 focus:ring-blue-400"
           />
         </label>
 
@@ -144,8 +129,8 @@ export default function NewPostClient({
             value={content}
             onChange={(e) => setContent(e.target.value)}
             rows={8}
-            placeholder="背景・困りごと・やりたいこと・協力してほしいこと など"
-            className="mt-1 w-full rounded-md border p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            placeholder="背景・困りごと・やりたいこと など"
+            className="mt-1 w-full rounded-md border p-2 focus:ring-2 focus:ring-blue-400"
           />
         </label>
 
@@ -166,15 +151,15 @@ export default function NewPostClient({
             onChange={(e) => setDeleteKey(e.target.value)}
             required
             placeholder="自分だけが知る合言葉"
-            className="mt-1 w-full rounded-md border p-2 focus:outline-none focus:ring-2 focus:ring-red-400"
+            className="mt-1 w-full rounded-md border p-2 focus:ring-2 focus:ring-red-400"
           />
         </label>
 
         {error && <p className="text-sm text-red-600">{error}</p>}
 
         <button
-            className="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
-            disabled={loading}
+          className="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-60"
+          disabled={loading}
         >
           {loading ? "送信中…" : "投稿する"}
         </button>
