@@ -64,6 +64,7 @@ model Comment {
   id         String     @id @default(cuid())
   content    String     @db.Text
   likeCount  Int        @default(0)
+  recCount  Int        @default(0)
   createdAt  DateTime   @default(now())
 
   postId     String
