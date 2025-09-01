@@ -1,6 +1,6 @@
 // app/new/page.tsx
 import { Suspense } from "react";
-import NewPostClient from "@/components/NewPostClient";
+import NewPostClient from "@./NewPostClient";
 
 export const dynamic = "force-dynamic";
 
