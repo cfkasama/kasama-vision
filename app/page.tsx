@@ -162,7 +162,6 @@ export default async function Home({
         </div>
 
         <div className="mt-4">
-          {/* @ts-expect-error Server Component 内での使用を許容 */}
           <IntentButtons />
         </div>
       </section>
