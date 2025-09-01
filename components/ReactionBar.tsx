@@ -1,9 +1,8 @@
 "use client";
 import { useState } from "react";
 
-export default function ReactionBar({ postId, likeCount, recCount }:{ postId: string; likeCount:number; recCount:number; }) {
+export default function ReactionBar({ postId, likeCount }:{ postId: string; likeCount:number;}) {
   const [likes, setLikes] = useState(likeCount);
-  const [recs, setRecs]   = useState(recCount);
   const [busy, setBusy]   = useState(false);
 
   async function react(type:"LIKE"|"RECOMMEND") {
@@ -18,7 +17,6 @@ export default function ReactionBar({ postId, likeCount, recCount }:{ postId: st
   return (
     <div className="mt-4 flex gap-3">
       <button onClick={()=>react("LIKE")} disabled={busy} className="rounded-lg bg-blue-600 px-3 py-1.5 text-white hover:bg-blue-700 disabled:opacity-50">👍 いいね {likes}</button>
-      <button onClick={()=>react("RECOMMEND")} disabled={busy} className="rounded-lg bg-yellow-400 px-3 py-1.5 text-black hover:bg-yellow-500 disabled:opacity-50">⭐ 推薦 {recs}</button>
     </div>
   );
 }
