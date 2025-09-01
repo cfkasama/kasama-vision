@@ -8,15 +8,6 @@ import type { VisionLite, CatchphraseLite, ProposalLite } from "@/types/db";
   const catchphrases: CatchphraseLite[] = [];
   const proposals: ProposalLite[] = [];
 
-async function getHero() {
-  const [catchphrase] = await prisma.post.findMany({
-    where: { type: "CATCHPHRASE", status: "PUBLISHED" }, orderBy: { likeCount: "desc" }, take: 1,
-  });
-  const visions = await prisma.post.findMany({
-    where: { type: "VISION", status: "PUBLISHED" }, orderBy: { likeCount: "desc" }, take: 3,
-  });
-  return { catchphrase, visions };
-}
 async function getList(sort: "new"|"likes"|"comments"|"hot" = "new") {
   const orderBy = sort==="likes" ? { likeCount:"desc" } : sort==="comments" ? { cmtCount:"desc" } : sort==="hot" ? { hotScore:"desc" } : { createdAt:"desc" };
   return prisma.post.findMany({ where: { status:"PUBLISHED" }, orderBy, take: 20, include: { tags: { include: { tag:true } } } });
@@ -27,7 +18,7 @@ async function getTopTags() {
 
 export default async function Home({ searchParams }:{ searchParams:{ sort?:string } }) {
   const sort = (searchParams.sort as any) ?? "new";
-  const [{ catchphrase, visions }, posts, topTags] = await Promise.all([ getHero(), getList(sort), getTopTags() ]);
+  const [posts, topTags] = await Promise.all([ getList(sort), getTopTags() ]);
 
   return (
     <>
