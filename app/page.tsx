@@ -121,7 +121,7 @@ export default async function Home() {
     <>
       <section className="mb-6">
         <h1 className="text-2xl font-bold">みんなで考える笠間の未来</h1>
-        <p className="text-sm text-gray-600">3行からOK。匿名で投稿、いいね/推薦で可視化、実現へ。</p>
+        <p className="text-sm text-gray-600">匿名で投稿、いいね/推薦で可視化、実現へ。</p>
       </section>
 
       {/* キャッチフレーズ & ビジョン */}
@@ -140,9 +140,7 @@ export default async function Home() {
               </h3>
               <p className="text-sm text-gray-600">
                 {topCatch.content?.slice(0, 120)}
-                {topCatch.content && topCatch.content.length > 120 ? "…" : ""}
               </p>
-              <div className="mt-2 text-xs text-gray-500">👍 {topCatch.likeCount}</div>
             </div>
           ) : (
             <p className="text-sm">まだありません。</p>
@@ -169,7 +167,6 @@ export default async function Home() {
                   <Link href={`/posts/${v.id}`} className="hover:underline">
                     {v.title}
                   </Link>{" "}
-                  <span className="text-gray-500">👍{v.likeCount}</span>
                 </li>
               ))}
             </ol>
