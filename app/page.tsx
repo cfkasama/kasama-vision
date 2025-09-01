@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { VisionLite, CatchphraseLite, ProposalLite } from "@/types/db";
 
+
 export default async function HomePage() {
   const visions: VisionLite[] = [];
   const catchphrases: CatchphraseLite[] = [];
