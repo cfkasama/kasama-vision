@@ -1,27 +1,24 @@
 // lib/recaptcha.ts
 const VERIFY_URL = "https://www.google.com/recaptcha/api/siteverify";
 
-/**
- * reCAPTCHA v3 を検証する
- * - 成功かつ score がしきい値以上で true
- * - 失敗/低スコアは false
- */
-export async function verifyRecaptcha(token: string, minScore = 0.5): Promise<boolean> {
+export type RecaptchaResult = {
+  ok: boolean;
+  score?: number;
+  action?: string;
+  errorCodes?: string[];
+  reason?: string; // 追加: 失敗理由のテキスト
+};
+
+export async function verifyRecaptcha(token: string, minScore = 0.5): Promise<RecaptchaResult> {
   try {
     const secret = process.env.RECAPTCHA_SECRET_KEY;
     if (!secret) {
-      console.error("RECAPTCHA_SECRET_KEY is not set");
-      return false;
+      return { ok: false, reason: "secret_missing" };
     }
-
     const res = await fetch(VERIFY_URL, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({
-        secret,
-        response: token,
-      }),
-      // 失敗時リトライ要らないのでOK
+      body: new URLSearchParams({ secret, response: token }),
       cache: "no-store",
     });
 
@@ -33,16 +30,13 @@ export async function verifyRecaptcha(token: string, minScore = 0.5): Promise<bo
     };
 
     if (!json.success) {
-      console.warn("reCAPTCHA verify failed:", json["error-codes"]);
-      return false;
+      return { ok: false, action: json.action, score: json.score, errorCodes: json["error-codes"], reason: "verify_failed" };
     }
     if (typeof json.score === "number" && json.score < minScore) {
-      console.warn("reCAPTCHA low score:", json.score);
-      return false;
+      return { ok: false, action: json.action, score: json.score, reason: "low_score" };
     }
-    return true;
+    return { ok: true, action: json.action, score: json.score };
   } catch (e) {
-    console.error("reCAPTCHA verify exception:", e);
-    return false;
+    return { ok: false, reason: "exception" };
   }
 }
