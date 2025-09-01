@@ -2,45 +2,32 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 
-export const dynamic = "force-dynamic"; // Vercel/Nextのキャッシュ無効化
+export const runtime = "nodejs";       // ← PrismaはEdge非対応。必ずNodeで。
+export const dynamic = "force-dynamic";
 
 type Params = { params: { postId: string } };
 
-// GET /api/posts/:postId/comments  -> コメント一覧（新しい順）
 export async function GET(_req: Request, { params }: Params) {
   const { postId } = params;
   if (!postId) {
     return NextResponse.json({ ok: false, error: "bad_request" }, { status: 400 });
   }
-
   try {
     const comments = await prisma.comment.findMany({
       where: { postId },
       orderBy: { createdAt: "desc" },
-      select: {
-        id: true,
-        content: true,
-        likeCount: true,
-        createdAt: true,
-        postId: true,
-        identityId: true,
-      },
+      select: { id: true, content: true, likeCount: true, createdAt: true, postId: true, identityId: true },
     });
-
     return NextResponse.json({ ok: true, comments });
-  } catch (e) {
+  } catch (e: any) {
     console.error("[GET comments] error", e);
-    return NextResponse.json({ ok: false, error: "server_error" }, { status: 500 });
+    return NextResponse.json({ ok: false, error: "server_error", detail: String(e?.message ?? e) }, { status: 500 });
   }
 }
 
-// POST /api/posts/:postId/comments  -> コメント作成
 export async function POST(req: Request, { params }: Params) {
   const { postId } = params;
-
-  if (!postId) {
-    return NextResponse.json({ ok: false, error: "bad_request" }, { status: 400 });
-  }
+  if (!postId) return NextResponse.json({ ok: false, error: "bad_request" }, { status: 400 });
 
   let body: { content?: string };
   try {
@@ -59,21 +46,14 @@ export async function POST(req: Request, { params }: Params) {
 
   try {
     const result = await prisma.$transaction(async (tx) => {
-      // Post が存在するか軽くチェック（なくても外部キーで失敗するが、明示的に）
       const post = await tx.post.findUnique({ where: { id: postId }, select: { id: true } });
       if (!post) throw new Error("post_not_found");
 
       const created = await tx.comment.create({
-        data: {
-          postId,
-          content,
-          // 匿名運用なら identityId は null のまま
-          identityId: null,
-        },
+        data: { postId, content, identityId: null },
         select: { id: true },
       });
 
-      // 集計フィールドも更新（失敗時はロールバック）
       await tx.post.update({
         where: { id: postId },
         data: { cmtCount: { increment: 1 } },
@@ -85,9 +65,10 @@ export async function POST(req: Request, { params }: Params) {
     return NextResponse.json({ ok: true, id: result.id });
   } catch (e: any) {
     console.error("[POST comment] error", e);
-    if (e?.message === "post_not_found") {
+    const msg = String(e?.message ?? e);
+    if (msg.includes("post_not_found")) {
       return NextResponse.json({ ok: false, error: "post_not_found" }, { status: 404 });
     }
-    return NextResponse.json({ ok: false, error: "server_error" }, { status: 500 });
+    return NextResponse.json({ ok: false, error: "server_error", detail: msg }, { status: 500 });
   }
 }
