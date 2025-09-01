@@ -1,4 +1,3 @@
-// components/CommentList.tsx
 "use client";
 import { useEffect, useState } from "react";
 
@@ -10,11 +9,12 @@ export default function CommentList({ postId }: { postId: string }) {
 
   async function load(signal?: AbortSignal) {
     try {
-      const r = await fetch(`/api/posts/${postId}/comments`, { signal });
+      const r = await fetch(`/api/posts/${postId}/comments`, { signal, cache: "no-store" });
       const j = await r.json();
+      if (!r.ok || !j?.ok) throw new Error(j?.error || "fetch_failed");
       setComments(j.comments || []);
     } catch (e) {
-      // ページ離脱などのAbortは無視
+      setError("コメントの取得に失敗しました。");
     }
   }
 
@@ -31,15 +31,15 @@ export default function CommentList({ postId }: { postId: string }) {
     setBusy(true);
     setError("");
 
-    // 楽観的更新（先に表示）
-    const temp = {
+    const optimistic = {
       id: "temp-" + Math.random().toString(36).slice(2),
       content,
       createdAt: new Date().toISOString(),
       postId,
       identityId: null,
+      likeCount: 0,
     };
-    setComments((prev) => [temp, ...prev]);
+    setComments((prev) => [optimistic, ...prev]);
 
     try {
       const r = await fetch(`/api/posts/${postId}/comments`, {
@@ -48,15 +48,15 @@ export default function CommentList({ postId }: { postId: string }) {
         body: JSON.stringify({ content }),
       });
       const j = await r.json();
-      if (!r.ok || !j.ok) throw new Error(j?.error || "failed");
-
+      if (!r.ok || !j?.ok) {
+        throw new Error(j?.error || "post_failed");
+      }
       setContent("");
-      // サーバー確定状態で再同期（tempを正規データに置換）
+      await load(); // 確定データで上書き
+    } catch (e: any) {
+      // 失敗時は楽観的反映を巻き戻してサーバーデータで再読込
       await load();
-    } catch (e) {
-      setError("投稿に失敗しました。時間をおいて再試行してください。");
-      // 失敗時はサーバーデータで巻き戻す
-      await load();
+      setError(`投稿に失敗しました。${e?.message ? `(${e.message})` : ""}`);
     } finally {
       setBusy(false);
     }
@@ -85,10 +85,7 @@ export default function CommentList({ postId }: { postId: string }) {
 
       <ul className="flex flex-col gap-3">
         {comments.map((c: any) => (
-          <li
-            key={c.id}
-            className="rounded-xl border bg-white p-3 opacity-100"
-          >
+          <li key={c.id} className="rounded-xl border bg-white p-3">
             <div className="mb-1 text-xs text-gray-500">
               匿名さん・{new Date(c.createdAt).toLocaleString()}
             </div>
