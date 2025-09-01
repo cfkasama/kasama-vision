@@ -234,7 +234,7 @@ export default async function Home() {
             <Pill color="green">実現提案</Pill>
             <span className="text-xs text-gray-500">件数 {realizedCount}</span>
           </div>
-          <Link href="/realized" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50 inline-block">
+          <Link href="/posts?type=PROPOSAL&status=REALIZED" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50 inline-block">
             実現一覧へ
           </Link>
         </Card>
