@@ -120,7 +120,7 @@ export default async function Home() {
   return (
     <>
       <section className="mb-6">
-        <h1 className="text-2xl font-bold">みんなで考える笠間の未来</h1>
+        <h1 className="text-2xl font-bold">みんなで創る、笠間の未来</h1>
         <p className="text-sm text-gray-600">匿名で投稿、いいね/推薦で可視化、実現へ。</p>
       </section>
 
