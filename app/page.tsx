@@ -146,7 +146,7 @@ export default async function Home() {
             <p className="text-sm">まだありません。</p>
           )}
           <div className="mt-3 flex gap-2">
-            <Link href="/?type=CATCHPHRASE" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
+            <Link href="/posts?type=CATCHPHRASE" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
               一覧を見る
             </Link>
             <Link href="/new?type=CATCHPHRASE" className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700">
@@ -174,7 +174,7 @@ export default async function Home() {
             <p className="text-sm">まだありません。</p>
           )}
           <div className="mt-3 flex gap-2">
-            <Link href="/?type=VISION" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
+            <Link href="/posts?type=VISION" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
               一覧を見る
             </Link>
             <Link href="/new?type=VISION" className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700">
@@ -192,7 +192,7 @@ export default async function Home() {
             <span className="text-xs text-gray-500">投稿数 {counts.consultation}</span>
           </div>
           <div className="mt-1 flex gap-2">
-            <Link href="/?type=CONSULTATION" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
+            <Link href="/posts?type=CONSULTATION" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
               一覧を見る
             </Link>
             <Link href="/new?type=CONSULTATION" className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700">
@@ -207,7 +207,7 @@ export default async function Home() {
             <span className="text-xs text-gray-500">投稿数 {counts.proposal}</span>
           </div>
           <div className="mt-1 flex gap-2">
-            <Link href="/?type=PROPOSAL" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
+            <Link href="/posts?type=PROPOSAL" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
               一覧を見る
             </Link>
             <Link href="/new?type=PROPOSAL" className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700">
@@ -224,7 +224,7 @@ export default async function Home() {
             <Pill color="gold">いいね100提案</Pill>
             <span className="text-xs text-gray-500">件数 {hundredLikeCount}</span>
           </div>
-          <Link href="/?type=PROPOSAL&minLikes=100" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50 inline-block">
+          <Link href="/posts?type=PROPOSAL&minLikes=100" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50 inline-block">
             提案一覧へ
           </Link>
         </Card>
@@ -251,8 +251,8 @@ export default async function Home() {
             <Link href="/new?type=REPORT_LIVE" className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700">
               住めなかった報告を投稿
             </Link>
-            <Link href="/?type=CONSULTATION" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
-              相談一覧へ
+            <Link href="/posts?type=REPORT_LIVE" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
+              報告一覧へ
             </Link>
           </div>
         </Card>
@@ -266,8 +266,8 @@ export default async function Home() {
             <Link href="/new?type=REPORT_WORK" className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700">
               働けなかった報告を投稿
             </Link>
-            <Link href="/?type=CONSULTATION" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
-              相談一覧へ
+            <Link href="/posts?type=REPORT_WORK" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
+              報告一覧へ
             </Link>
           </div>
         </Card>
@@ -281,8 +281,8 @@ export default async function Home() {
             <Link href="/new?type=REPORT_TOURISM" className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700">
               不満がある報告を投稿
             </Link>
-            <Link href="/?type=CONSULTATION" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
-              相談一覧へ
+            <Link href="/posts?type=REPORT_TOURISM" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
+              報告一覧へ
             </Link>
           </div>
         </Card>
