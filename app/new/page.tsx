@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+export const dynamic='force-dynamic';
 
 const TYPES = [
   ["CONSULTATION","相談"],["PROPOSAL","提案"],
@@ -47,6 +48,7 @@ export default function NewPostPage() {
   }
 
   return (
+    <Suspense fallback={
     <div className="mx-auto max-w-2xl">
       <h2 className="mb-2 text-xl font-bold">投稿する</h2>
       <p className="mb-4 text-sm text-gray-600">ニックネーム不要、<b>3行からOK</b>。荒らし対策で<strong>削除用パスワード</strong>が必須です。</p>
@@ -89,6 +91,7 @@ export default function NewPostPage() {
           {loading ? "送信中…" : "投稿する"}
         </button>
       </form>
-    </div>
+    </div>}>
+    </Suspense>
   );
 }
