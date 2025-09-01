@@ -36,7 +36,7 @@ export default async function PostDetail({ params }:{ params:{ id:string }}) {
         <p>{post.content}</p>
       </article>
 
-      <ReactionBar postId={post.id} likeCount={post.likeCount} recCount={post.recCount} />
+      <ReactionBar postId={post.id} likeCount={post.likeCount}  />
       <CommentList postId={post.id} />
       <ReportButton postId={post.id} />
     </div>
