@@ -1,21 +1,17 @@
 // app/tags/[name]/page.tsx
 import Link from "next/link";
 import { prisma } from "@/lib/db";
-import { notFound } from "next/navigation";
 
-
-export const dynamic = "force-dynamic"; // ビルド時のDB依存を避ける
+export const dynamic = "force-dynamic";     // SSGでコケないように
+export const revalidate = 0;                // 常に最新
+export const dynamicParams = true;          // 生成してないパラメータでもOK
 
 type Props = { params: { name: string } };
 
-async function getData(tagName: string) {
-  // タグの存在チェック
-  const tag = await prisma.tag.findUnique({ where: { name: tagName } });
+export default async function TagPage({ params }: Props) {
+  const tagName = decodeURIComponent(params.name);
 
-  // タグが無くても 404 ではなく空リストを返したいなら、ここで null を許容してもOK
-  // 既存リンク前提なら、ない場合は404でもよい
-  if (!tag) return { tag: null, posts: [] as any[] };
-
+  // タグが存在しなくても404にしない（空結果表示）
   const posts = await prisma.post.findMany({
     where: {
       status: "PUBLISHED",
@@ -25,16 +21,6 @@ async function getData(tagName: string) {
     take: 50,
     include: { tags: { include: { tag: true } } },
   });
-
-  return { tag, posts };
-}
-
-export default async function TagPage({ params }: Props) {
-  const tagName = params.name; // Next.jsは基本デコード済み（日本語タグOK）
-  const { tag, posts } = await getData(tagName);
-
-  // タグが全く存在しない場合は 404 にする場合↓（存在しないタグリンクを避けるならこちら推奨）
-  if (!tag) notFound();
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -49,9 +35,7 @@ export default async function TagPage({ params }: Props) {
       </header>
 
       {posts.length === 0 ? (
-        <p className="text-sm text-gray-600">
-          まだこのタグの投稿はありません。最初の1件を投稿してみませんか？
-        </p>
+        <p className="text-sm text-gray-600">まだこのタグの投稿はありません。</p>
       ) : (
         <ul className="space-y-3">
           {posts.map((p) => (
@@ -77,9 +61,7 @@ export default async function TagPage({ params }: Props) {
                     </Link>
                   ))}
                 </div>
-                <div>
-                  👍 {p.likeCount}　⭐ {p.recCount}　💬 {p.cmtCount}
-                </div>
+                <div>👍 {p.likeCount}　⭐ {p.recCount}　💬 {p.cmtCount}</div>
               </div>
             </li>
           ))}
@@ -87,9 +69,7 @@ export default async function TagPage({ params }: Props) {
       )}
 
       <div className="pt-4">
-        <Link href="/" className="text-sm text-blue-600 hover:underline">
-          ← トップへ戻る
-        </Link>
+        <Link href="/" className="text-sm text-blue-600 hover:underline">← トップへ戻る</Link>
       </div>
     </div>
   );
