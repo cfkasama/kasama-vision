@@ -10,7 +10,7 @@ export default function ReactionBar({ postId, likeCount }:{ postId: string; like
     setBusy(true);
     const res = await fetch("/api/reactions", { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify({ postId, type })});
     if (res.status===409) { setBusy(false); return; }
-    if (res.ok) { type==="LIKE" ? setLikes(likes+1) : setRecs(recs+1); }
+    if (res.ok) { setLikes(likes+1); }
     setBusy(false);
   }
 
