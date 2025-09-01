@@ -2,7 +2,7 @@ import "./../styles/globals.css";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "みんなで考える笠間の未来",
+  title: "みんなで創る、笠間の未来",
   description: "投稿・評価で市民の声を可視化し、実現へつなげる。",
 };
 
@@ -12,7 +12,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen">
         <header className="border-b bg-white">
           <div className="container flex items-center justify-between py-3">
-            <a href="/" className="font-bold">みんなで考える笠間の未来</a>
+            <a href="/" className="font-bold">みんなで創る、笠間の未来</a>
             <nav className="flex items-center gap-2 text-sm">
               <a href="/proposals" className="text-gray-600 hover:text-gray-900">提案</a>
               <a href="/realized" className="text-gray-600 hover:text-gray-900">実現</a>
