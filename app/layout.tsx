@@ -24,7 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </header>
         <main className="container py-6">{children}</main>
         <footer className="mt-10 border-t">
-          <div className="container py-6 text-xs text-gray-500">© Kasama Future / Digital Democracy 2030</div>
+          <div className="container py-6 text-xs text-gray-500">© Kasama Mirai</div>
         </footer>
       </body>
     </html>
