@@ -14,7 +14,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="container flex items-center justify-between py-3">
             <a href="/" className="font-bold">みんなで創る、笠間の未来</a>
             <nav className="flex items-center gap-2 text-sm">
-              <a href="/proposals" className="text-gray-600 hover:text-gray-900">提案</a>
+              <a href="/posts?type=PROPOSAL" className="text-gray-600 hover:text-gray-900">提案</a>
               <a href="/realized" className="text-gray-600 hover:text-gray-900">実現</a>
               <a href="/about" className="text-gray-600 hover:text-gray-900">本サイトについて</a>
               <a href="/modlog" className="text-gray-600 hover:text-gray-900">公開ログ</a>
