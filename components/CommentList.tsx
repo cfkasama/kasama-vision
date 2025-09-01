@@ -5,42 +5,25 @@ export default function CommentList({ postId }: { postId: string }) {
   const [comments, setComments] = useState<any[]>([]);
   const [content, setContent] = useState("");
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
+  const [err, setErr] = useState<string>("");
 
-  async function load(signal?: AbortSignal) {
+  async function load() {
+    setErr("");
     try {
-      const r = await fetch(`/api/posts/${postId}/comments`, { signal, cache: "no-store" });
+      const r = await fetch(`/api/posts/${postId}/comments`, { cache: "no-store" });
       const j = await r.json();
-      if (!r.ok || !j?.ok) throw new Error(j?.error || "fetch_failed");
+      if (!j.ok) throw new Error(j.error || "failed");
       setComments(j.comments || []);
-    } catch (e) {
-      setError("コメントの取得に失敗しました。");
+    } catch (e: any) {
+      setErr(`コメント取得に失敗しました: ${e?.message ?? e}`);
     }
   }
+  useEffect(() => { load(); }, [postId]);
 
-  useEffect(() => {
-    const ac = new AbortController();
-    load(ac.signal);
-    return () => ac.abort();
-  }, [postId]);
-
-  async function submit(e: React.FormEvent) {
+  async function submit(e: any) {
     e.preventDefault();
-    if (!content.trim() || busy) return;
-
-    setBusy(true);
-    setError("");
-
-    const optimistic = {
-      id: "temp-" + Math.random().toString(36).slice(2),
-      content,
-      createdAt: new Date().toISOString(),
-      postId,
-      identityId: null,
-      likeCount: 0,
-    };
-    setComments((prev) => [optimistic, ...prev]);
-
+    if (!content.trim()) return;
+    setBusy(true); setErr("");
     try {
       const r = await fetch(`/api/posts/${postId}/comments`, {
         method: "POST",
@@ -48,15 +31,13 @@ export default function CommentList({ postId }: { postId: string }) {
         body: JSON.stringify({ content }),
       });
       const j = await r.json();
-      if (!r.ok || !j?.ok) {
-        throw new Error(j?.error || "post_failed");
+      if (!r.ok || !j.ok) {
+        throw new Error(j?.error ? `${j.error}${j.detail ? `: ${j.detail}` : ""}` : `HTTP ${r.status}`);
       }
       setContent("");
-      await load(); // 確定データで上書き
+      await load(); // ← 投稿後に一覧を再取得
     } catch (e: any) {
-      // 失敗時は楽観的反映を巻き戻してサーバーデータで再読込
-      await load();
-      setError(`投稿に失敗しました。${e?.message ? `(${e.message})` : ""}`);
+      setErr(`コメント投稿に失敗しました: ${e?.message ?? e}`);
     } finally {
       setBusy(false);
     }
@@ -65,7 +46,6 @@ export default function CommentList({ postId }: { postId: string }) {
   return (
     <section className="mt-6">
       <h4 className="mb-2 text-lg font-semibold">コメント</h4>
-
       <form onSubmit={submit} className="mb-3 space-y-2">
         <textarea
           rows={3}
@@ -74,13 +54,15 @@ export default function CommentList({ postId }: { postId: string }) {
           placeholder="気づき・応援・補足など"
           className="w-full rounded-md border p-2"
         />
-        {error && <p className="text-sm text-red-600">{error}</p>}
-        <button
-          className="inline-flex items-center rounded-lg border bg-white px-3 py-1.5 hover:bg-gray-50 disabled:opacity-50"
-          disabled={busy || !content.trim()}
-        >
-          {busy ? "送信中…" : "送信"}
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            className="inline-flex items-center rounded-lg border bg-white px-3 py-1.5 hover:bg-gray-50 disabled:opacity-60"
+            disabled={busy}
+          >
+            送信
+          </button>
+          {err && <span className="text-sm text-red-600">{err}</span>}
+        </div>
       </form>
 
       <ul className="flex flex-col gap-3">
@@ -89,12 +71,9 @@ export default function CommentList({ postId }: { postId: string }) {
             <div className="mb-1 text-xs text-gray-500">
               匿名さん・{new Date(c.createdAt).toLocaleString()}
             </div>
-            <p className="prose-basic whitespace-pre-wrap text-sm">{c.content}</p>
+            <p className="prose-basic text-sm whitespace-pre-wrap break-words">{c.content}</p>
           </li>
         ))}
-        {comments.length === 0 && (
-          <li className="text-sm text-gray-500">最初のコメントを書いてみよう！</li>
-        )}
       </ul>
     </section>
   );
