@@ -1,5 +1,6 @@
 // app/(site)/page.tsx など
 
+
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { Card, Pill, Chip } from "@/components/ui";
