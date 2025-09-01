@@ -162,7 +162,7 @@ export default async function Home({
         </div>
 
         <div className="mt-4">
-          <IntentButtons />
+          {/*  <IntentButtons /> */}
         </div>
       </section>
 
