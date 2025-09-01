@@ -10,33 +10,6 @@ datasource db {
   directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
-enum PostType {
-  CATCHPHRASE
-  VISION
-  CONSULTATION
-  PROPOSAL
-  REPORT_LIVE
-  REPORT_WORK
-  REPORT_TOURISM
-}
-
-enum PostStatus {
-  PUBLISHED
-  REMOVED
-  REALIZED
-}
-
-enum ReactionType {
-  LIKE
-  RECOMMEND
-}
-
-enum ReportStatus {
-  OPEN
-  RESOLVED
-  DISMISSED
-}
-
 model Identity {
   id           String        @id @default(cuid())
   createdAt    DateTime      @default(now())
@@ -154,4 +127,31 @@ post      Post? @relation(fields:[postId],references:[id],onDelete:SetNull)
   @@index([createdAt])
   @@index([actor])
   @@index([action])
+}
+
+enum PostType {
+  CATCHPHRASE
+  VISION
+  CONSULTATION
+  PROPOSAL
+  REPORT_LIVE
+  REPORT_WORK
+  REPORT_TOURISM
+}
+
+enum PostStatus {
+  PUBLISHED
+  REMOVED
+  REALIZED
+}
+
+enum ReactionType {
+  LIKE
+  RECOMMEND
+}
+
+enum ReportStatus {
+  OPEN
+  RESOLVED
+  DISMISSED
 }
