@@ -1,223 +1,319 @@
-// app/(site)/page.tsx など
-
-
+// app/page.tsx
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { Card, Pill, Chip } from "@/components/ui";
-import IntentButtons from "@/components/IntentButtons";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
-type SortKey = "new" | "likes" | "comments" | "hot";
+type PostType =
+  | "CATCHPHRASE"
+  | "VISION"
+  | "CONSULTATION"
+  | "PROPOSAL"
+  | "REPORT_LIVE"
+  | "REPORT_WORK"
+  | "REPORT_TOURISM";
 
-async function getList(sort: SortKey = "new") {
-  const orderBy =
-    sort === "likes"
-      ? { likeCount: "desc" as const }
-      : sort === "comments"
-      ? { cmtCount: "desc" as const }
-      : sort === "hot"
-      ? { hotScore: "desc" as const }
-      : { createdAt: "desc" as const };
-
-  return prisma.post.findMany({
+async function countsByType() {
+  const rows = await prisma.post.groupBy({
+    by: ["type"],
     where: { status: "PUBLISHED" },
-    orderBy,
-    take: 20,
+    _count: { _all: true },
+  });
+  const map = Object.fromEntries(rows.map(r => [r.type, r._count._all]));
+  const get = (t: PostType) => (map[t] ?? 0) as number;
+  return {
+    catchphrase: get("CATCHPHRASE"),
+    vision: get("VISION"),
+    consultation: get("CONSULTATION"),
+    proposal: get("PROPOSAL"),
+    reportLive: get("REPORT_LIVE"),
+    reportWork: get("REPORT_WORK"),
+    reportTourism: get("REPORT_TOURISM"),
+  };
+}
+
+async function getTopCatchphrase() {
+  return prisma.post.findFirst({
+    where: { status: "PUBLISHED", type: "CATCHPHRASE" },
+    orderBy: { likeCount: "desc" },
     include: { tags: { include: { tag: true } } },
   });
 }
 
-async function getTopTags() {
-  return prisma.tagTop5.findMany({ orderBy: { count: "desc" }, take: 5 });
+async function getTopVisions() {
+  return prisma.post.findMany({
+    where: { status: "PUBLISHED", type: "VISION" },
+    orderBy: { likeCount: "desc" },
+    take: 3,
+    include: { tags: { include: { tag: true } } },
+  });
 }
 
-export default async function Home({
-  searchParams,
-}: {
-  searchParams?: { [key: string]: string | string[] | undefined };
-}) {
-  const sort = (searchParams?.sort as SortKey) ?? "new";
+async function getHundredLikeProposalsCount() {
+  return prisma.post.count({
+    where: { status: "PUBLISHED", type: "PROPOSAL", likeCount: { gte: 100 } },
+  });
+}
+async function getRealizedProposalsCount() {
+  return prisma.post.count({
+    where: { status: "REALIZED", type: "PROPOSAL" },
+  });
+}
 
-  const [posts, topTags] = await Promise.all([getList(sort), getTopTags()]);
+// Intent（住みたい/働きたい/行きたい）の押下回数を AdminLog から集計（なければ 0）
+async function getIntentCounts() {
+  const actions = ["INTENT_LIVE", "INTENT_WORK", "INTENT_TOURISM"] as const;
+  const rows = await prisma.adminLog.groupBy({
+    by: ["action"],
+    where: { action: { in: actions as unknown as string[] } },
+    _count: { _all: true },
+  });
+  const map = Object.fromEntries(rows.map(r => [r.action, r._count._all]));
+  return {
+    live: (map["INTENT_LIVE"] ?? 0) as number,
+    work: (map["INTENT_WORK"] ?? 0) as number,
+    tourism: (map["INTENT_TOURISM"] ?? 0) as number,
+  };
+}
 
-  // サマリー用の簡易抽出
-  const visions = posts
-    .filter((p) => p.type === "VISION")
-    .sort((a, b) => b.likeCount - a.likeCount)
-    .slice(0, 3);
+// タグランキング：TagTop5 優先、無ければ PostTag から集計
+async function getTopTags() {
+  try {
+    const top = await prisma.tagTop5.findMany({ orderBy: { count: "desc" }, take: 5 });
+    if (top.length) return top.map(t => ({ id: t.id, name: t.tagName, count: t.count }));
+  } catch {}
+  const grouped = await prisma.postTag.groupBy({
+    by: ["tagId"],
+    _count: { tagId: true },
+    orderBy: { _count: { tagId: "desc" } },
+    take: 5,
+  });
+  const tags = await prisma.tag.findMany({ where: { id: { in: grouped.map(g => g.tagId) } } });
+  return grouped.map(g => ({
+    id: g.tagId,
+    name: tags.find(t => t.id === g.tagId)?.name ?? "",
+    count: g._count.tagId,
+  }));
+}
 
-  const catchphrases = posts.filter((p) => p.type === "CATCHPHRASE").slice(0, 3);
+export default async function Home() {
+  const [
+    counts,
+    topCatch,
+    topVis,
+    hundredLikeCount,
+    realizedCount,
+    intent,
+    topTags,
+  ] = await Promise.all([
+    countsByType(),
+    getTopCatchphrase(),
+    getTopVisions(),
+    getHundredLikeProposalsCount(),
+    getRealizedProposalsCount(),
+    getIntentCounts(),
+    getTopTags(),
+  ]);
 
   return (
     <>
       <section className="mb-6">
-        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold">みんなで考える笠間の未来</h1>
-            <p className="text-sm text-gray-600">
-              3行からOK。匿名で投稿、いいね/推薦で可視化、実現へ。
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Link
-              href="/new"
-              className="inline-flex items-center rounded-lg bg-blue-600 px-3 py-1.5 text-white hover:bg-blue-700"
-            >
-              ＋ 投稿する
-            </Link>
-            <Link
-              href="/proposals"
-              className="inline-flex items-center rounded-lg border bg-white px-3 py-1.5 hover:bg-gray-50"
-            >
-              提案
-            </Link>
-            <Link
-              href="/realized"
-              className="inline-flex items-center rounded-lg border bg-white px-3 py-1.5 hover:bg-gray-50"
-            >
-              実現
-            </Link>
-          </div>
-        </div>
+        <h1 className="text-2xl font-bold">みんなで考える笠間の未来</h1>
+        <p className="text-sm text-gray-600">3行からOK。匿名で投稿、いいね/推薦で可視化、実現へ。</p>
+      </section>
 
-        <div className="mt-4 grid gap-4 md:grid-cols-3">
-          {/* キャッチフレーズ */}
-          <Card>
-            <div className="mb-2">
-              <Pill>キャッチフレーズ</Pill>
-            </div>
-            {catchphrases.length ? (
-              <ul className="space-y-3">
-                {catchphrases.map((c) => (
-                  <li key={c.id}>
-                    <h3 className="font-semibold">{c.title}</h3>
-                    <p className="mt-1 text-sm text-gray-600">
-                      {c.content?.slice(0, 120)}
-                      {c.content && c.content.length > 120 ? "…" : ""}
-                    </p>
-                    <Link
-                      href={`/posts/${c.id}`}
-                      className="mt-3 inline-block text-sm text-blue-600 hover:underline"
-                    >
-                      見る
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-sm">
-                まだありません。
-                <Link
-                  href="/new?type=CATCHPHRASE"
-                  className="text-blue-600 hover:underline"
-                >
-                  最初の1件を投稿
+      {/* キャッチフレーズ & ビジョン */}
+      <section className="mt-4 grid gap-4 md:grid-cols-2">
+        <Card>
+          <div className="mb-2 flex items-center justify-between">
+            <Pill>キャッチフレーズ</Pill>
+            <span className="text-xs text-gray-500">投稿数 {counts.catchphrase}</span>
+          </div>
+          {topCatch ? (
+            <div>
+              <h3 className="mb-1 font-semibold">
+                <Link href={`/posts/${topCatch.id}`} className="hover:underline">
+                  {topCatch.title}
                 </Link>
+              </h3>
+              <p className="text-sm text-gray-600">
+                {topCatch.content?.slice(0, 120)}
+                {topCatch.content && topCatch.content.length > 120 ? "…" : ""}
               </p>
-            )}
-          </Card>
-
-          {/* ビジョン TOP3 */}
-          <Card>
-            <div className="mb-2">
-              <Pill color="gray">ビジョン TOP3</Pill>
+              <div className="mt-2 text-xs text-gray-500">👍 {topCatch.likeCount}</div>
             </div>
-            {visions.length ? (
-              <ol className="list-decimal pl-5 text-sm">
-                {visions.map((v) => (
-                  <li key={v.id} className="mb-1">
-                    <Link
-                      href={`/posts/${v.id}`}
-                      className="hover:underline"
-                    >
-                      {v.title}
-                    </Link>{" "}
-                    <span className="text-gray-500">👍{v.likeCount}</span>
-                  </li>
-                ))}
-              </ol>
-            ) : (
-              <p className="text-sm">最初のビジョンを投稿しよう。</p>
-            )}
-          </Card>
+          ) : (
+            <p className="text-sm">まだありません。</p>
+          )}
+          <div className="mt-3 flex gap-2">
+            <Link href="/?type=CATCHPHRASE" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
+              一覧を見る
+            </Link>
+            <Link href="/new?type=CATCHPHRASE" className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700">
+              投稿する
+            </Link>
+          </div>
+        </Card>
 
-          {/* タグ TOP5 */}
-          <Card>
-            <div className="mb-2">
-              <Pill color="green">タグ TOP5</Pill>
-            </div>
-            <ul className="flex flex-wrap gap-2">
-              {topTags.map((t) => (
-                <li key={t.id}>
-                  <Link
-                    href={`/tags/${encodeURIComponent(t.tagName)}`}
-                    className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs"
-                  >
-                    {t.tagName}（{t.count}）
-                  </Link>
+        <Card>
+          <div className="mb-2 flex items-center justify-between">
+            <Pill color="gray">ビジョン（上位3つ）</Pill>
+            <span className="text-xs text-gray-500">投稿数 {counts.vision}</span>
+          </div>
+          {topVis.length ? (
+            <ol className="list-decimal pl-5 text-sm">
+              {topVis.map((v) => (
+                <li key={v.id} className="mb-1">
+                  <Link href={`/posts/${v.id}`} className="hover:underline">
+                    {v.title}
+                  </Link>{" "}
+                  <span className="text-gray-500">👍{v.likeCount}</span>
                 </li>
               ))}
-            </ul>
-          </Card>
-        </div>
-
-        <div className="mt-4">
-          {/*  <IntentButtons /> */}
-        </div>
-      </section>
-
-      <section className="mb-4 flex items-center justify-between">
-        <div className="flex gap-2 text-sm">
-          {[
-            ["new", "新着"],
-            ["hot", "トレンド"],
-            ["likes", "いいね順"],
-            ["comments", "コメント多い順"],
-          ].map(([key, label]) => (
-            <Link
-              key={key}
-              href={`/?sort=${key}`}
-              className={`rounded-lg border px-3 py-1.5 hover:bg-gray-50 ${
-                sort === key ? "bg-white" : ""
-              }`}
-            >
-              {label}
+            </ol>
+          ) : (
+            <p className="text-sm">まだありません。</p>
+          )}
+          <div className="mt-3 flex gap-2">
+            <Link href="/?type=VISION" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
+              一覧を見る
             </Link>
-          ))}
-        </div>
-        <div className="text-sm text-gray-500">全{posts.length}件</div>
+            <Link href="/new?type=VISION" className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700">
+              投稿する
+            </Link>
+          </div>
+        </Card>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-3">
-        {posts.map((p) => (
-          <Card key={p.id} className="flex flex-col">
-            <header className="mb-1 flex items-center gap-2">
-              <Pill>{p.type}</Pill>
-              {p.likeCount >= 100 && <Pill color="gold">100いいね</Pill>}
-              {p.status === "REALIZED" && <Pill color="green">実現</Pill>}
-            </header>
-            <h3 className="mb-1 line-clamp-2 font-semibold">
-              <Link href={`/posts/${p.id}`} className="hover:underline">
-                {p.title}
-              </Link>
-            </h3>
-            <p className="flex-1 text-sm text-gray-600">
-              {p.content?.slice(0, 140)}
-              {p.content && p.content.length > 140 ? "…" : ""}
-            </p>
-            <footer className="mt-3 flex items-center justify-between text-xs text-gray-500">
-              <div className="flex flex-wrap gap-1">
-                {p.tags.map((t: any) => (
-                  <Chip key={t.tagId}>{t.tag.name}</Chip>
-                ))}
-              </div>
-              <div>
-                👍 {p.likeCount}　⭐ {p.recCount}　💬 {p.cmtCount}
-              </div>
-            </footer>
-          </Card>
-        ))}
+      {/* 相談 & 提案 */}
+      <section className="mt-4 grid gap-4 md:grid-cols-2">
+        <Card>
+          <div className="mb-2 flex items-center justify-between">
+            <Pill>相談</Pill>
+            <span className="text-xs text-gray-500">投稿数 {counts.consultation}</span>
+          </div>
+          <div className="mt-1 flex gap-2">
+            <Link href="/?type=CONSULTATION" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
+              一覧を見る
+            </Link>
+            <Link href="/new?type=CONSULTATION" className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700">
+              投稿する
+            </Link>
+          </div>
+        </Card>
+
+        <Card>
+          <div className="mb-2 flex items-center justify-between">
+            <Pill>提案</Pill>
+            <span className="text-xs text-gray-500">投稿数 {counts.proposal}</span>
+          </div>
+          <div className="mt-1 flex gap-2">
+            <Link href="/?type=PROPOSAL" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
+              一覧を見る
+            </Link>
+            <Link href="/new?type=PROPOSAL" className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700">
+              投稿する
+            </Link>
+          </div>
+        </Card>
+      </section>
+
+      {/* 100いいね提案 & 実現提案 */}
+      <section className="mt-4 grid gap-4 md:grid-cols-2">
+        <Card>
+          <div className="mb-2 flex items-center justify-between">
+            <Pill color="gold">いいね100提案</Pill>
+            <span className="text-xs text-gray-500">件数 {hundredLikeCount}</span>
+          </div>
+          <Link href="/?type=PROPOSAL&minLikes=100" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50 inline-block">
+            提案一覧へ
+          </Link>
+        </Card>
+
+        <Card>
+          <div className="mb-2 flex items-center justify-between">
+            <Pill color="green">実現提案</Pill>
+            <span className="text-xs text-gray-500">件数 {realizedCount}</span>
+          </div>
+          <Link href="/realized" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50 inline-block">
+            実現一覧へ
+          </Link>
+        </Card>
+      </section>
+
+      {/* Intent ボタン行 */}
+      <section className="mt-4 grid gap-4 md:grid-cols-3">
+        <Card>
+          <div className="mb-2 flex items-center justify-between">
+            <Pill>笠間に住みたい</Pill>
+            <span className="text-xs text-gray-500">押された数 {intent.live}</span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Link href="/new?type=REPORT_LIVE" className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700">
+              住めなかった報告を投稿
+            </Link>
+            <Link href="/?type=CONSULTATION" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
+              相談一覧へ
+            </Link>
+          </div>
+        </Card>
+
+        <Card>
+          <div className="mb-2 flex items-center justify-between">
+            <Pill>笠間で働きたい</Pill>
+            <span className="text-xs text-gray-500">押された数 {intent.work}</span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Link href="/new?type=REPORT_WORK" className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700">
+              働けなかった報告を投稿
+            </Link>
+            <Link href="/?type=CONSULTATION" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
+              相談一覧へ
+            </Link>
+          </div>
+        </Card>
+
+        <Card>
+          <div className="mb-2 flex items-center justify-between">
+            <Pill>笠間に行きたい</Pill>
+            <span className="text-xs text-gray-500">押された数 {intent.tourism}</span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Link href="/new?type=REPORT_TOURISM" className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700">
+              不満がある報告を投稿
+            </Link>
+            <Link href="/?type=CONSULTATION" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
+              相談一覧へ
+            </Link>
+          </div>
+        </Card>
+      </section>
+
+      {/* タグランキング & 本サイトについて */}
+      <section className="mt-4 grid gap-4 md:grid-cols-2">
+        <Card>
+          <div className="mb-2"><Pill color="green">タグランキング（TOP5）</Pill></div>
+          <ul className="flex flex-wrap gap-2">
+            {topTags.map((t) => (
+              <li key={t.id}>
+                <Link href={`/tags/${encodeURIComponent(t.name)}`} className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs">
+                  {t.name}（{t.count}）
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </Card>
+
+        <Card>
+          <div className="mb-2"><Pill color="gray">本サイトについて</Pill></div>
+          <p className="text-sm text-gray-700">
+            「みんなで考える笠間の未来」は、匿名で
+            <strong>キャッチフレーズ / ビジョン / 相談 / 提案</strong>を投稿し、
+            いいねや推薦で可視化・実現を後押しするためのコミュニティサイトです。
+          </p>
+        </Card>
       </section>
     </>
   );
