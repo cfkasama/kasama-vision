@@ -7,7 +7,7 @@ export async function POST(req: Request) {
 
   // abuseReport 作成
   await prisma.abuseReport.create({
-    data: { postId, reason: "COMMENT", note},
+    data: { postId, reason: "POST", note},
   });
 
   // 直近24hの通報数を集計
