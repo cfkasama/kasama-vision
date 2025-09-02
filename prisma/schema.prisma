@@ -16,6 +16,7 @@ model Identity {
   reactions    Reaction[]
   comments     Comment[]
   abuseReports AbuseReport[]
+  commentActions CommentAction[]
 }
 
 model Post {
@@ -72,6 +73,7 @@ model Comment {
 
   identityId String?
   identity   Identity?  @relation(fields: [identityId], references: [id])
+  actions CommentAction[]
 }
 
 model AbuseReport {
