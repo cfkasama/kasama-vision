@@ -86,7 +86,10 @@ model AbuseReport {
   note       String?
 
   postId     String
-  post       Post         @relation(fields: [postId], references: [id])
+  post       Post         @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  commentId String?
+  comment Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
 
   identityId String?
   identity   Identity?    @relation(fields: [identityId], references: [id])
