@@ -22,11 +22,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </nav>
           </div>
         </header>
-        <main className="container py-6">{children}</main>
+        <ClientLayout><main className="container py-6">{children}</main></ClientLayout>
         <footer className="mt-10 border-t">
           <div className="container py-6 text-xs text-gray-500">©cfkasama</div>
         </footer>
-        <ClientLayout></ClientLayout>
       </body>
     </html>
   );
