@@ -1,6 +1,6 @@
 import "./../styles/globals.css";
 import type { Metadata } from "next";
-import RecapchaLoader from "@/components/RecapchaLoader";
+import RecaptchaLoader from "@/components/RecaptchaLoader";
 const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!;
 export const metadata: Metadata = {
   title: "みんなで創る、笠間の未来",
