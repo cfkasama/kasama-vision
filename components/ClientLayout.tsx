@@ -2,7 +2,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import RecapchaLoader from "@/components/RecapchaLoader";
+import RecaptchaLoader from "@/components/RecaptchaLoader";
 
 const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!;
 
@@ -14,7 +14,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
   return (
     <>
-      {needRecaptcha && <RecapchaLoader siteKey={siteKey} />}
+      {needRecaptcha && <RecaptchaLoader siteKey={siteKey} />}
       {children}
     </>
   );
