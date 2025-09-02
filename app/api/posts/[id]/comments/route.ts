@@ -26,6 +26,7 @@ export async function GET(_req: Request, { params }: Params) {
         content: true,
         createdAt: true,
         likeCount: true,
+        recCount: true,
         postId: true,
         identityId: true,
       },
