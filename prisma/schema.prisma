@@ -1,70 +1,15 @@
-// prisma/schema.prisma
-
-generator client {
-  provider = "prisma-client-js"
+// 追加：コメントアクション用の enum
+enum CommentActionType {
+  LIKE
+  RECOMMEND
 }
 
-datasource db {
-  provider  = "postgresql"
-  url       = env("POSTGRES_PRISMA_URL")
-  directUrl = env("POSTGRES_URL_NON_POOLING")
-}
-
-model Identity {
-  id           String        @id @default(cuid())
-  createdAt    DateTime      @default(now())
-  reactions    Reaction[]
-  comments     Comment[]
-  abuseReports AbuseReport[]
-}
-
-model Post {
-  id               String      @id @default(cuid())
-  type             PostType
-  status           PostStatus  @default(PUBLISHED)
-  title            String
-  content          String?     @db.Text
-  createdAt        DateTime    @default(now())
-  updatedAt        DateTime    @updatedAt
-
-  likeCount        Int         @default(0)
-  recCount         Int         @default(0)
-  cmtCount         Int         @default(0)
-  hotScore         Float       @default(0)
-
-  deleteKey        String?
-  lowExposureActive Boolean    @default(false)
-  lowExposureAt    DateTime?
-  tempHiddenActive Boolean     @default(false)
-  tempHiddenAt     DateTime?
-  realizedAt       DateTime?
-
-  reactions        Reaction[]
-  comments         Comment[]
-  tags             PostTag[]
-abuseReports     AbuseReport[]
-adminLogs AdminLog[]
-}
-
-model Reaction {
-  id         String       @id @default(cuid())
-  type       ReactionType
-  createdAt  DateTime     @default(now())
-
-  postId     String
-  post       Post         @relation(fields: [postId], references: [id])
-
-  identityId String?
-  identity   Identity?    @relation(fields: [identityId], references: [id])
-
-  @@unique([postId, identityId, type])
-}
-
+// 修正：Comment に recCount を足す（未追加なら）
 model Comment {
   id         String     @id @default(cuid())
   content    String     @db.Text
   likeCount  Int        @default(0)
-  recCount  Int        @default(0)
+  recCount   Int        @default(0)   // ← 追加
   createdAt  DateTime   @default(now())
 
   postId     String
@@ -74,85 +19,20 @@ model Comment {
   identity   Identity?  @relation(fields: [identityId], references: [id])
 }
 
-model AbuseReport {
-  id         String       @id @default(cuid())
-  reason     String?
-  status     ReportStatus @default(OPEN)
-  createdAt  DateTime     @default(now())
-  resolvedAt DateTime?
-  resolver   String?
-  note       String?
+// 追加：コメントへの「いいね/推薦」アクションテーブル
+model CommentAction {
+  commentId  String
+  identityId String
+  type       CommentActionType
+  createdAt  DateTime @default(now())
 
-  postId     String
-  post       Post         @relation(fields: [postId], references: [id])
+  comment    Comment   @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  identity   Identity  @relation(fields: [identityId], references: [id], onDelete: Cascade)
 
-  identityId String?
-  identity   Identity?    @relation(fields: [identityId], references: [id])
-}
+  // 二重連打防止（1ユーザーが同じコメントに同じ種類は1回まで）
+  @@id([commentId, identityId, type])
 
-model Tag {
-  id    String    @id @default(cuid())
-  name  String    @unique
-  posts PostTag[]
-}
-
-model PostTag {
-  postId String
-  tagId  String
-
-  post   Post @relation(fields: [postId], references: [id])
-  tag    Tag  @relation(fields: [tagId], references: [id])
-
-  @@id([postId, tagId])
-}
-
-model TagTop5 {
-  id        String   @id @default(cuid())
-  tagId     String
-  tagName   String
-  count     Int      @default(0)
-  updatedAt DateTime @default(now())
-}
-
-model AdminLog {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  actor     String                    // 例: 管理者メール/GitHubアカウント
-  action    String                    // 例: "REMOVE_POST" / "DISMISS" など
-  target    String?                   // 例: "post:abc123" や "report:xyz"
-  note      String?
-  meta      Json?                     // 任意の追加情報（diffなど）
-postId      String?
-post      Post? @relation(fields:[postId],references:[id],onDelete:SetNull)
-
-  @@index([createdAt])
-  @@index([actor])
-  @@index([action])
-}
-
-enum PostType {
-  CATCHPHRASE
-  VISION
-  CONSULTATION
-  PROPOSAL
-  REPORT_LIVE
-  REPORT_WORK
-  REPORT_TOURISM
-}
-
-enum PostStatus {
-  PUBLISHED
-  REMOVED
-  REALIZED
-}
-
-enum ReactionType {
-  LIKE
-  RECOMMEND
-}
-
-enum ReportStatus {
-  OPEN
-  RESOLVED
-  DISMISSED
+  // よく引く順で
+  @@index([commentId, createdAt])
+  @@index([identityId, createdAt])
 }
