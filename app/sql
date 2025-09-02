@@ -1,1 +1,23 @@
+-- 1) commentId を追加
+ALTER TABLE "AbuseReport" ADD COLUMN "commentId" TEXT;
 
+-- 2) 外部キー制約（コメント削除時に通報も消える）
+ALTER TABLE "AbuseReport"
+  ADD CONSTRAINT "AbuseReport_commentId_fkey"
+  FOREIGN KEY ("commentId") REFERENCES "Comment"("id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- 3) よく使う絞り込み用のインデックス
+CREATE INDEX IF NOT EXISTS "AbuseReport_commentId_idx" ON "AbuseReport" ("commentId");
+
+-- 4) もし meta に commentId を入れていた場合のバックフィル
+UPDATE "AbuseReport"
+SET "commentId" = meta->>'commentId'
+WHERE "commentId" IS NULL
+  AND meta ? 'commentId';
+
+-- 5) （任意）commentId があるのに postId がズレている可能性を整合（保険）
+UPDATE "AbuseReport" ar
+SET "postId" = c."postId"
+FROM "Comment" c
+WHERE ar."commentId" = c."id" AND ar."postId" <> c."postId";
