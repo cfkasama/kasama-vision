@@ -1,51 +1,93 @@
-// components/CommentList.tsx
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-type Comment = {
-  id: string;
-  content: string;
-  createdAt: string;
-  likeCount: number;
-  recCount: number;
-};
+declare global {
+  interface Window {
+    grecaptcha?: any;
+    __recaptchaScriptInjected__?: boolean;
+  }
+}
 
-export default function CommentList({ postId, siteKey }: { postId: string; siteKey: string }) {
-  const [comments, setComments] = useState<Comment[]>([]);
+type Props = { postId: string; siteKey: string };
+
+export default function CommentList({ postId, siteKey }: Props) {
+  const [comments, setComments] = useState<any[]>([]);
   const [content, setContent] = useState("");
   const [busy, setBusy] = useState(false);
-  const [acting, setActing] = useState<{ [cid: string]: boolean }>({});
-  const [toast, setToast] = useState<{ type: "success" | "error"; msg: string } | null>(null);
+  const [recaptchaReady, setRecaptchaReady] = useState(false);
+  const [recaptchaError, setRecaptchaError] = useState<string>("");
 
-  function showToast(type: "success" | "error", msg: string) {
-    setToast({ type, msg });
-    setTimeout(() => setToast(null), 1800);
-  }
+  const pollTimer = useRef<number | null>(null);
+  const timeoutTimer = useRef<number | null>(null);
 
+  // --- コメント取得 ---
   async function load() {
     const r = await fetch(`/api/posts/${postId}/comments`, { cache: "no-store" });
     const j = await r.json();
     setComments(j.comments || []);
   }
-  useEffect(() => {
-    load();
-  }, [postId]);
+  useEffect(() => { load(); }, [postId]);
 
-  async function submit(e: any) {
+  // --- reCAPTCHA スクリプト読み込み＆準備完了待ち ---
+  useEffect(() => {
+    if (!siteKey) {
+      setRecaptchaError("reCAPTCHA のサイトキーが未設定です。");
+      return;
+    }
+
+    // Script を1回だけ注入（他ページと共存できるように）
+    if (!window.__recaptchaScriptInjected__) {
+      const s = document.createElement("script");
+      s.src = `https://www.google.com/recaptcha/api.js?render=${siteKey}`;
+      s.async = true;
+      s.defer = true;
+      s.onerror = () => setRecaptchaError("reCAPTCHA スクリプトの読み込みに失敗しました。");
+      document.head.appendChild(s);
+      window.__recaptchaScriptInjected__ = true;
+    }
+
+    // grecaptcha が生えるまでポーリング（最大15秒）
+    let elapsed = 0;
+    pollTimer.current = window.setInterval(() => {
+      if (window.grecaptcha?.ready) {
+        window.clearInterval(pollTimer.current!);
+        pollTimer.current = null;
+        // ready 内でフラグを立てる
+        window.grecaptcha.ready(() => setRecaptchaReady(true));
+      } else {
+        elapsed += 300;
+      }
+    }, 300) as unknown as number;
+
+    timeoutTimer.current = window.setTimeout(() => {
+      if (!recaptchaReady) setRecaptchaError("reCAPTCHA の初期化がタイムアウトしました。");
+      if (pollTimer.current) {
+        window.clearInterval(pollTimer.current);
+        pollTimer.current = null;
+      }
+    }, 15000) as unknown as number;
+
+    return () => {
+      if (pollTimer.current) window.clearInterval(pollTimer.current);
+      if (timeoutTimer.current) window.clearTimeout(timeoutTimer.current);
+    };
+  }, [siteKey]);
+
+  // --- コメント投稿 ---
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!content.trim()) return;
 
+    if (!recaptchaReady || !window.grecaptcha?.execute) {
+      setRecaptchaError("reCAPTCHA 読み込み中です。数秒後に再試行してください。");
+      return;
+    }
+
     setBusy(true);
+    setRecaptchaError("");
+
     try {
-      // コメント投稿は reCAPTCHA 必須
-      // @ts-ignore
-      const grecaptcha = (window as any).grecaptcha;
-      if (!grecaptcha?.ready) {
-        showToast("error", "reCAPTCHA読み込み中。少し待って再試行してください。");
-        return;
-      }
-      await grecaptcha.ready();
-      const token = await grecaptcha.execute(siteKey, { action: "submit_comment" });
+      const token: string = await window.grecaptcha.execute(siteKey, { action: "comment" });
 
       const r = await fetch(`/api/posts/${postId}/comments`, {
         method: "POST",
@@ -53,49 +95,21 @@ export default function CommentList({ postId, siteKey }: { postId: string; siteK
         body: JSON.stringify({ content, recaptchaToken: token }),
       });
       const j = await r.json();
-      if (!j.ok) throw new Error(j.error || "post_failed");
+      if (!r.ok || !j.ok) {
+        throw new Error(j?.error || "submit_failed");
+      }
 
       setContent("");
-      await load();
-      showToast("success", "コメントを投稿しました");
+      await load(); // 投稿後に一覧を更新
     } catch (err: any) {
-      showToast("error", "コメント投稿に失敗しました");
-      console.error(err);
+      setRecaptchaError(`コメント送信に失敗しました: ${err?.message ?? err}`);
     } finally {
       setBusy(false);
     }
   }
 
-  async function act(cid: string, kind: "like" | "recommend") {
-    if (acting[cid]) return;
-    setActing((m) => ({ ...m, [cid]: true }));
-    try {
-      const r = await fetch(`/api/comments/${cid}/${kind}`, { method: "POST" });
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.error || "act_failed");
-      await load();
-      showToast("success", kind === "like" ? "いいねしました" : "推薦しました");
-    } catch (e) {
-      showToast("error", "操作に失敗しました");
-      console.error(e);
-    } finally {
-      setActing((m) => ({ ...m, [cid]: false }));
-    }
-  }
-
   return (
     <section className="mt-6">
-      {/* Toast */}
-      {toast && (
-        <div
-          className={`fixed bottom-4 right-4 rounded-md px-4 py-2 text-white shadow ${
-            toast.type === "success" ? "bg-green-600" : "bg-red-600"
-          }`}
-        >
-          {toast.msg}
-        </div>
-      )}
-
       <h4 className="mb-2 text-lg font-semibold">コメント</h4>
 
       <form onSubmit={submit} className="mb-3 space-y-2">
@@ -106,37 +120,24 @@ export default function CommentList({ postId, siteKey }: { postId: string; siteK
           placeholder="気づき・応援・補足など"
           className="w-full rounded-md border p-2"
         />
-        <button
-          className="inline-flex items-center rounded-lg border bg-white px-3 py-1.5 hover:bg-gray-50 disabled:opacity-50"
-          disabled={busy}
-        >
-          {busy ? "送信中…" : "送信"}
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            className="inline-flex items-center rounded-lg border bg-white px-3 py-1.5 hover:bg-gray-50 disabled:opacity-50"
+            disabled={busy || !recaptchaReady}
+          >
+            {busy ? "送信中…" : recaptchaReady ? "送信" : "reCAPTCHA読み込み中…"}
+          </button>
+          {recaptchaError && <span className="text-sm text-red-600">{recaptchaError}</span>}
+        </div>
       </form>
 
       <ul className="flex flex-col gap-3">
-        {comments.map((c) => (
+        {comments.map((c: any) => (
           <li key={c.id} className="rounded-xl border bg-white p-3">
             <div className="mb-1 text-xs text-gray-500">
               匿名さん・{new Date(c.createdAt).toLocaleString()}
             </div>
             <p className="prose-basic text-sm whitespace-pre-wrap">{c.content}</p>
-            <div className="mt-2 flex gap-2 text-sm">
-              <button
-                onClick={() => act(c.id, "like")}
-                disabled={!!acting[c.id]}
-                className="rounded-full border px-2 py-0.5 hover:bg-gray-50 disabled:opacity-50"
-              >
-                👍 いいね（{c.likeCount ?? 0}）
-              </button>
-              <button
-                onClick={() => act(c.id, "recommend")}
-                disabled={!!acting[c.id]}
-                className="rounded-full border px-2 py-0.5 hover:bg-gray-50 disabled:opacity-50"
-              >
-                ⭐ 推薦（{c.recCount ?? 0}）
-              </button>
-            </div>
           </li>
         ))}
       </ul>
