@@ -1,6 +1,6 @@
 import "./../styles/globals.css";
 import type { Metadata } from "next";
-import RecaptchaLoader from "@/components/RecaptchaLoader";
+import ClientLayout from "@/components/ClientLayout"; // ← 追加
 const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!;
 export const metadata: Metadata = {
   title: "みんなで創る、笠間の未来",
@@ -26,7 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <footer className="mt-10 border-t">
           <div className="container py-6 text-xs text-gray-500">©cfkasama</div>
         </footer>
-        <RecaptchaLoader siteKey={siteKey} />
+        <ClientLayout>{children}</ClientLayout>
       </body>
     </html>
   );
