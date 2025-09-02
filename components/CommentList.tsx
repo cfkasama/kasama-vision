@@ -190,9 +190,9 @@ export default function CommentList({ postId }: { postId: string }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           postId: c.postId,
+          commentId: c.id,
           reason: "COMMENT",       // サーバ側で扱いやすい固定値
           note: reason || "",       // 入力内容
-          meta: { commentId: c.id } // どのコメントか識別
         }),
       });
       const j = await r.json();
