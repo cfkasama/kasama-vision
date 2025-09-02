@@ -1,95 +1,90 @@
+// app/api/comments/[id]/recommend/route.ts
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { prisma } from "@/lib/db";
-import { verifyRecaptcha } from "@/lib/recaptcha";
 
-const THRESHOLD = 10;
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
-export async function POST(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+type Params = { params: { id: string } };
+
+export async function POST(_req: Request, { params }: Params) {
+  const { id } = params;
+  if (!id) return NextResponse.json({ ok: false, error: "bad_request" }, { status: 400 });
+
+  // 匿名Identity（cookie）確保
+  const jar = cookies();
+  let identityId = jar.get("kid")?.value;
+  if (!identityId) {
+    const identity = await prisma.identity.create({ data: {} });
+    identityId = identity.id;
+    jar.set("kid", identityId, {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365,
+    });
+  }
+
   try {
-    const commentId = params.id;
-    if (!commentId) {
-      return NextResponse.json({ ok: false, error: "bad_request" }, { status: 400 });
-    }
-
-    // reCAPTCHA は任意（来たときだけ検証）
-    let recaptchaOk = true;
-    try {
-      const body = await req.json().catch(() => ({}));
-      const token = body?.recaptchaToken;
-      if (token) recaptchaOk = await verifyRecaptcha(token);
-    } catch {/* no-op */}
-    if (!recaptchaOk) {
-      return NextResponse.json({ ok: false, error: "recaptcha" }, { status: 400 });
-    }
-
+    // コメント & 紐づく投稿を取得
     const comment = await prisma.comment.findUnique({
-      where: { id: commentId },
-      include: { post: true },
+      where: { id },
+      select: { id: true, content: true, postId: true },
     });
-    if (!comment) {
-      return NextResponse.json({ ok: false, error: "not_found" }, { status: 404 });
-    }
+    if (!comment) return NextResponse.json({ ok: false, error: "comment_not_found" }, { status: 404 });
 
-    const updated = await prisma.comment.update({
-      where: { id: commentId },
-      data: { recCount: { increment: 1 } },
-      select: { id: true, recCount: true, content: true, postId: true },
-    });
+    let became10 = false;
 
-    let createdPostId: string | null = null;
+    await prisma.$transaction(async (tx) => {
+      // 1) 推薦アクションを「一意制約」で追加（重複なら何もしない）
+      await tx.$executeRawUnsafe(
+        `INSERT INTO "CommentAction" ("commentId","identityId","type") VALUES ($1,$2,'RECOMMEND') ON CONFLICT DO NOTHING`,
+        id,
+        identityId
+      );
 
-    if (updated.recCount >= THRESHOLD) {
-      const existing = await prisma.adminLog.findFirst({
-        where: { action: "AUTO_PROPOSAL_FROM_COMMENT", target: `comment:${updated.id}` },
-        select: { id: true, postId: true },
+      // 2) このユーザーの推薦が入っているか確認 → 入っていれば recCount++
+      const acted = await tx.commentAction.findUnique({
+        where: { commentId_identityId_type: { commentId: id, identityId, type: "RECOMMEND" } as any },
+      });
+      if (acted) {
+        await tx.comment.update({
+          where: { id },
+          data: { recCount: { increment: 1 } },
+        });
+      }
+
+      // 3) 総推薦数を正にカウント（レースに強い）し、ちょうど10ならPost化
+      const total = await tx.commentAction.count({
+        where: { commentId: id, type: "RECOMMEND" },
       });
 
-      if (!existing) {
-        const firstLine = (updated.content ?? "").split(/\r?\n/)[0]?.trim() || "提案";
-        const title = firstLine.slice(0, 40);
+      if (total === 10) {
+        became10 = true;
 
-        const newPost = await prisma.post.create({
-          data: {
-            type: "PROPOSAL",
-            status: "PUBLISHED",
-            title,
-            content: updated.content ?? "",
-          },
+        // すでに同内容の提案が直近で生成済みか軽く確認（念のため）
+        const dup = await tx.post.findFirst({
+          where: { type: "PROPOSAL", title: { equals: comment.content.slice(0, 80) } },
           select: { id: true },
         });
-        createdPostId = newPost.id;
-
-        await prisma.adminLog.create({
-          data: {
-            actor: "system",
-            action: "AUTO_PROPOSAL_FROM_COMMENT",
-            target: `comment:${updated.id}`,
-            note: "推薦が閾値に到達したため自動で提案化",
-            postId: newPost.id,
-            meta: {
-              sourceCommentId: updated.id,
-              sourcePostId: updated.postId,
-              threshold: THRESHOLD,
-            } as any,
-          },
-        });
-      } else {
-        createdPostId = existing.postId ?? null;
+        if (!dup) {
+          await tx.post.create({
+            data: {
+              type: "PROPOSAL",
+              title: comment.content.slice(0, 80) || "提案",
+              content: comment.content,
+              status: "PUBLISHED",
+            },
+          });
+        }
       }
-    }
-
-    return NextResponse.json({
-      ok: true,
-      commentId: updated.id,
-      recCount: updated.recCount,
-      reachedThreshold: updated.recCount >= THRESHOLD,
-      createdPostId,
     });
-  } catch (e) {
-    console.error("[comments.recommend] error:", e);
+
+    return NextResponse.json({ ok: true, became10 });
+  } catch (e: any) {
+    console.error("[POST /comments/:id/recommend] error:", e);
     return NextResponse.json({ ok: false, error: "server_error" }, { status: 500 });
   }
 }
