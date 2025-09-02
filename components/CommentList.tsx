@@ -185,7 +185,7 @@ export default function CommentList({ postId }: { postId: string }) {
     if (reason === null) return;
 
     try {
-      const r = await fetch(`/api/abuse`, {
+      const r = await fetch(`/api/report`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
