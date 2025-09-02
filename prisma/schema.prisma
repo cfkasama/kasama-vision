@@ -90,6 +90,7 @@ model AbuseReport {
 
   identityId String?
   identity   Identity?    @relation(fields: [identityId], references: [id])
+  meta       Json?
 }
 
 model Tag {
