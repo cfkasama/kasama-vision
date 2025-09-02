@@ -1,6 +1,7 @@
 // lib/password.ts
 import { hash as aHash, verify as aVerify } from "@node-rs/argon2";
 import crypto from "crypto";
+export const runtime="nodejs";
 
 // パラメータは安全寄りに（コストは環境で微調整）
 const ARGON_OPTS = {
