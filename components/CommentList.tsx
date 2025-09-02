@@ -6,21 +6,27 @@ type Comment = {
   content: string;
   createdAt: string;
   likeCount: number;
-  recCount?: number;        // ないとき用に0で補完
+  recCount?: number;
   postId: string;
   identityId: string | null;
 };
+
+const LIKE_KEY = (id: string) => `c_like_${id}`;
+const REC_KEY  = (id: string) => `c_rec_${id}`;
 
 export default function CommentList({ postId }: { postId: string }) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [content, setContent] = useState("");
   const [busy, setBusy] = useState(false);
 
-  // アクション中のコメントIDを保持して二重連打を防止
+  // 連打防止（通信中）
   const [acting, setActing] = useState<Record<string, boolean>>({});
+  // “すでにこの端末で押したか” を sessionStorage で保持
+  const [pressedLike, setPressedLike] = useState<Record<string, boolean>>({});
+  const [pressedRec,  setPressedRec]  = useState<Record<string, boolean>>({});
+
   // 簡易トースト
   const [toast, setToast] = useState<string>("");
-
   const showToast = (msg: string) => {
     setToast(msg);
     setTimeout(() => setToast(""), 1800);
@@ -34,6 +40,16 @@ export default function CommentList({ postId }: { postId: string }) {
       ...c,
     }));
     setComments(list);
+
+    // 既に押した状態の復元（sessionStorage）
+    const likeMap: Record<string, boolean> = {};
+    const recMap: Record<string, boolean> = {};
+    list.forEach((c) => {
+      likeMap[c.id] = sessionStorage.getItem(LIKE_KEY(c.id)) === "1";
+      recMap[c.id]  = sessionStorage.getItem(REC_KEY(c.id)) === "1";
+    });
+    setPressedLike(likeMap);
+    setPressedRec(recMap);
   }
 
   useEffect(() => {
@@ -80,29 +96,37 @@ export default function CommentList({ postId }: { postId: string }) {
     }
   }
 
-  // いいね
+  // いいね（端末内で一度だけ）
   const like = async (id: string) => {
+    if (pressedLike[id]) {
+      showToast("この端末では既に『いいね』済みです");
+      return;
+    }
     if (acting[id]) return;
     setActing((m) => ({ ...m, [id]: true }));
+
     // 楽観的更新
     setComments((prev) =>
       prev.map((c) => (c.id === id ? { ...c, likeCount: c.likeCount + 1 } : c))
     );
+
     try {
       const r = await fetch(`/api/comments/${id}/like`, { method: "POST" });
       const j = await r.json();
       if (!r.ok || !j.ok) {
         // ロールバック
         setComments((prev) =>
-          prev.map((c) => (c.id === id ? { ...c, likeCount: c.likeCount - 1 } : c))
+          prev.map((c) => (c.id === id ? { ...c, likeCount: Math.max(c.likeCount - 1, 0) } : c))
         );
         showToast("いいねに失敗しました");
       } else {
+        sessionStorage.setItem(LIKE_KEY(id), "1");
+        setPressedLike((m) => ({ ...m, [id]: true }));
         showToast("いいねしました");
       }
     } catch {
       setComments((prev) =>
-        prev.map((c) => (c.id === id ? { ...c, likeCount: c.likeCount - 1 } : c))
+        prev.map((c) => (c.id === id ? { ...c, likeCount: Math.max(c.likeCount - 1, 0) } : c))
       );
       showToast("いいねでエラーが発生しました");
     } finally {
@@ -110,16 +134,22 @@ export default function CommentList({ postId }: { postId: string }) {
     }
   };
 
-  // 推薦
+  // 推薦（端末内で一度だけ）
   const recommend = async (id: string) => {
+    if (pressedRec[id]) {
+      showToast("この端末では既に『推薦』済みです");
+      return;
+    }
     if (acting[id]) return;
     setActing((m) => ({ ...m, [id]: true }));
-    // 楽観的更新（recCount が undefined の場合は0扱い）
+
+    // 楽観的更新
     setComments((prev) =>
       prev.map((c) =>
         c.id === id ? { ...c, recCount: (c.recCount ?? 0) + 1 } : c
       )
     );
+
     try {
       const r = await fetch(`/api/comments/${id}/recommend`, { method: "POST" });
       const j = await r.json();
@@ -132,6 +162,8 @@ export default function CommentList({ postId }: { postId: string }) {
         );
         showToast("推薦に失敗しました");
       } else {
+        sessionStorage.setItem(REC_KEY(id), "1");
+        setPressedRec((m) => ({ ...m, [id]: true }));
         showToast("推薦しました");
       }
     } catch {
@@ -143,6 +175,34 @@ export default function CommentList({ postId }: { postId: string }) {
       showToast("推薦でエラーが発生しました");
     } finally {
       setActing((m) => ({ ...m, [id]: false }));
+    }
+  };
+
+  // 通報（コメントに紐づけたいので、AbuseReport.note/metaにcommentIdを含める）
+  const report = async (c: Comment) => {
+    const reason = prompt("通報理由を入力してください（任意）", "");
+    // キャンセルなら何もしない
+    if (reason === null) return;
+
+    try {
+      const r = await fetch(`/api/abuse`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          postId: c.postId,
+          reason: "COMMENT",       // サーバ側で扱いやすい固定値
+          note: reason || "",       // 入力内容
+          meta: { commentId: c.id } // どのコメントか識別
+        }),
+      });
+      const j = await r.json();
+      if (!r.ok || !j.ok) {
+        showToast("通報に失敗しました");
+      } else {
+        showToast("通報しました。ご協力ありがとうございます");
+      }
+    } catch {
+      showToast("通報でエラーが発生しました");
     }
   };
 
@@ -174,19 +234,29 @@ export default function CommentList({ postId }: { postId: string }) {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => like(c.id)}
-                  disabled={!!acting[c.id]}
+                  disabled={!!acting[c.id] || !!pressedLike[c.id]}
                   className="rounded-full border px-2 py-0.5 text-xs hover:bg-gray-50 disabled:opacity-60"
                   aria-label="いいね"
+                  title={pressedLike[c.id] ? "この端末では既にいいね済み" : "いいね"}
                 >
                   👍 {c.likeCount}
                 </button>
                 <button
                   onClick={() => recommend(c.id)}
-                  disabled={!!acting[c.id]}
+                  disabled={!!acting[c.id] || !!pressedRec[c.id]}
                   className="rounded-full border px-2 py-0.5 text-xs hover:bg-gray-50 disabled:opacity-60"
                   aria-label="推薦"
+                  title={pressedRec[c.id] ? "この端末では既に推薦済み" : "推薦"}
                 >
                   ⭐ {(c.recCount ?? 0)}
+                </button>
+                <button
+                  onClick={() => report(c)}
+                  className="rounded-full border px-2 py-0.5 text-xs hover:bg-gray-50"
+                  aria-label="通報"
+                  title="通報する"
+                >
+                  🚩 通報
                 </button>
               </div>
             </div>
