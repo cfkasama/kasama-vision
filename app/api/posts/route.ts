@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { verifyRecaptcha } from "@/lib/recaptcha";
+import { hashDeleteKey } from "@/lib/password";
 
 export const dynamic = "force-dynamic"; // SSG/ISRに巻き込まれないように
 export const revalidate = 0;
@@ -91,13 +92,14 @@ export async function POST(req: Request) {
 
     // 必要ならここでdeleteKeyをハッシュ化に差し替え
     // const hashed = await bcrypt.hash(deleteKey, 10);
+const hashed = await hashDeleteKey(deleteKey);
 
     const post = await prisma.post.create({
       data: {
         type,
         title,
         content,
-        deleteKey, // 実運用はハッシュに！
+        deleteKey: hashed, // 実運用はハッシュに！
         // status は Prisma の default(PUBLISHED) に任せる
       },
     });
