@@ -3,11 +3,11 @@ import { NextResponse } from "next/server";
 import type { AbuseIdentityRow } from "@/types/db";
 
 export async function POST(req: Request) {
-  const { postId, reason } = await req.json();
+  const { postId, note } = await req.json();
 
   // abuseReport 作成
   await prisma.abuseReport.create({
-    data: { postId, reason },
+    data: { postId, reason: "COMMENT", note},
   });
 
   // 直近24hの通報数を集計
