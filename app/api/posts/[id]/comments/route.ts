@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { verifyRecaptcha } from "@/lib/recaptcha";
 import { hashDeleteKey } from "@/lib/hash"; // argon2 導入済み前提
+import { getOrCreateIdentityId } from "@/lib/identity";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -72,10 +73,10 @@ export async function POST(req: Request, { params }: Params) {
 
     // 削除キーをハッシュ化して保存（平文は保存しない）
     const hashed = await hashDeleteKey(deleteKey);
-
+     const identityId = await getOrCreateIdentityId();
     // コメント作成（identityId は匿名可なので null）
     const created = await prisma.comment.create({
-      data: { postId: id, content, identityId: null, deleteKey: hashed },
+      data: { postId: id, content, identityId, deleteKey: hashed },
       select: { id: true },
     });
 
