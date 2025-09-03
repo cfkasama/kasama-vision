@@ -18,7 +18,7 @@ const REC_KEY  = (id: string) => `c_rec_${id}`;
 export default function CommentList({ postId }:{ postId:string }) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [content, setContent]   = useState("");
-  const [deleteKey, setDeleteKey] = useState("");  // ← 追加：投稿時に必須
+  const [deleteKey, setDeleteKey] = useState(""); 
   const [busy, setBusy]         = useState(false);
 
   const [acting, setActing] = useState<Record<string, boolean>>({});
@@ -82,15 +82,115 @@ export default function CommentList({ postId }:{ postId:string }) {
       setBusy(false);
     }
   }
+  
+  // いいね（端末内で一度だけ）
+  const like = async (id: string) => {
+    if (pressedLike[id]) {
+      showToast("この端末では既に『いいね』済みです");
+      return;
+    }
+    if (acting[id]) return;
+    setActing((m) => ({ ...m, [id]: true }));
 
-  // いいね
-  async function like(id:string) { /* ここはあなたの現行のままでOK */ }
+    // 楽観的更新
+    setComments((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, likeCount: c.likeCount + 1 } : c))
+    );
 
-  // 推薦
-  async function recommend(id:string) { /* ここも現行のままでOK */ }
+    try {
+      const r = await fetch(`/api/comments/${id}/like`, { method: "POST" });
+      const j = await r.json();
+      if (!r.ok || !j.ok) {
+        // ロールバック
+        setComments((prev) =>
+          prev.map((c) => (c.id === id ? { ...c, likeCount: Math.max(c.likeCount - 1, 0) } : c))
+        );
+        showToast("いいねに失敗しました");
+      } else {
+        sessionStorage.setItem(LIKE_KEY(id), "1");
+        setPressedLike((m) => ({ ...m, [id]: true }));
+        showToast("いいねしました");
+      }
+    } catch {
+      setComments((prev) =>
+        prev.map((c) => (c.id === id ? { ...c, likeCount: Math.max(c.likeCount - 1, 0) } : c))
+      );
+      showToast("いいねでエラーが発生しました");
+    } finally {
+      setActing((m) => ({ ...m, [id]: false }));
+    }
+  };
 
-  // 通報
-  async function report(c: Comment) { /* 現行のままでOK */ }
+  // 推薦（端末内で一度だけ）
+  const recommend = async (id: string) => {
+    if (pressedRec[id]) {
+      showToast("この端末では既に『推薦』済みです");
+      return;
+    }
+    if (acting[id]) return;
+    setActing((m) => ({ ...m, [id]: true }));
+
+    // 楽観的更新
+    setComments((prev) =>
+      prev.map((c) =>
+        c.id === id ? { ...c, recCount: (c.recCount ?? 0) + 1 } : c
+      )
+    );
+
+    try {
+      const r = await fetch(`/api/comments/${id}/recommend`, { method: "POST" });
+      const j = await r.json();
+      if (!r.ok || !j.ok) {
+        // ロールバック
+        setComments((prev) =>
+          prev.map((c) =>
+            c.id === id ? { ...c, recCount: Math.max((c.recCount ?? 1) - 1, 0) } : c
+          )
+        );
+        showToast("推薦に失敗しました");
+      } else {
+        sessionStorage.setItem(REC_KEY(id), "1");
+        setPressedRec((m) => ({ ...m, [id]: true }));
+        showToast("推薦しました");
+      }
+    } catch {
+      setComments((prev) =>
+        prev.map((c) =>
+          c.id === id ? { ...c, recCount: Math.max((c.recCount ?? 1) - 1, 0) } : c
+        )
+      );
+      showToast("推薦でエラーが発生しました");
+    } finally {
+      setActing((m) => ({ ...m, [id]: false }));
+    }
+  };
+
+  // 通報（コメントに紐づけたいので、AbuseReport.note/metaにcommentIdを含める）
+  const report = async (c: Comment) => {
+    const reason = prompt("通報理由を入力してください（任意）", "");
+    // キャンセルなら何もしない
+    if (reason === null) return;
+
+    try {
+      const r = await fetch(`/api/report`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          postId: c.postId,
+          commentId: c.id,
+          reason: "COMMENT",       // サーバ側で扱いやすい固定値
+          note: reason || "",       // 入力内容
+        }),
+      });
+      const j = await r.json();
+      if (!r.ok || !j.ok) {
+        showToast("通報に失敗しました");
+      } else {
+        showToast("通報しました。ご協力ありがとうございます");
+      }
+    } catch {
+      showToast("通報でエラーが発生しました");
+    }
 
   // コメント削除（投稿者がパスワードで消す）
   async function removeComment(id: string) {
@@ -114,7 +214,7 @@ export default function CommentList({ postId }:{ postId:string }) {
     } catch {
       showToast("削除でエラーが発生しました");
     }
-  }
+  } };
 
   return (
     <section className="mt-6">
@@ -144,15 +244,38 @@ export default function CommentList({ postId }:{ postId:string }) {
         </button>
       </form>
 
-      <ul className="flex flex-col gap-3">
-        {comments.map((c)=>(
+         <ul className="flex flex-col gap-3">
+        {comments.map((c) => (
           <li key={c.id} className="rounded-xl border bg-white p-3">
             <div className="mb-1 flex items-center justify-between text-xs text-gray-500">
               <span>匿名さん・{new Date(c.createdAt).toLocaleString()}</span>
               <div className="flex items-center gap-2">
-                <button /* いいね */  onClick={()=>like(c.id)} className="rounded-full border px-2 py-0.5 text-xs hover:bg-gray-50">👍 {c.likeCount}</button>
-                <button /* 推薦 */    onClick={()=>recommend(c.id)} className="rounded-full border px-2 py-0.5 text-xs hover:bg-gray-50">⭐ {(c.recCount ?? 0)}</button>
-                <button /* 通報 */    onClick={()=>report(c)} className="rounded-full border px-2 py-0.5 text-xs hover:bg-gray-50">🚩 通報</button>
+                <button
+                  onClick={() => like(c.id)}
+                  disabled={!!acting[c.id] || !!pressedLike[c.id]}
+                  className="rounded-full border px-2 py-0.5 text-xs hover:bg-gray-50 disabled:opacity-60"
+                  aria-label="いいね"
+                  title={pressedLike[c.id] ? "この端末では既にいいね済み" : "いいね"}
+                >
+                  👍 {c.likeCount}
+                </button>
+                <button
+                  onClick={() => recommend(c.id)}
+                  disabled={!!acting[c.id] || !!pressedRec[c.id]}
+                  className="rounded-full border px-2 py-0.5 text-xs hover:bg-gray-50 disabled:opacity-60"
+                  aria-label="推薦"
+                  title={pressedRec[c.id] ? "この端末では既に推薦済み" : "推薦"}
+                >
+                  ⭐ {(c.recCount ?? 0)}
+                </button>
+                <button
+                  onClick={() => report(c)}
+                  className="rounded-full border px-2 py-0.5 text-xs hover:bg-gray-50"
+                  aria-label="通報"
+                  title="通報する"
+                >
+                  🚩 通報
+                </button>
                 <button /* 削除 */    onClick={()=>removeComment(c.id)} className="rounded-full border px-2 py-0.5 text-xs hover:bg-gray-50">🗑️ 削除</button>
               </div>
             </div>
@@ -160,7 +283,6 @@ export default function CommentList({ postId }:{ postId:string }) {
           </li>
         ))}
       </ul>
-
       {toast && (
         <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-black/80 px-3 py-2 text-xs text-white">
           {toast}
