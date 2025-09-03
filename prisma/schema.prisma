@@ -17,6 +17,7 @@ model Identity {
   comments     Comment[]
   abuseReports AbuseReport[]
   commentActions CommentAction[]
+posts        Post[]
 }
 
 model Post {
