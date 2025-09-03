@@ -24,7 +24,6 @@ export async function hashDeleteKey(raw: string): Promise<string> {
 /**
  * 検証：
  * 1) 保存値が $argon2... なら argon2.verify(正規化済み入力)
- * 2) そうでなければ「レガシー平文」とみなし、保存値も正規化して素直に比較
  */
 export async function verifyDeleteKey(stored: string, input: string): Promise<boolean> {
   if (!stored) return false;
