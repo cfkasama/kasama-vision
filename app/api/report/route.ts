@@ -1,7 +1,7 @@
 // app/api/report/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { cookies } from "next/headers";
+import { getOrCreateIdentityId } from "@/lib/identity";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -53,19 +53,7 @@ export async function POST(req: Request) {
     }
   }
 
-  // ---- 可能なら identityId を付与（cookie の anon_id を採用）
-  let identityId: string | null = null;
-  try {
-    const c = await cookies();
-    const anon = c.get("anon_id")?.value;
-    if (anon) {
-      // anon_id は Identity.id として発行している想定。存在しなくても create まではしない。
-      const exists = await prisma.identity.findUnique({ where: { id: anon }, select: { id: true } });
-      if (exists) identityId = exists.id;
-    }
-  } catch {
-    // 取得失敗時は黙って null 運用
-  }
+const identityId = await getOrCreateIdentityId();
 
   // ---- 通報レコード作成
   await prisma.abuseReport.create({
