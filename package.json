@@ -20,7 +20,7 @@
     "@prisma/client": "^5.17.0"
   },
   "override":{
-     "argon2":"npm:@node-rs/argon2@^1.7.0",
+     "argon2":"npm:@node-rs/argon2@^1.7.0"
   },
   "devDependencies": {
     "prisma": "^5.17.0",
