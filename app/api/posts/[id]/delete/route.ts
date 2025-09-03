@@ -1,7 +1,7 @@
 // app/api/posts/[id]/delete/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { verifyDeleteKey, hashDeleteKey } from "@/lib/password";
+import { verifyDeleteKey, hashDeleteKey } from "@/lib/hash";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
