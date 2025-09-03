@@ -5,6 +5,7 @@ import { verifyRecaptcha } from "@/lib/recaptcha";
 import { hashDeleteKey } from "@/lib/hash";
 
 export const dynamic = "force-dynamic"; // SSG/ISRに巻き込まれないように
+export const runtime ="nodejs";
 export const revalidate = 0;
 
 type SortKey = "new" | "likes" | "comments" | "hot";
