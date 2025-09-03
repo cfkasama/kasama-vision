@@ -5,6 +5,8 @@ type Comment = {
   id: string;
   content: string;
   createdAt: string;
+  deleteKey: string;
+  deletedAt: datetime;
   likeCount: number;
   recCount?: number;
   postId: string;
