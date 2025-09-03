@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { verifyDeleteKey } from "@/lib/hash";
+import { verifyDeleteKey, hashDeleteKey } from "@/lib/hash"; // レガシー平文→その場で再ハッシュする場合に備え
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -33,19 +33,38 @@ export async function POST(req: Request, { params }: Params) {
     return NextResponse.json({ ok:false, error:"no_delete_key" }, { status:403 });
   }
 
-  const valid = await verifyDeleteKey(comment.deleteKey, deleteKeyPlain);
+  // ★ 引数順を「平文, ハッシュ(or平文)」に
+  const valid = await verifyDeleteKey(deleteKeyPlain, comment.deleteKey);
   if (!valid) return NextResponse.json({ ok:false, error:"invalid_key" }, { status:403 });
 
-  await prisma.comment.update({
-    where: { id },
-    data: { deletedAt: new Date() }
-  });
+  // （任意）レガシー平文で保存されていた場合は、このタイミングで再ハッシュして上書き
+  if (!comment.deleteKey.startsWith?.("$argon2")) {
+    try {
+      const newHash = await hashDeleteKey(deleteKeyPlain);
+      await prisma.comment.update({ where: { id }, data: { deleteKey: newHash } });
+    } catch (_) {
+      /* ここは致命ではないので握りつぶしでもOK */
+    }
+  }
 
-  // 親ポストのコメント数をデクリメント（下限0）
-  prisma.post.update({
-    where: { id: comment.postId },
-    data: { cmtCount: { decrement: 1 } }
-  }).catch(()=>{ /* 失敗してもスルー */ });
+  // 原子性を確保するならトランザクションにまとめる
+  await prisma.$transaction([
+    prisma.comment.update({
+      where: { id },
+      data: { deletedAt: new Date() }
+    }),
+    // cmtCount が負にならないようにガード（0未満にしない）
+    prisma.post.update({
+      where: { id: comment.postId },
+      data: { cmtCount: { decrement: 1 } }
+    })
+  ]).catch(async () => {
+    // decrement が負になり得る場合の保険（DBでCHECK制約が無い前提）
+    const p = await prisma.post.findUnique({ where: { id: comment.postId }, select: { cmtCount: true } });
+    if (p && p.cmtCount < 0) {
+      await prisma.post.update({ where: { id: comment.postId }, data: { cmtCount: 0 } });
+    }
+  });
 
   return NextResponse.json({ ok:true });
 }
