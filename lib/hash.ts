@@ -29,15 +29,5 @@ export async function hashDeleteKey(raw: string): Promise<string> {
 export async function verifyDeleteKey(stored: string, input: string): Promise<boolean> {
   if (!stored) return false;
   const norm = normalizeDeleteKey(input);
-
-  if (stored.startsWith("$argon2")) {
-    try {
-      return await argon2.verify(stored, norm);
-    } catch {
-      return false;
-    }
-  }
-
-  // 旧データ(平文)に対応
-  return normalizeDeleteKey(stored) === norm;
+  return await argon2.verify(stored, norm);
 }
