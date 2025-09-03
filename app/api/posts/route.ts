@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { verifyRecaptcha } from "@/lib/recaptcha";
-import { hashDeleteKey } from "@/lib/password";
+import { hashDeleteKey } from "@/lib/hash";
 
 export const dynamic = "force-dynamic"; // SSG/ISRに巻き込まれないように
 export const revalidate = 0;
