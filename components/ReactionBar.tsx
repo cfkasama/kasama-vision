@@ -52,14 +52,14 @@ export default function ReactionBar({
   async function deletePost() {
     if (busy) return;
     const key = prompt("削除用パスワードを入力してください");
-    if (key == null || !key.trim()) return;
+    if (key == null) return;
 
     setBusy(true);
     try {
       const res = await fetch(`/api/posts/${postId}/delete`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ deleteKey: key.trim() }),
+        body: JSON.stringify({ deleteKey: key }),
       });
       const json = await res.json().catch(() => ({}));
       if (!res.ok || !json?.ok) {
