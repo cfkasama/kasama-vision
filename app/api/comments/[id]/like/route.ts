@@ -13,7 +13,6 @@ export async function POST(_req: Request, { params }: Params) {
   if (!id) return NextResponse.json({ ok: false, error: "bad_request" }, { status: 400 });
 
   // 匿名 Identity を確保（cookie: kid）
-  const jar = cookies();
   const identityId = await getOrCreateIdentityId();
 
   try {
