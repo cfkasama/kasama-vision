@@ -255,7 +255,6 @@ export default function CommentList({ postId }: { postId: string }) {
           required
         />
         <input
-          type="password"
           value={deleteKey}
           onChange={(e) => setDeleteKey(e.target.value)}
           placeholder="削除用パスワード（必須・後から削除に使います）"
