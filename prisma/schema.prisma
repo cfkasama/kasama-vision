@@ -68,7 +68,7 @@ model Comment {
   recCount  Int        @default(0)
   createdAt  DateTime   @default(now())
   deleteKey  String?
-  deleteAt   DateTime?
+  deletedAt   DateTime?
 
   postId     String
   post       Post       @relation(fields: [postId], references: [id])
