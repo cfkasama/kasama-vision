@@ -1,8 +1,6 @@
--- コメントに削除用ハッシュと論理削除の日時を追加
-ALTER TABLE "Comment"
-  ADD COLUMN IF NOT EXISTS "deleteKey" TEXT,
-  ADD COLUMN IF NOT EXISTS "deletedAt" TIMESTAMP;
-
--- 取得クエリを楽にするためのインデックス（任意）
-CREATE INDEX IF NOT EXISTS "idx_comment_postid_deletedat"
-  ON "Comment" ("postId", "deletedAt");
+ALTER TABLE "Post" ADD COLUMN "identityId" TEXT NULL;
+ALTER TABLE "Post"
+  ADD CONSTRAINT "Post_identityId_fkey"
+  FOREIGN KEY ("identityId") REFERENCES "Identity"("id")
+  ON DELETE SET NULL ON UPDATE CASCADE;
+CREATE INDEX "Post_identityId_idx" ON "Post"("identityId");
