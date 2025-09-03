@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { verifyRecaptcha } from "@/lib/recaptcha";
-import { hashDeleteKey } from "@/lib/password"; // argon2 導入済み前提
+import { hashDeleteKey } from "@/lib/hash"; // argon2 導入済み前提
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
