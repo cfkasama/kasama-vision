@@ -1,60 +1,43 @@
 // lib/hash.ts
-import crypto from "node:crypto";
+import * as argon2 from "argon2";
 
-// ========== 正規化 ==========
-// 全角/半角のゆらぎ、ゼロ幅文字、前後のスペースなどを揃える
-export function normalizeKey(input: string): string {
-  let s = input.normalize("NFKC");         // 全角→半角、互換文字揺れ統一
-  s = s.trim();                            // 前後のスペース削除
-  s = s.replace(/[\u200B-\u200D\uFEFF]/g, ""); // ゼロ幅文字削除
-  return s;
+// 入力のゆらぎ吸収（全角/半角スペース、NFKC、連続空白、前後空白）
+export function normalizeDeleteKey(input: string): string {
+  if (!input) return "";
+  return input
+    .normalize("NFKC")
+    .replace(/\u3000/g, " ")      // 全角スペース → 半角
+    .replace(/\s+/g, " ")         // 連続空白を 1 個に
+    .trim();
 }
 
-// ========== PBKDF2 設定 ==========
-const ITER = 120_000;
-const KEYLEN = 32;
-const DIGEST = "sha256";
-
-// ========== ハッシュ化 ==========
-export async function hashDeleteKey(plain: string): Promise<string> {
-  const norm = normalizeKey(plain);
-  const salt = crypto.randomBytes(16);
-  const derived = crypto.pbkdf2Sync(norm, salt, ITER, KEYLEN, DIGEST);
-  return `pbkdf2$${DIGEST}$${ITER}$${salt.toString("base64")}$${derived.toString("base64")}`;
+// 保存用ハッシュ（必ず正規化してから）
+export async function hashDeleteKey(raw: string): Promise<string> {
+  const norm = normalizeDeleteKey(raw);
+  // パラメータは必要に応じて
+  return argon2.hash(norm, {
+    type: argon2.argon2id,
+    // memoryCost/timeCost/parallelism はデフォルトでもOK
+  });
 }
 
-// ========== 検証 ==========
-export async function verifyDeleteKey(inputPlain: string, stored: string): Promise<boolean> {
-  // まず正規化して検証
-  if (await verifyWithNorm(inputPlain, stored)) return true;
+/**
+ * 検証：
+ * 1) 保存値が $argon2... なら argon2.verify(正規化済み入力)
+ * 2) そうでなければ「レガシー平文」とみなし、保存値も正規化して素直に比較
+ */
+export async function verifyDeleteKey(stored: string, input: string): Promise<boolean> {
+  if (!stored) return false;
+  const norm = normalizeDeleteKey(input);
 
-  // 旧データ対応: 正規化せず試す
-  if (await verifyWithoutNorm(inputPlain, stored)) return true;
+  if (stored.startsWith("$argon2")) {
+    try {
+      return await argon2.verify(stored, norm);
+    } catch {
+      return false;
+    }
+  }
 
-  return false;
-}
-
-// 内部処理
-function parseStored(stored: string) {
-  const [scheme, digest, iterStr, saltB64, hashB64] = stored.split("$");
-  if (scheme !== "pbkdf2") return null;
-  return {
-    digest,
-    iter: Number(iterStr),
-    salt: Buffer.from(saltB64, "base64"),
-    hash: Buffer.from(hashB64, "base64"),
-  };
-}
-
-async function verifyWithNorm(inputPlain: string, stored: string) {
-  const p = parseStored(stored); if (!p) return false;
-  const norm = normalizeKey(inputPlain);
-  const derived = crypto.pbkdf2Sync(norm, p.salt, p.iter, p.hash.length, p.digest as any);
-  return crypto.timingSafeEqual(derived, p.hash);
-}
-
-async function verifyWithoutNorm(inputPlain: string, stored: string) {
-  const p = parseStored(stored); if (!p) return false;
-  const derived = crypto.pbkdf2Sync(inputPlain, p.salt, p.iter, p.hash.length, p.digest as any);
-  return crypto.timingSafeEqual(derived, p.hash);
+  // 旧データ(平文)に対応
+  return normalizeDeleteKey(stored) === norm;
 }
