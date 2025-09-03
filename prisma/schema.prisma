@@ -40,6 +40,9 @@ model Post {
   tempHiddenAt     DateTime?
   realizedAt       DateTime?
 
+  identityId  String?
+  identity  Identity? @relation(fields:[identityId],references:[id], onDelete: SetNull)
+
   reactions        Reaction[]
   comments         Comment[]
   tags             PostTag[]
