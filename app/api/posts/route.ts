@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { verifyRecaptcha } from "@/lib/recaptcha";
 import { hashDeleteKey } from "@/lib/hash";
+import { getOrCreateIdentityId } from "@/lib/identity";
 
 export const dynamic = "force-dynamic"; // SSG/ISRに巻き込まれないように
 export const runtime ="nodejs";
@@ -94,6 +95,7 @@ export async function POST(req: Request) {
     // 必要ならここでdeleteKeyをハッシュ化に差し替え
     // const hashed = await bcrypt.hash(deleteKey, 10);
 const hashed = await hashDeleteKey(deleteKey);
+     const identityId = await getOrCreateIdentityId();
 
     const post = await prisma.post.create({
       data: {
@@ -101,6 +103,7 @@ const hashed = await hashDeleteKey(deleteKey);
         title,
         content,
         deleteKey: hashed, // 実運用はハッシュに！
+        identityId,
         // status は Prisma の default(PUBLISHED) に任せる
       },
     });
