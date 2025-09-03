@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
+import { getOrCreateIdentityId } from "@/lib/identity";
 import { prisma } from "@/lib/db";
 
 export const runtime = "nodejs";
@@ -12,13 +12,7 @@ export async function POST(_req: Request, { params }: Params) {
   const { id } = params;
   if (!id) return NextResponse.json({ ok: false, error: "bad_request" }, { status: 400 });
 
-  const jar = cookies();
-  let identityId = jar.get("kid")?.value;
-  if (!identityId) {
-    const identity = await prisma.identity.create({ data: {} });
-    identityId = identity.id;
-    jar.set("kid", identityId, { httpOnly: true, sameSite: "lax", path: "/", maxAge: 60 * 60 * 24 * 365 });
-  }
+  const identityId = await getOrCreateIdentityId();
 
   try {
     const comment = await prisma.comment.findUnique({
