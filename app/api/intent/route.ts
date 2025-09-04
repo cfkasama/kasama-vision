@@ -1,8 +1,51 @@
+// app/api/intent/route.ts
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { getOrCreateIdentityId } from "@/lib/identity";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+type Body = { kind: "LIVE" | "WORK" | "TOURISM" };
+
+const MAP: Record<Body["kind"], string> = {
+  LIVE: "INTENT_LIVE",
+  WORK: "INTENT_WORK",
+  TOURISM: "INTENT_TOURISM",
+};
+
 export async function POST(req: Request) {
-  const { type } = await req.json();
-  const template = type==="LIVE" ? "笠間に住みたい。困っていること/欲しい情報は…"
-               : type==="WORK" ? "笠間で働きたい。ハードル/支援が欲しい点は…"
-               : "笠間に行きたい。交通/魅力/不満点は…";
-  return NextResponse.json({ ok:true, draftTitle: template, draftTags:[type==="LIVE"?"住めなかった報告":type==="WORK"?"働けなかった報告":"不満がある報告"] });
+  try {
+    const body = (await req.json()) as Body;
+    const kind = body?.kind;
+    if (!kind || !MAP[kind]) {
+      return NextResponse.json({ ok: false, error: "bad_request" }, { status: 400 });
+    }
+
+    // 端末の匿名ID（なければ作成）
+    const identityId = await getOrCreateIdentityId();
+
+    // IPも一応メモ（任意）
+    const ip =
+      (req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "")
+        .split(",")[0]
+        .trim() || null;
+
+    await prisma.adminLog.create({
+      data: {
+        action: MAP[kind],
+        actor: `public:${ip ?? "unknown"}`,
+        target: "intent",
+        note: null,
+        postId: null,
+        meta: { identityId, ip },
+      },
+    });
+
+    return NextResponse.json({ ok: true });
+  } catch (e) {
+    console.error("[POST /api/intent] error:", e);
+    return NextResponse.json({ ok: false, error: "server_error" }, { status: 500 });
+  }
 }
