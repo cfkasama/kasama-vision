@@ -240,7 +240,7 @@ export default async function Home() {
           </Link>
         </Card>
       </section>
-
+<IntentButtons initial={intent} />
       {/* Intent ボタン行 */}
       <section className="mt-4 grid gap-4 md:grid-cols-3">
         <Card>
