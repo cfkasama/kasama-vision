@@ -16,11 +16,10 @@
     "react-dom": "18.2.0",
     "next-auth": "^4.24.7",
     "clsx": "^2.1.0",
-   "argon2": "^0.30.4", 
+   "argon2": "^0.31.2", 
     "@prisma/client": "^5.17.0"
   },
   "overrides": {
-    "@node-rs/argon2": "npm:argon2@0.30.4"
   },
   "devDependencies": {
     "prisma": "^5.17.0",
