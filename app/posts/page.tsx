@@ -130,6 +130,18 @@ export default async function PostsPage({ searchParams }: { searchParams: Record
                   </Link>
                 ))}
               </div>
+ {/* ここを置き換え/追加 */}
+  <div className="flex items-center gap-2">
+    <PostReactions
+      postId={p.id}
+      likeCount={p.likeCount}
+      recCount={p.recCount ?? 0}
+      compact
+    />
+    {/* もし従来の素の数表示も残したければこの行は消してOK
+    <span>💬 {p.cmtCount}</span>
+    */}
+  </div>
               <div>
                 👍 {p.likeCount}　⭐ {p.recCount}　💬 {p.cmtCount}
               </div>
