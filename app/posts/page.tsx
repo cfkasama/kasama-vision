@@ -139,13 +139,8 @@ export default async function PostsPage({ searchParams }: { searchParams: Record
       recCount={p.recCount ?? 0}
       compact
     />
-    {/* もし従来の素の数表示も残したければこの行は消してOK
     <span>💬 {p.cmtCount}</span>
-    */}
   </div>
-              <div>
-                👍 {p.likeCount}　⭐ {p.recCount}　💬 {p.cmtCount}
-              </div>
             </footer>
           </Card>
         ))}
