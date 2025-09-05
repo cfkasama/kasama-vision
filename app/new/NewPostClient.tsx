@@ -17,7 +17,7 @@ type Props = {
 export default function NewPostClient({
     initialType,
   initialTitle,
-  initialTags,
+  initialTags
 }: Props) {
   const router = useRouter();
   const [type, setType] = useState(initialType || "CONSULTATION");
