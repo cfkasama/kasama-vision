@@ -31,7 +31,9 @@ export default async function PostDetail({ params }:{ params:{ id:string }}) {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <a href='/posts?type=${post.type}' className="text-sm text-gray-600 hover:underline">← 一覧へ</a>
+              <Link href={`/posts?type=${p.id}`} className="text-sm text-gray-600 hover:underline">
+                ← 一覧へ
+              </Link>
 
       <div className="mt-2 flex items-center gap-2">
         <Pill>{labelByType[post.type as PostType] ?? post.type}</Pill>
