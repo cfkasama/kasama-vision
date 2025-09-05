@@ -242,52 +242,6 @@ export default async function Home() {
       </section>
 <IntentButtons initial={intent} />
       {/* Intent ボタン行 */}
-      <section className="mt-4 grid gap-4 md:grid-cols-3">
-        <Card>
-          <div className="mb-2 flex items-center justify-between">
-            <Pill>笠間に住みたい</Pill>
-            <span className="text-xs text-gray-500">押された数 {intent.live}</span>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Link href="/new?type=REPORT_LIVE" className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700">
-              住めなかった報告を投稿
-            </Link>
-            <Link href="/posts?type=REPORT_LIVE" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
-              報告一覧へ
-            </Link>
-          </div>
-        </Card>
-
-        <Card>
-          <div className="mb-2 flex items-center justify-between">
-            <Pill>笠間で働きたい</Pill>
-            <span className="text-xs text-gray-500">押された数 {intent.work}</span>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Link href="/new?type=REPORT_WORK" className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700">
-              働けなかった報告を投稿
-            </Link>
-            <Link href="/posts?type=REPORT_WORK" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
-              報告一覧へ
-            </Link>
-          </div>
-        </Card>
-
-        <Card>
-          <div className="mb-2 flex items-center justify-between">
-            <Pill>笠間に行きたい</Pill>
-            <span className="text-xs text-gray-500">押された数 {intent.tourism}</span>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Link href="/new?type=REPORT_TOURISM" className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700">
-              不満がある報告を投稿
-            </Link>
-            <Link href="/posts?type=REPORT_TOURISM" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
-              報告一覧へ
-            </Link>
-          </div>
-        </Card>
-      </section>
 
       {/* タグランキング & 本サイトについて */}
       <section className="mt-4 grid gap-4 md:grid-cols-2">
