@@ -8,12 +8,22 @@ const TYPES = [
   ["REPORT_LIVE","住めなかった報告"],["REPORT_WORK","働けなかった報告"],["REPORT_TOURISM","不満がある報告"],
 ];
 
+type Props = {
+  initialType: string;
+  initialTitle: string;
+  initialTags: string;
+};
+  
 export default function NewPostClient() {
+    initialType,
+  initialTitle,
+  initialTags,
+}: Props) {
   const router = useRouter();
-  const [type, setType] = useState("CONSULTATION");
-  const [title, setTitle] = useState("");
+  const [type, setType] = useState(initialType || "CONSULTATION");
+  const [title, setTitle] = useState(initialTitle || "");
   const [content, setContent] = useState("");
-  const [tags, setTags] = useState("");
+  const [tags, setTags] = useState(initialTags || "");
   const [deleteKey, setDeleteKey] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
