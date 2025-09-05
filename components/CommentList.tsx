@@ -299,7 +299,7 @@ export default function CommentList({ postId }: { postId: string }) {
                   aria-label="通報"
                   title="通報する"
                 >
-                  🚩 通報
+                  {busy.LIKE ? "⏳" : "🚩"} 通報
                 </button>
                 <button
                   onClick={() => removeComment(c.id)}
