@@ -66,16 +66,15 @@ async function getRealizedProposalsCount() {
 // Intent（住みたい/働きたい/行きたい）の押下回数を AdminLog から集計（なければ 0）
 async function getIntentCounts() {
   const actions = ["INTENT_LIVE", "INTENT_WORK", "INTENT_TOURISM"] as const;
-  const rows = await prisma.adminLog.groupBy({
-    by: ["action"],
-    where: { action: { in: actions as unknown as string[] } },
+  const rows = await prisma.intent.groupBy({
+    by: ["kind"],
     _count: { _all: true },
   });
-  const map = Object.fromEntries(rows.map(r => [r.action, r._count._all]));
+  const map = Object.fromEntries(rows.map(r => [r.kind, r._count._all]));
   return {
-    live: (map["INTENT_LIVE"] ?? 0) as number,
-    work: (map["INTENT_WORK"] ?? 0) as number,
-    tourism: (map["INTENT_TOURISM"] ?? 0) as number,
+    live: (map["LIVE"] ?? 0) as number,
+    work: (map["WORK"] ?? 0) as number,
+    tourism: (map["TOURISM"] ?? 0) as number,
   };
 }
 
