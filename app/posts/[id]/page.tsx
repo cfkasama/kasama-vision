@@ -50,7 +50,7 @@ export default async function PostDetail({ params }:{ params:{ id:string }}) {
 
       <div className="mt-1 flex flex-wrap gap-1">
         {post.tags.map((t:any) => <Chip key={t.tagId}><Link href={`/tags/${encodeURIComponent(t.tag.name)}`} className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs">
-                  {t.tag.name}（{t.tag.count}）
+                  {t.tag.name}
                 </Link></Chip>)}
       </div>
 
