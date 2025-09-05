@@ -5,6 +5,16 @@ import { Pill, Chip } from "@/components/ui";
 import ReportButton from "@/components/ReportButton";
 import {PostStatus}from "@prisma/client";
 
+  const labelByType: Partial<Record<PostType, string>> = {
+    CATCHPHRASE: "キャッチフレーズ",
+    VISION: "ビジョン",
+    CONSULTATION: "相談",
+    PROPOSAL: "提案",
+    REPORT_LIVE: "住めなかった報告",
+    REPORT_WORK: "働けなかった報告",
+    REPORT_TOURISM: "不満がある報告",
+  };
+
 export default async function PostDetail({ params }:{ params:{ id:string }}) {
   const post = await prisma.post.findUnique({ where: { id: params.id }, include: { tags: { include: { tag:true } } } });
   if (!post || post.status!=="PUBLISHED") return <div>見つかりませんでした。</div>;
@@ -14,7 +24,7 @@ export default async function PostDetail({ params }:{ params:{ id:string }}) {
       <a href="/posts?type={post.type}" className="text-sm text-gray-600 hover:underline">← 一覧へ</a>
 
       <div className="mt-2 flex items-center gap-2">
-        <Pill>{post.type}</Pill>
+        <Pill>{labelByType[p.type as PostType] ?? p.type}</Pill>
         {post.likeCount>=100 && <Pill color="gold">100いいね</Pill>}
         {(()=>{
         const status = post.status as PostStatus;
