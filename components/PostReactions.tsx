@@ -78,15 +78,6 @@ export default function PostReactions({ postId, likeCount, recCount, compact = t
         >
           {busy.LIKE ? "⏳" : "👍"} <span>{likes}</span>
         </button>
-        <button
-          onClick={() => react("RECOMMEND")}
-          disabled={busy.RECOMMEND || pressed.RECOMMEND}
-          className={btnBase}
-          aria-label="推薦"
-          title={pressed.RECOMMEND ? "この端末では既に推薦済み" : "推薦"}
-        >
-          {busy.RECOMMEND ? "⏳" : "⭐"} <span>{recs}</span>
-        </button>
       </div>
 
       {/* 簡易トースト */}
