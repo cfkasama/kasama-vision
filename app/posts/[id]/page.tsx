@@ -33,7 +33,7 @@ export default async function PostDetail({ params }:{ params:{ id:string }}) {
       <a href="/posts?type={post.type}" className="text-sm text-gray-600 hover:underline">← 一覧へ</a>
 
       <div className="mt-2 flex items-center gap-2">
-        <Pill>{labelByType[p.type as PostType] ?? p.type}</Pill>
+        <Pill>{labelByType[post.type as PostType] ?? post.type}</Pill>
         {post.likeCount>=100 && <Pill color="gold">100いいね</Pill>}
         {(()=>{
         const status = post.status as PostStatus;
