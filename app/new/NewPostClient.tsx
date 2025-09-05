@@ -14,7 +14,7 @@ type Props = {
   initialTags: string;
 };
   
-export default function NewPostClient() {
+export default function NewPostClient({
     initialType,
   initialTitle,
   initialTags,
