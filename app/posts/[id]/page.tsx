@@ -39,7 +39,9 @@ export default async function PostDetail({ params }:{ params:{ id:string }}) {
       <h2 className="mt-2 text-xl font-bold">{post.title}</h2>
 
       <div className="mt-1 flex flex-wrap gap-1">
-        {post.tags.map((t:any) => <Chip key={t.tagId}>{t.tag.name}</Chip>)}
+        {post.tags.map((t:any) => <Chip key={t.tagId}><Link href={`/tags/${encodeURIComponent(t.name)}`} className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs">
+                  {t.tag.name}（{t.tag.count}）
+                </Link></Chip>)}
       </div>
 
       <article className="prose-basic mt-3 text-[15px] text-gray-800">
