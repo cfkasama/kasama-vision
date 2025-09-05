@@ -5,6 +5,15 @@ import { Pill, Chip } from "@/components/ui";
 import ReportButton from "@/components/ReportButton";
 import {PostStatus}from "@prisma/client";
 
+type PostType =
+  | "CATCHPHRASE"
+  | "VISION"
+  | "CONSULTATION"
+  | "PROPOSAL"
+  | "REPORT_LIVE"
+  | "REPORT_WORK"
+  | "REPORT_TOURISM";
+
   const labelByType: Partial<Record<PostType, string>> = {
     CATCHPHRASE: "キャッチフレーズ",
     VISION: "ビジョン",
