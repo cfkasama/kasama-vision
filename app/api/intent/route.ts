@@ -8,7 +8,6 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 type Body = { kind: "LIVE" | "WORK" | "TOURISM" };
-
 const MAP: Record<Body["kind"], string> = {
   LIVE: "INTENT_LIVE",
   WORK: "INTENT_WORK",
@@ -23,23 +22,29 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: "bad_request" }, { status: 400 });
     }
 
-    // 端末の匿名ID（なければ作成）
+    // 匿名ID（Cookieベース）を取得/作成
     const identityId = await getOrCreateIdentityId();
+    const actor = `identity:${identityId}`;
 
-    // IPも一応メモ（任意）
-    const ip =
-      (req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "")
-        .split(",")[0]
-        .trim() || null;
+    // 既に同じ identityId が同じ intent を押していないかチェック
+    const exists = await prisma.adminLog.findFirst({
+      where: { action: MAP[kind], actor },
+      select: { id: true },
+    });
+    if (exists) {
+      // すでに押している → 409
+      return NextResponse.json({ ok: false, error: "already_pressed" }, { status: 409 });
+    }
 
+    // ログ追加（集計は adminLog の groupBy のままでOK）
     await prisma.adminLog.create({
       data: {
         action: MAP[kind],
-        actor: `public:${ip ?? "unknown"}`,
+        actor,                     // identity で固定
         target: "intent",
         note: null,
         postId: null,
-        meta: { identityId, ip },
+        meta: {},                 // 必要なら追加情報
       },
     });
 
