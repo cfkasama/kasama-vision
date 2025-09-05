@@ -93,7 +93,7 @@ export default function NewPostClient() {
     <div className="mx-auto max-w-2xl">
       <h2 className="mb-2 text-xl font-bold">投稿する</h2>
       <p className="mb-4 text-sm text-gray-600">
-        ニックネーム不要、<b>3行からOK</b>。荒らし対策で<strong>削除用パスワード</strong>が必須です。
+        ニックネーム不要。荒らし対策で<strong>削除用パスワード</strong>が必須です。
       </p>
 
       <form onSubmit={onSubmit} className="space-y-4">
