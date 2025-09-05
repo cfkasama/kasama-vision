@@ -1,65 +1,74 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type Props = {
   postId: string;
   likeCount: number;
-  recCount: number;
   compact?: boolean; // 一覧では true 推奨
 };
 
 const LIKE_KEY = (id: string) => `p_like_${id}`;
-const REC_KEY = (id: string) => `p_rec_${id}`;
 
-export default function PostReactions({ postId, likeCount, recCount, compact = true }: Props) {
+export default function PostReactions({ postId, likeCount, compact = true }: Props) {
   const [likes, setLikes] = useState(likeCount);
-  const [recs, setRecs] = useState(recCount);
-  const [busy, setBusy] = useState<Record<"LIKE" | "RECOMMEND", boolean>>({ LIKE: false, RECOMMEND: false });
-  const [pressed, setPressed] = useState<Record<"LIKE" | "RECOMMEND", boolean>>(() => ({
-    LIKE: typeof window !== "undefined" && sessionStorage.getItem(LIKE_KEY(postId)) === "1",
-    RECOMMEND: typeof window !== "undefined" && sessionStorage.getItem(REC_KEY(postId)) === "1",
-  }));
+  const [busy, setBusy] = useState(false);
+  const [pressed, setPressed] = useState(false);
 
-  // トースト表示
+  // 初回マウント時に「この端末で既にいいね済みか」を復元
+  useEffect(() => {
+    try {
+      setPressed(sessionStorage.getItem(LIKE_KEY(postId)) === "1");
+    } catch {/* noop */}
+  }, [postId]);
+
+  // 簡易トースト
   const [toast, setToast] = useState("");
   const showToast = (msg: string) => {
     setToast(msg);
     setTimeout(() => setToast(""), 1800);
   };
 
-  async function react(type: "LIKE" | "RECOMMEND") {
-    if (busy[type] || pressed[type]) return;
-    setBusy((b) => ({ ...b, [type]: true }));
+  async function like() {
+    if (busy || pressed) return;
 
+    setBusy(true);
     // 楽観的更新
-    if (type === "LIKE") setLikes((v) => v + 1);
-    else setRecs((v) => v + 1);
+    setLikes((v) => v + 1);
 
     try {
       const res = await fetch("/api/reactions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ postId, type }),
+        body: JSON.stringify({ postId, type: "LIKE" }),
       });
 
-      if (!res.ok && res.status !== 409) {
-        // ロールバック
-        if (type === "LIKE") setLikes((v) => Math.max(v - 1, 0));
-        else setRecs((v) => Math.max(v - 1, 0));
+      // サーバ側で「既に押してる（同一端末/identity）」なら 409 を返す想定
+      if (res.status === 409) {
+        // ロールバックして「押済み」状態に
+        setLikes((v) => Math.max(v - 1, 0));
+        try { sessionStorage.setItem(LIKE_KEY(postId), "1"); } catch {}
+        setPressed(true);
+        showToast("この端末では既にいいね済みです");
+        return;
+      }
+
+      if (!res.ok) {
+        // その他の失敗 → ロールバック
+        setLikes((v) => Math.max(v - 1, 0));
         showToast("エラーが発生しました");
         return;
       }
 
-      if (type === "LIKE") sessionStorage.setItem(LIKE_KEY(postId), "1");
-      else sessionStorage.setItem(REC_KEY(postId), "1");
-      setPressed((p) => ({ ...p, [type]: true }));
-      showToast(type === "LIKE" ? "いいねしました" : "推薦しました");
+      // 成功 → 端末に押済み保存
+      try { sessionStorage.setItem(LIKE_KEY(postId), "1"); } catch {}
+      setPressed(true);
+      showToast("いいねしました");
     } catch {
-      if (type === "LIKE") setLikes((v) => Math.max(v - 1, 0));
-      else setRecs((v) => Math.max(v - 1, 0));
+      // 通信エラー → ロールバック
+      setLikes((v) => Math.max(v - 1, 0));
       showToast("通信エラーが発生しました");
     } finally {
-      setBusy((b) => ({ ...b, [type]: false }));
+      setBusy(false);
     }
   }
 
@@ -70,19 +79,25 @@ export default function PostReactions({ postId, likeCount, recCount, compact = t
     <>
       <div className="flex items-center gap-2">
         <button
-          onClick={() => react("LIKE")}
-          disabled={busy.LIKE || pressed.LIKE}
+          onClick={like}
+          disabled={busy || pressed}
           className={btnBase}
           aria-label="いいね"
-          title={pressed.LIKE ? "この端末では既にいいね済み" : "いいね"}
+          title={pressed ? "この端末では既にいいね済み" : "いいね"}
         >
-          {busy.LIKE ? "⏳" : "👍"} <span>{likes}</span>
+          {busy ? "⏳" : "👍"}
+          <span>{likes}</span>
+          {!compact && <span className="ml-1">いいね</span>}
         </button>
       </div>
 
-      {/* 簡易トースト */}
+      {/* トースト */}
       {toast && (
-        <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-black/80 px-3 py-2 text-xs text-white">
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-black/80 px-3 py-2 text-xs text-white"
+        >
           {toast}
         </div>
       )}
