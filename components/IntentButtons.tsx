@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
 type Counts = { live: number; work: number; tourism: number };
@@ -9,24 +9,30 @@ const LS_KEY = (k: "LIVE" | "WORK" | "TOURISM") => `intent_${k.toLowerCase()}`;
 export default function IntentButtons({ initial }: { initial: Counts }) {
   const [counts, setCounts] = useState<Counts>(initial);
   const [busy, setBusy] = useState<Record<string, boolean>>({});
+  const [pressed, setPressed] = useState<{ LIVE: boolean; WORK: boolean; TOURISM: boolean }>({
+    LIVE: false,
+    WORK: false,
+    TOURISM: false,
+  });
 
-  // 1端末で複数回の“連打”を抑止（1回押したらローカル保存）
-  const pressed = useMemo(
-    () => ({
-      LIVE: localStorage.getItem(LS_KEY("LIVE")) === "1",
-      WORK: localStorage.getItem(LS_KEY("WORK")) === "1",
-      TOURISM: localStorage.getItem(LS_KEY("TOURISM")) === "1",
-    }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [typeof window !== "undefined" && localStorage.getItem(LS_KEY("LIVE")), typeof window !== "undefined" && localStorage.getItem(LS_KEY("WORK")), typeof window !== "undefined" && localStorage.getItem(LS_KEY("TOURISM"))]
-  );
+  // CSR で押済み状態を復元
+  useEffect(() => {
+    try {
+      setPressed({
+        LIVE: localStorage.getItem(LS_KEY("LIVE")) === "1",
+        WORK: localStorage.getItem(LS_KEY("WORK")) === "1",
+        TOURISM: localStorage.getItem(LS_KEY("TOURISM")) === "1",
+      });
+    } catch {/* noop */}
+  }, []);
 
   async function press(kind: "LIVE" | "WORK" | "TOURISM") {
     if (busy[kind]) return;
-    if (pressed[kind]) return; // 端末内で一度だけ
+    if (pressed[kind]) return;
 
     setBusy((b) => ({ ...b, [kind]: true }));
-    // 楽観的更新
+
+    // 楽観的 +1
     setCounts((c) => {
       const next = { ...c };
       if (kind === "LIVE") next.live += 1;
@@ -42,8 +48,9 @@ export default function IntentButtons({ initial }: { initial: Counts }) {
         body: JSON.stringify({ kind }),
       });
       const j = await r.json().catch(() => ({}));
-      if (!r.ok || !j?.ok) {
-        // ロールバック
+
+      if (r.status === 409) {
+        // 既に押済み → 表示を元に戻しつつ、この端末でも押済みにする
         setCounts((c) => {
           const next = { ...c };
           if (kind === "LIVE") next.live = Math.max(next.live - 1, 0);
@@ -51,12 +58,30 @@ export default function IntentButtons({ initial }: { initial: Counts }) {
           if (kind === "TOURISM") next.tourism = Math.max(next.tourism - 1, 0);
           return next;
         });
-        alert("送信に失敗しました。通信状況をご確認ください。");
-      } else {
-        localStorage.setItem(LS_KEY(kind), "1");
+        try { localStorage.setItem(LS_KEY(kind), "1"); } catch {}
+        setPressed((p) => ({ ...p, [kind]: true }));
+        alert("この意向は既に送信済みです。");
+        return;
       }
+
+      if (!r.ok || !j?.ok) {
+        // 失敗 → ロールバック
+        setCounts((c) => {
+          const next = { ...c };
+          if (kind === "LIVE") next.live = Math.max(next.live - 1, 0);
+          if (kind === "WORK") next.work = Math.max(next.work - 1, 0);
+          if (kind === "TOURISM") next.tourism = Math.max(next.tourism - 1, 0);
+          return next;
+        });
+        alert("送信に失敗しました。しばらくしてから再度お試しください。");
+        return;
+      }
+
+      // 成功 → 端末に押済み保存
+      try { localStorage.setItem(LS_KEY(kind), "1"); } catch {}
+      setPressed((p) => ({ ...p, [kind]: true }));
     } catch {
-      // ロールバック
+      // エラー → ロールバック
       setCounts((c) => {
         const next = { ...c };
         if (kind === "LIVE") next.live = Math.max(next.live - 1, 0);
@@ -70,14 +95,12 @@ export default function IntentButtons({ initial }: { initial: Counts }) {
     }
   }
 
-  const btnBase =
+  const btn =
     "w-full rounded-2xl px-4 py-5 text-white text-lg font-semibold shadow transition disabled:opacity-60";
-  const box =
-    "rounded-xl border bg-white p-4 flex flex-col gap-3";
+  const box = "rounded-xl border bg-white p-4 flex flex-col gap-3";
 
   return (
     <section className="grid gap-4 md:grid-cols-3">
-      {/* 笠間に住みたい */}
       <div className={box}>
         <div className="flex items-center justify-between">
           <span className="text-sm text-gray-600">押された数 {counts.live}</span>
@@ -85,7 +108,7 @@ export default function IntentButtons({ initial }: { initial: Counts }) {
         <button
           onClick={() => press("LIVE")}
           disabled={!!busy.LIVE || pressed.LIVE}
-          className={`${btnBase} bg-emerald-600 hover:bg-emerald-700`}
+          className={`${btn} bg-emerald-600 hover:bg-emerald-700`}
         >
           🏠 笠間に住みたい
         </button>
@@ -99,7 +122,6 @@ export default function IntentButtons({ initial }: { initial: Counts }) {
         </div>
       </div>
 
-      {/* 笠間で働きたい */}
       <div className={box}>
         <div className="flex items-center justify-between">
           <span className="text-sm text-gray-600">押された数 {counts.work}</span>
@@ -107,7 +129,7 @@ export default function IntentButtons({ initial }: { initial: Counts }) {
         <button
           onClick={() => press("WORK")}
           disabled={!!busy.WORK || pressed.WORK}
-          className={`${btnBase} bg-blue-600 hover:bg-blue-700`}
+          className={`${btn} bg-blue-600 hover:bg-blue-700`}
         >
           💼 笠間で働きたい
         </button>
@@ -121,7 +143,6 @@ export default function IntentButtons({ initial }: { initial: Counts }) {
         </div>
       </div>
 
-      {/* 笠間に行きたい */}
       <div className={box}>
         <div className="flex items-center justify-between">
           <span className="text-sm text-gray-600">押された数 {counts.tourism}</span>
@@ -129,7 +150,7 @@ export default function IntentButtons({ initial }: { initial: Counts }) {
         <button
           onClick={() => press("TOURISM")}
           disabled={!!busy.TOURISM || pressed.TOURISM}
-          className={`${btnBase} bg-orange-600 hover:bg-orange-700`}
+          className={`${btn} bg-orange-600 hover:bg-orange-700`}
         >
           🚆 笠間に行きたい
         </button>
