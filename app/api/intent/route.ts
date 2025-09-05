@@ -1,4 +1,3 @@
-// app/api/intent/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getOrCreateIdentityId } from "@/lib/identity";
@@ -8,48 +7,37 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 type Body = { kind: "LIVE" | "WORK" | "TOURISM" };
-const MAP: Record<Body["kind"], string> = {
-  LIVE: "INTENT_LIVE",
-  WORK: "INTENT_WORK",
-  TOURISM: "INTENT_TOURISM",
-};
 
 export async function POST(req: Request) {
   try {
     const body = (await req.json()) as Body;
     const kind = body?.kind;
-    if (!kind || !MAP[kind]) {
+    if (!kind || !["LIVE", "WORK", "TOURISM"].includes(kind)) {
       return NextResponse.json({ ok: false, error: "bad_request" }, { status: 400 });
     }
 
-    // 匿名ID（Cookieベース）を取得/作成
     const identityId = await getOrCreateIdentityId();
-    const actor = `identity:${identityId}`;
 
-    // 既に同じ identityId が同じ intent を押していないかチェック
-    const exists = await prisma.adminLog.findFirst({
-      where: { action: MAP[kind], actor },
+    // 既に押してたら 409（ユニーク制約エラーでも拾う）
+    const exists = await prisma.intent.findUnique({
+      where: { identityId_kind: { identityId, kind: kind as any } },
       select: { id: true },
     });
     if (exists) {
-      // すでに押している → 409
       return NextResponse.json({ ok: false, error: "already_pressed" }, { status: 409 });
     }
 
-    // ログ追加（集計は adminLog の groupBy のままでOK）
-    await prisma.adminLog.create({
-      data: {
-        action: MAP[kind],
-        actor,                     // identity で固定
-        target: "intent",
-        note: null,
-        postId: null,
-        meta: {},                 // 必要なら追加情報
-      },
+    // 追加
+    await prisma.intent.create({
+      data: { identityId, kind: kind as any },
     });
 
     return NextResponse.json({ ok: true });
-  } catch (e) {
+  } catch (e: any) {
+    // ユニーク制約の同時押しなどもここで 409 に変換
+    if (String(e?.code) === "P2002") {
+      return NextResponse.json({ ok: false, error: "already_pressed" }, { status: 409 });
+    }
     console.error("[POST /api/intent] error:", e);
     return NextResponse.json({ ok: false, error: "server_error" }, { status: 500 });
   }
