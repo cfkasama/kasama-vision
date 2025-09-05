@@ -189,3 +189,23 @@ model CommentAction {
   @@index([commentId, createdAt])
   @@index([identityId, createdAt])
 }
+
+enum IntentKind {
+  LIVE
+  WORK
+  TOURISM
+}
+
+model Intent {
+  id         String     @id @default(cuid())
+  createdAt  DateTime   @default(now())
+  // 誰が
+  identityId String
+  identity   Identity   @relation(fields: [identityId], references: [id], onDelete: Cascade)
+
+  // 何を押したか
+  kind       IntentKind
+
+  @@unique([identityId, kind])          // 同一 identity は各種1回だけ
+  @@index([kind, createdAt])            // 集計・時系列用
+}
