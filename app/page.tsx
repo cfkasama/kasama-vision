@@ -63,6 +63,22 @@ async function getNewProposals() {
   });
 }
 
+async function getHundredLikeProposals() {
+  return prisma.post.findMany({
+    where: { status: "PUBLISHED", type: "PROPOSAL", likeCount: { gte: 100 } },
+    orderBy: { createdAt: "desc" },
+    take: 3,
+  });
+}
+
+async function getRealizedProposals() {
+  return prisma.post.findMany({
+    where: { status: "REALIZED", type: "PROPOSAL" },
+    orderBy: { createdAt: "desc" },
+    take: 3,
+  });
+}
+
 async function getHundredLikeProposalsCount() {
   return prisma.post.count({
     where: { status: "PUBLISHED", type: "PROPOSAL", likeCount: { gte: 100 } },
@@ -116,6 +132,8 @@ export default async function Home() {
     topVis,
     newCons,
     newPros,
+    hundredLikes,
+    realizeds,    
     hundredLikeCount,
     realizedCount,
     intent,
@@ -126,6 +144,8 @@ export default async function Home() {
     getTopVisions(),
     getNewConsultations(),
     getNewProposals(),
+    getHundredLikeProposals(),
+    getRealizedProposals(),
     getHundredLikeProposalsCount(),
     getRealizedProposalsCount(),
     getIntentCounts(),
@@ -207,7 +227,7 @@ export default async function Home() {
             <span className="text-xs text-gray-500">投稿数 {counts.consultation}</span>
           </div>
                     {newCons.length ? (
-            <ol className="list-decimal pl-5 text-sm">
+            <ol className="list-disc pl-5 text-sm">
               {newCons.map((v) => (
                 <li key={v.id} className="mb-1">
                   <Link href={`/posts/${v.id}`} className="hover:underline">
@@ -234,8 +254,8 @@ export default async function Home() {
             <Pill>提案</Pill>
             <span className="text-xs text-gray-500">投稿数 {counts.proposal}</span>
           </div>
-                              {newPros.length ? (
-            <ol className="list-decimal pl-5 text-sm">
+         {newPros.length ? (
+            <ol className="list-disc pl-5 text-sm">
               {newPros.map((v) => (
                 <li key={v.id} className="mb-1">
                   <Link href={`/posts/${v.id}`} className="hover:underline">
@@ -265,16 +285,41 @@ export default async function Home() {
             <Pill color="gold">いいね100提案</Pill>
             <span className="text-xs text-gray-500">件数 {hundredLikeCount}</span>
           </div>
+           {hundredLikes.length ? (
+            <ol className="list-disc pl-5 text-sm">
+              {hundredLikes.map((v) => (
+                <li key={v.id} className="mb-1">
+                  <Link href={`/posts/${v.id}`} className="hover:underline">
+                    {v.title}
+                  </Link>{" "}
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className="text-sm">まだありません。</p>
+          )}
           <Link href="/posts?type=PROPOSAL&minLikes=100" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50 inline-block">
             提案一覧へ
           </Link>
         </Card>
-
         <Card>
           <div className="mb-2 flex items-center justify-between">
             <Pill color="green">実現提案</Pill>
             <span className="text-xs text-gray-500">件数 {realizedCount}</span>
           </div>
+           {realizeds.length ? (
+            <ol className="list-disc pl-5 text-sm">
+              {realizeds.map((v) => (
+                <li key={v.id} className="mb-1">
+                  <Link href={`/posts/${v.id}`} className="hover:underline">
+                    {v.title}
+                  </Link>{" "}
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className="text-sm">まだありません。</p>
+          )}
           <Link href="/posts?type=PROPOSAL&status=REALIZED" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50 inline-block">
             実現一覧へ
           </Link>
