@@ -31,7 +31,7 @@ export default async function PostDetail({ params }:{ params:{ id:string }}) {
 
   return (
     <div className="mx-auto max-w-2xl">
-              <Link href={`/posts?type=${p.id}`} className="text-sm text-gray-600 hover:underline">
+              <Link href={`/posts?type=${post.id}`} className="text-sm text-gray-600 hover:underline">
                 ← 一覧へ
               </Link>
 
