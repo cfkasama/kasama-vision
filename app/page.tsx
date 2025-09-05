@@ -29,9 +29,6 @@ async function countsByType() {
     vision: get("VISION"),
     consultation: get("CONSULTATION"),
     proposal: get("PROPOSAL"),
-    reportLive: get("REPORT_LIVE"),
-    reportWork: get("REPORT_WORK"),
-    reportTourism: get("REPORT_TOURISM"),
   };
 }
 
@@ -39,7 +36,6 @@ async function getTopCatchphrase() {
   return prisma.post.findFirst({
     where: { status: "PUBLISHED", type: "CATCHPHRASE" },
     orderBy: { likeCount: "desc" },
-    include: { tags: { include: { tag: true } } },
   });
 }
 
@@ -48,7 +44,22 @@ async function getTopVisions() {
     where: { status: "PUBLISHED", type: "VISION" },
     orderBy: { likeCount: "desc" },
     take: 3,
-    include: { tags: { include: { tag: true } } },
+  });
+}
+
+async function getNewConsultations() {
+  return prisma.post.findMany({
+    where: { status: "PUBLISHED", type: "CONSULTATION" },
+    orderBy: { createdAt: "desc" },
+    take: 3,
+  });
+}
+
+async function getNewProposals() {
+  return prisma.post.findMany({
+    where: { status: "PUBLISHED", type: "PROPOSAL" },
+    orderBy: { createdAt: "desc" },
+    take: 3,
   });
 }
 
@@ -63,7 +74,7 @@ async function getRealizedProposalsCount() {
   });
 }
 
-// Intent（住みたい/働きたい/行きたい）の押下回数を AdminLog から集計（なければ 0）
+// Intent（住みたい/働きたい/行きたい）の押下回数を集計（なければ 0）
 async function getIntentCounts() {
   const actions = ["INTENT_LIVE", "INTENT_WORK", "INTENT_TOURISM"] as const;
   const rows = await prisma.intent.groupBy({
@@ -103,6 +114,8 @@ export default async function Home() {
     counts,
     topCatch,
     topVis,
+    newCons,
+    newPros,
     hundredLikeCount,
     realizedCount,
     intent,
@@ -111,6 +124,8 @@ export default async function Home() {
     countsByType(),
     getTopCatchphrase(),
     getTopVisions(),
+    getNewConsultations(),
+    getNewProposals(),
     getHundredLikeProposalsCount(),
     getRealizedProposalsCount(),
     getIntentCounts(),
@@ -191,6 +206,19 @@ export default async function Home() {
             <Pill>相談</Pill>
             <span className="text-xs text-gray-500">投稿数 {counts.consultation}</span>
           </div>
+                    {newCons.length ? (
+            <ol className="list-decimal pl-5 text-sm">
+              {newCons.map((v) => (
+                <li key={v.id} className="mb-1">
+                  <Link href={`/posts/${v.id}`} className="hover:underline">
+                    {v.title}
+                  </Link>{" "}
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className="text-sm">まだありません。</p>
+          )}
           <div className="mt-1 flex gap-2">
             <Link href="/posts?type=CONSULTATION" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
               一覧を見る
@@ -206,6 +234,19 @@ export default async function Home() {
             <Pill>提案</Pill>
             <span className="text-xs text-gray-500">投稿数 {counts.proposal}</span>
           </div>
+                              {newPros.length ? (
+            <ol className="list-decimal pl-5 text-sm">
+              {newPros.map((v) => (
+                <li key={v.id} className="mb-1">
+                  <Link href={`/posts/${v.id}`} className="hover:underline">
+                    {v.title}
+                  </Link>{" "}
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className="text-sm">まだありません。</p>
+          )}
           <div className="mt-1 flex gap-2">
             <Link href="/posts?type=PROPOSAL" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
               一覧を見る
