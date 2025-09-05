@@ -2,6 +2,8 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { Card, Pill, Chip } from "@/components/ui";
+import { PostReactions } from "@/components/PostReactions";
+
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
