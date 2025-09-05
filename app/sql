@@ -1,6 +1,24 @@
-ALTER TABLE "Post" ADD COLUMN "identityId" TEXT NULL;
-ALTER TABLE "Post"
-  ADD CONSTRAINT "Post_identityId_fkey"
-  FOREIGN KEY ("identityId") REFERENCES "Identity"("id")
-  ON DELETE SET NULL ON UPDATE CASCADE;
-CREATE INDEX "Post_identityId_idx" ON "Post"("identityId");
+-- enum がなければ作成
+DO $$ BEGIN
+  CREATE TYPE "IntentKind" AS ENUM ('LIVE','WORK','TOURISM');
+EXCEPTION
+  WHEN duplicate_object THEN NULL;
+END $$;
+
+-- テーブル
+CREATE TABLE IF NOT EXISTS "Intent" (
+  "id"         TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+  "createdAt"  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  "identityId" TEXT NOT NULL,
+  "kind"       "IntentKind" NOT NULL,
+  CONSTRAINT "Intent_identityId_fkey"
+    FOREIGN KEY ("identityId") REFERENCES "Identity"("id") ON DELETE CASCADE
+);
+
+-- 同一 identity × kind は1回だけ
+CREATE UNIQUE INDEX IF NOT EXISTS "Intent_identityId_kind_key"
+  ON "Intent"("identityId","kind");
+
+-- 集計・時系列
+CREATE INDEX IF NOT EXISTS "Intent_kind_createdAt_idx"
+  ON "Intent"("kind","createdAt");
