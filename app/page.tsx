@@ -341,6 +341,9 @@ export default async function Home() {
               </li>
             ))}
           </ul>
+          <Link href="/tags" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50 inline-block">
+            タグ一覧へ
+          </Link>
         </Card>
 
         <Card>
