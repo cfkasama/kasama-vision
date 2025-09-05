@@ -18,6 +18,7 @@ model Identity {
   abuseReports AbuseReport[]
   commentActions CommentAction[]
 posts        Post[]
+intents        Intent[]
 }
 
 model Post {
