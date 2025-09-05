@@ -89,7 +89,7 @@ export default function ReactionBar({
       <button
         onClick={deletePost}
         disabled={busy}
-        className="rounded-lg bg-White-600 px-3 py-1.5 text-black hover:bg-gray-700 disabled:opacity-50"
+        className="rounded-lg bg-gtay-0 px-3 py-1.5 hover:bg-gray-50 disabled:opacity-60"
       >
         🗑️ 削除
       </button>
