@@ -282,7 +282,7 @@ export default function CommentList({ postId }: { postId: string }) {
                   aria-label="いいね"
                   title={pressedLike[c.id] ? "この端末では既にいいね済み" : "いいね"}
                 >
-                  👍 {c.likeCount}
+                  {busy.LIKE ? "⏳" : "👍"}  {c.likeCount}
                 </button>
                 <button
                   onClick={() => recommend(c.id)}
@@ -291,7 +291,7 @@ export default function CommentList({ postId }: { postId: string }) {
                   aria-label="推薦"
                   title={pressedRec[c.id] ? "この端末では既に推薦済み" : "推薦"}
                 >
-                  ⭐ {c.recCount ?? 0}
+                  {busy.LIKE ? "⏳" : "⭐"}  {c.recCount ?? 0}
                 </button>
                 <button
                   onClick={() => report(c)}
@@ -305,7 +305,7 @@ export default function CommentList({ postId }: { postId: string }) {
                   onClick={() => removeComment(c.id)}
                   className="rounded-full border px-2 py-0.5 text-xs hover:bg-gray-50"
                 >
-                  🗑️ 削除
+                  {busy.LIKE ? "⏳" : "🗑️"} 削除
                 </button>
               </div>
             </div>
