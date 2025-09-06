@@ -18,7 +18,9 @@ export default function PostReactions({ postId, likeCount, compact = true }: Pro
   useEffect(() => {
     try {
       setPressed(sessionStorage.getItem(LIKE_KEY(postId)) === "1");
-    } catch {/* noop */}
+    } catch {
+      /* noop */
+    }
   }, [postId]);
 
   // 簡易トースト
@@ -36,15 +38,11 @@ export default function PostReactions({ postId, likeCount, compact = true }: Pro
     setLikes((v) => v + 1);
 
     try {
-      const res = await fetch("/api/reactions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ postId, type: "LIKE" }),
-      });
+      const res = await fetch(`/api/posts/${postId}/like`, { method: "POST" });
+      const json = await res.json().catch(() => ({} as any));
 
-      // サーバ側で「既に押してる（同一端末/identity）」なら 409 を返す想定
       if (res.status === 409) {
-        // ロールバックして「押済み」状態に
+        // もしサーバが重複押下を409で返す実装ならここでロールバック
         setLikes((v) => Math.max(v - 1, 0));
         try { sessionStorage.setItem(LIKE_KEY(postId), "1"); } catch {}
         setPressed(true);
@@ -52,14 +50,18 @@ export default function PostReactions({ postId, likeCount, compact = true }: Pro
         return;
       }
 
-      if (!res.ok) {
-        // その他の失敗 → ロールバック
+      if (!res.ok || !json?.ok) {
+        // 失敗 → ロールバック
         setLikes((v) => Math.max(v - 1, 0));
         showToast("エラーが発生しました");
         return;
       }
 
-      // 成功 → 端末に押済み保存
+      // サーバが likeCount を返すならそれを採用（ズレ補正）
+      if (typeof json.likeCount === "number") {
+        setLikes(json.likeCount);
+      }
+
       try { sessionStorage.setItem(LIKE_KEY(postId), "1"); } catch {}
       setPressed(true);
       showToast("いいねしました");
@@ -81,6 +83,7 @@ export default function PostReactions({ postId, likeCount, compact = true }: Pro
         <button
           onClick={like}
           disabled={busy || pressed}
+          aria-busy={busy}
           className={btnBase}
           aria-label="いいね"
           title={pressed ? "この端末では既にいいね済み" : "いいね"}
