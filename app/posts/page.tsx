@@ -136,7 +136,7 @@ export default async function PostsPage({ searchParams }: { searchParams: Record
     <PostReactions
       postId={p.id}
       likeCount={p.likeCount}
-      recCount={p.recCount ?? 0}
+      //recCount={p.recCount ?? 0}
       compact
     />
     <span>💬 {p.cmtCount}</span>
