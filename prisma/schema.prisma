@@ -68,6 +68,7 @@ model Post {
   tags             PostTag[]
 abuseReports     AbuseReport[]
 adminLogs AdminLog[]
+  @@index([municipalityId])
 }
 
 model Reaction {
