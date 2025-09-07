@@ -17,9 +17,11 @@ const TYPES: [string, string][] = [
 export default function NewPostClient({
   initialType,
   municipalities,
+  initialMunicipalitySlug = "japan", // ← 追加（既定値）
 }: {
   initialType?: string;
   municipalities: Municipality[];
+  initialMunicipalitySlug?: string;
 }) {
   const router = useRouter();
 
@@ -28,14 +30,17 @@ export default function NewPostClient({
   const [content, setContent] = useState("");
   const [tags, setTags] = useState("");
   const [deleteKey, setDeleteKey] = useState("");
-  const [municipalitySlug, setMunicipalitySlug] = useState<string>(
-    municipalities[0]?.slug ?? ""
-  );
+
+  // ここを "japan" 優先に
+  const [municipalitySlug, setMunicipalitySlug] = useState<string>(() => {
+    const exists = municipalities.some(m => m.slug === initialMunicipalitySlug);
+    if (exists) return initialMunicipalitySlug;
+    return municipalities[0]?.slug ?? "";
+  });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Invisible reCAPTCHA 読み込み
   useEffect(() => {
     const script = document.createElement("script");
     script.src = `https://www.google.com/recaptcha/api.js`;
@@ -56,7 +61,6 @@ export default function NewPostClient({
       setLoading(false);
       return;
     }
-
     if (!municipalitySlug) {
       setError("自治体を選択してください。");
       setLoading(false);
@@ -76,19 +80,15 @@ export default function NewPostClient({
           type,
           title,
           content,
-          tags: tags
-            .split(",")
-            .map((s) => s.trim())
-            .filter(Boolean),
+          tags: tags.split(",").map(s => s.trim()).filter(Boolean),
           deleteKey,
           recaptchaToken: token,
-          municipalitySlug, // ← 追加
+          municipalitySlug, // ← 日本/本サイト含む slug を送る
         }),
       });
 
       const json = await res.json();
       if (!json?.ok) throw new Error(json?.error || "投稿に失敗しました。");
-
       router.push(`/posts/${json.id}`);
     } catch (err: any) {
       setError(err?.message || "投稿に失敗しました。");
@@ -105,7 +105,7 @@ export default function NewPostClient({
       </p>
 
       <form onSubmit={onSubmit} className="space-y-4">
-        {/* 自治体セレクト */}
+        {/* 自治体セレクト（日本がデフォルト） */}
         <label className="block text-sm">
           自治体（必須）
           <select
@@ -114,11 +114,9 @@ export default function NewPostClient({
             required
             className="mt-1 w-full rounded-md border p-2"
           >
-            <option value="" disabled>
-              選択してください
-            </option>
+            <option value="" disabled>選択してください</option>
             {municipalities.map((m) => (
-              <option key={m.id} value={m.slug}>
+              <option key={m.slug} value={m.slug}>
                 {m.name}
               </option>
             ))}
@@ -188,6 +186,7 @@ export default function NewPostClient({
           />
         </label>
 
+        {/* エラー/送信 */}
         {error && <p className="text-sm text-red-600">{error}</p>}
         <button
           className="g-recaptcha inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-60"
