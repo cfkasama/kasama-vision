@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import ClientLayout from "@/components/ClientLayout"; // ← 追加
 const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!;
 export const metadata: Metadata = {
-  title: "みんなで創る、笠間の未来",
+  title: "みんなで創る未来",
   description: "投稿・評価で市民の声を可視化し、実現へつなげる。",
 };
 
@@ -13,7 +13,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen">
         <header className="border-b bg-white">
           <div className="container flex items-center justify-between py-3">
-            <a href="/" className="font-bold">みんなで創る、笠間の未来</a>
+            <a href="/" className="font-bold">みんなで創る未来</a>
             <nav className="flex items-center gap-2 text-sm">
               <a href="/posts?type=PROPOSAL" className="text-gray-600 hover:text-gray-900">提案</a>
               <a href="/about" className="text-gray-600 hover:text-gray-900">本サイトについて</a>
