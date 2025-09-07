@@ -10,6 +10,20 @@ datasource db {
   directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
+model Municipality {
+  id        String  @id @default(cuid())
+  createdAt DateTime @default(now())
+  name      String
+  slug      String  @unique        // 例: "kasama"
+  prefecture String?               // 例: "茨城県"
+  code      String?                // JIS コード等（任意）
+
+  posts     Post[]
+  intents   Intent[]
+
+  @@index([slug])
+}
+
 model Identity {
   id           String        @id @default(cuid())
   createdAt    DateTime      @default(now())
@@ -44,6 +58,10 @@ model Post {
 
   identityId  String?
   identity  Identity? @relation(fields:[identityId],references:[id], onDelete: SetNull)
+
+// ★ 追加
+  municipalityId String
+  municipality   Municipality  @relation(fields: [municipalityId], references: [id], onDelete: Restrict)
 
   reactions        Reaction[]
   comments         Comment[]
