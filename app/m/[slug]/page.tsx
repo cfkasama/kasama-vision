@@ -1,8 +1,8 @@
-// app/page.tsx
+// app/m/[slug]/page.tsx
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { Card, Pill, Chip } from "@/components/ui";
-import IntentButtons from "@/components/IntentButtons";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -16,147 +16,130 @@ type PostType =
   | "REPORT_WORK"
   | "REPORT_TOURISM";
 
-async function countsByType() {
+const labelByType: Record<PostType, string> = {
+  CATCHPHRASE: "キャッチフレーズ",
+  VISION: "ビジョン",
+  CONSULTATION: "相談",
+  PROPOSAL: "提案",
+  REPORT_LIVE: "住めなかった報告",
+  REPORT_WORK: "働けなかった報告",
+  REPORT_TOURISM: "不満がある報告",
+};
+
+async function countsByType(muniSlug: string) {
   const rows = await prisma.post.groupBy({
     by: ["type"],
-    where: { status: "PUBLISHED" },
+    where: { status: "PUBLISHED", municipality: { slug: muniSlug } },
     _count: { _all: true },
   });
-  const map = Object.fromEntries(rows.map(r => [r.type, r._count._all]));
+  const map = Object.fromEntries(rows.map((r) => [r.type, r._count._all]));
   const get = (t: PostType) => (map[t] ?? 0) as number;
   return {
     catchphrase: get("CATCHPHRASE"),
     vision: get("VISION"),
     consultation: get("CONSULTATION"),
     proposal: get("PROPOSAL"),
+    reportLive: get("REPORT_LIVE"),
+    reportWork: get("REPORT_WORK"),
+    reportTourism: get("REPORT_TOURISM"),
   };
 }
 
-async function getTopCatchphrase() {
+async function getTopCatchphrase(muniSlug: string) {
   return prisma.post.findFirst({
-    where: { status: "PUBLISHED", type: "CATCHPHRASE" },
+    where: { status: "PUBLISHED", type: "CATCHPHRASE", municipality: { slug: muniSlug } },
     orderBy: { likeCount: "desc" },
+    include: { tags: { include: { tag: true } } },
   });
 }
 
-async function getTopVisions() {
+async function getTopVisions(muniSlug: string) {
   return prisma.post.findMany({
-    where: { status: "PUBLISHED", type: "VISION" },
+    where: { status: "PUBLISHED", type: "VISION", municipality: { slug: muniSlug } },
     orderBy: { likeCount: "desc" },
     take: 3,
+    include: { tags: { include: { tag: true } } },
   });
 }
 
-async function getNewConsultations() {
-  return prisma.post.findMany({
-    where: { status: "PUBLISHED", type: "CONSULTATION" },
-    orderBy: { createdAt: "desc" },
-    take: 3,
-  });
-}
-
-async function getNewProposals() {
-  return prisma.post.findMany({
-    where: { status: "PUBLISHED", type: "PROPOSAL" },
-    orderBy: { createdAt: "desc" },
-    take: 3,
-  });
-}
-
-async function getHundredLikeProposals() {
-  return prisma.post.findMany({
-    where: { status: "PUBLISHED", type: "PROPOSAL", likeCount: { gte: 100 } },
-    orderBy: { createdAt: "desc" },
-    take: 3,
-  });
-}
-
-async function getRealizedProposals() {
-  return prisma.post.findMany({
-    where: { status: "REALIZED", type: "PROPOSAL" },
-    orderBy: { createdAt: "desc" },
-    take: 3,
-  });
-}
-
-async function getHundredLikeProposalsCount() {
+async function getHundredLikeProposalsCount(muniSlug: string) {
   return prisma.post.count({
-    where: { status: "PUBLISHED", type: "PROPOSAL", likeCount: { gte: 100 } },
+    where: { status: "PUBLISHED", type: "PROPOSAL", municipality: { slug: muniSlug }, likeCount: { gte: 100 } },
   });
 }
-async function getRealizedProposalsCount() {
+async function getRealizedProposalsCount(muniSlug: string) {
   return prisma.post.count({
-    where: { status: "REALIZED", type: "PROPOSAL" },
+    where: { status: "REALIZED", type: "PROPOSAL", municipality: { slug: muniSlug } },
   });
 }
 
-// Intent（住みたい/働きたい/行きたい）の押下回数を集計（なければ 0）
-async function getIntentCounts() {
-  const actions = ["INTENT_LIVE", "INTENT_WORK", "INTENT_TOURISM"] as const;
-  const rows = await prisma.intent.groupBy({
-    by: ["kind"],
-    _count: { _all: true },
-  });
-  const map = Object.fromEntries(rows.map(r => [r.kind, r._count._all]));
-  return {
-    live: (map["LIVE"] ?? 0) as number,
-    work: (map["WORK"] ?? 0) as number,
-    tourism: (map["TOURISM"] ?? 0) as number,
-  };
-}
-
-// タグランキング：TagTop5 優先、無ければ PostTag から集計
-async function getTopTags() {
-  try {
-    const top = await prisma.tagTop5.findMany({ orderBy: { count: "desc" }, take: 5 });
-    if (top.length) return top.map(t => ({ id: t.id, name: t.tagName, count: t.count }));
-  } catch {}
+// タグTOP5（TagTop5が自治体別で無い想定なので PostTag から集計）
+async function getTopTags(muniSlug: string) {
   const grouped = await prisma.postTag.groupBy({
     by: ["tagId"],
+    where: { post: { status: "PUBLISHED", municipality: { slug: muniSlug } } },
     _count: { tagId: true },
     orderBy: { _count: { tagId: "desc" } },
     take: 5,
   });
-  const tags = await prisma.tag.findMany({ where: { id: { in: grouped.map(g => g.tagId) } } });
-  return grouped.map(g => ({
+  if (grouped.length === 0) return [];
+  const tags = await prisma.tag.findMany({ where: { id: { in: grouped.map((g) => g.tagId) } } });
+  return grouped.map((g) => ({
     id: g.tagId,
-    name: tags.find(t => t.id === g.tagId)?.name ?? "",
+    name: tags.find((t) => t.id === g.tagId)?.name ?? "",
     count: g._count.tagId,
   }));
 }
 
-export default async function Home() {
-  const [
-    counts,
-    topCatch,
-    topVis,
-    newCons,
-    newPros,
-    hundredLikes,
-    realizeds,    
-    hundredLikeCount,
-    realizedCount,
-    intent,
-    topTags,
-  ] = await Promise.all([
-    countsByType(),
-    getTopCatchphrase(),
-    getTopVisions(),
-    getNewConsultations(),
-    getNewProposals(),
-    getHundredLikeProposals(),
-    getRealizedProposals(),
-    getHundredLikeProposalsCount(),
-    getRealizedProposalsCount(),
-    getIntentCounts(),
-    getTopTags(),
+export default async function MunicipalityPage({ params }: { params: { slug: string } }) {
+  const slug = params.slug;
+
+  const muni = await prisma.municipality.findUnique({
+    where: { slug },
+    select: { id: true, name: true, prefecture: true, slug: true },
+  });
+  if (!muni) notFound();
+
+  const [counts, topCatch, topVis, hundredLikeCount, realizedCount, topTags] = await Promise.all([
+    countsByType(slug),
+    getTopCatchphrase(slug),
+    getTopVisions(slug),
+    getHundredLikeProposalsCount(slug),
+    getRealizedProposalsCount(slug),
+    getTopTags(slug),
   ]);
+
+  const baseQuery = (q: Record<string, string | number | undefined>) =>
+    "/posts?" +
+    Object.entries({ municipality: slug, ...q })
+      .filter(([, v]) => v !== undefined && v !== "")
+      .map(([k, v]) => `${k}=${encodeURIComponent(String(v))}`)
+      .join("&");
 
   return (
     <>
+      {/* ヘッダ */}
       <section className="mb-6">
-        <h1 className="text-2xl font-bold">みんなで創る、笠間の未来</h1>
-        <p className="text-sm text-gray-600">匿名で投稿、いいね/推薦で可視化、実現へ。</p>
+        <h1 className="text-2xl font-bold">
+          {(muni.prefecture ? `${muni.prefecture} ` : "") + muni.name} の投稿
+        </h1>
+        <p className="text-sm text-gray-600">
+          自治体別ページです。匿名で投稿、いいね/推薦で可視化、実現へ。
+        </p>
+        <div className="mt-3 flex gap-2">
+          <Link
+            href={`/m`}
+            className="inline-flex items-center rounded-lg border bg-white px-3 py-1.5 text-sm hover:bg-gray-50"
+          >
+            ← 自治体一覧へ
+          </Link>
+          <Link
+            href={baseQuery({})}
+            className="inline-flex items-center rounded-lg border bg-white px-3 py-1.5 text-sm hover:bg-gray-50"
+          >
+            この自治体の投稿一覧
+          </Link>
+        </div>
       </section>
 
       {/* キャッチフレーズ & ビジョン */}
@@ -173,15 +156,27 @@ export default async function Home() {
                   {topCatch.title}
                 </Link>
               </h3>
+              <p className="text-sm text-gray-600">{topCatch.content?.slice(0, 120)}</p>
+              {/* タグ表示（任意） */}
+              <div className="mt-2 flex flex-wrap gap-1">
+                {topCatch.tags.map((t) => (
+                  <Link key={t.tagId} href={baseQuery({ tag: t.tag.name })}>
+                    <Chip>{t.tag.name}</Chip>
+                  </Link>
+                ))}
+              </div>
             </div>
           ) : (
             <p className="text-sm">まだありません。</p>
           )}
           <div className="mt-3 flex gap-2">
-            <Link href="/posts?type=CATCHPHRASE" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
+            <Link href={baseQuery({ type: "CATCHPHRASE" })} className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
               一覧を見る
             </Link>
-            <Link href="/new?type=CATCHPHRASE" className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700">
+            <Link
+              href={`/new?type=CATCHPHRASE&municipality=${encodeURIComponent(slug)}`}
+              className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700"
+            >
               投稿する
             </Link>
           </div>
@@ -198,7 +193,7 @@ export default async function Home() {
                 <li key={v.id} className="mb-1">
                   <Link href={`/posts/${v.id}`} className="hover:underline">
                     {v.title}
-                  </Link>{" "}
+                  </Link>
                 </li>
               ))}
             </ol>
@@ -206,10 +201,13 @@ export default async function Home() {
             <p className="text-sm">まだありません。</p>
           )}
           <div className="mt-3 flex gap-2">
-            <Link href="/posts?type=VISION" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
+            <Link href={baseQuery({ type: "VISION" })} className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
               一覧を見る
             </Link>
-            <Link href="/new?type=VISION" className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700">
+            <Link
+              href={`/new?type=VISION&municipality=${encodeURIComponent(slug)}`}
+              className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700"
+            >
               投稿する
             </Link>
           </div>
@@ -223,24 +221,14 @@ export default async function Home() {
             <Pill>相談</Pill>
             <span className="text-xs text-gray-500">投稿数 {counts.consultation}</span>
           </div>
-                    {newCons.length ? (
-            <ol className="list-disc pl-5 text-sm">
-              {newCons.map((v) => (
-                <li key={v.id} className="mb-1">
-                  <Link href={`/posts/${v.id}`} className="hover:underline">
-                    {v.title}
-                  </Link>{" "}
-                </li>
-              ))}
-            </ol>
-          ) : (
-            <p className="text-sm">まだありません。</p>
-          )}
           <div className="mt-1 flex gap-2">
-            <Link href="/posts?type=CONSULTATION" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
+            <Link href={baseQuery({ type: "CONSULTATION" })} className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
               一覧を見る
             </Link>
-            <Link href="/new?type=CONSULTATION" className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700">
+            <Link
+              href={`/new?type=CONSULTATION&municipality=${encodeURIComponent(slug)}`}
+              className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700"
+            >
               投稿する
             </Link>
           </div>
@@ -251,24 +239,14 @@ export default async function Home() {
             <Pill>提案</Pill>
             <span className="text-xs text-gray-500">投稿数 {counts.proposal}</span>
           </div>
-         {newPros.length ? (
-            <ol className="list-disc pl-5 text-sm">
-              {newPros.map((v) => (
-                <li key={v.id} className="mb-1">
-                  <Link href={`/posts/${v.id}`} className="hover:underline">
-                    {v.title}
-                  </Link>{" "}
-                </li>
-              ))}
-            </ol>
-          ) : (
-            <p className="text-sm">まだありません。</p>
-          )}
           <div className="mt-1 flex gap-2">
-            <Link href="/posts?type=PROPOSAL" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
+            <Link href={baseQuery({ type: "PROPOSAL" })} className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
               一覧を見る
             </Link>
-            <Link href="/new?type=PROPOSAL" className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700">
+            <Link
+              href={`/new?type=PROPOSAL&municipality=${encodeURIComponent(slug)}`}
+              className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700"
+            >
               投稿する
             </Link>
           </div>
@@ -282,75 +260,56 @@ export default async function Home() {
             <Pill color="gold">いいね100提案</Pill>
             <span className="text-xs text-gray-500">件数 {hundredLikeCount}</span>
           </div>
-           {hundredLikes.length ? (
-            <ol className="list-disc pl-5 text-sm">
-              {hundredLikes.map((v) => (
-                <li key={v.id} className="mb-1">
-                  <Link href={`/posts/${v.id}`} className="hover:underline">
-                    {v.title}
-                  </Link>{" "}
-                </li>
-              ))}
-            </ol>
-          ) : (
-            <p className="text-sm">まだありません。</p>
-          )}
-          <Link href="/posts?type=PROPOSAL&minLikes=100" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50 inline-block">
+          <Link
+            href={baseQuery({ type: "PROPOSAL", minLikes: 100 })}
+            className="inline-block rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50"
+          >
             提案一覧へ
           </Link>
         </Card>
+
         <Card>
           <div className="mb-2 flex items-center justify-between">
             <Pill color="green">実現提案</Pill>
             <span className="text-xs text-gray-500">件数 {realizedCount}</span>
           </div>
-           {realizeds.length ? (
-            <ol className="list-disc pl-5 text-sm">
-              {realizeds.map((v) => (
-                <li key={v.id} className="mb-1">
-                  <Link href={`/posts/${v.id}`} className="hover:underline">
-                    {v.title}
-                  </Link>{" "}
-                </li>
-              ))}
-            </ol>
-          ) : (
-            <p className="text-sm">まだありません。</p>
-          )}
-          <Link href="/posts?type=PROPOSAL&status=REALIZED" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50 inline-block">
+          <Link
+            href={baseQuery({ type: "PROPOSAL", status: "REALIZED" })}
+            className="inline-block rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50"
+          >
             実現一覧へ
           </Link>
         </Card>
       </section>
-            <section className="mt-4 grid gap-4">
-<IntentButtons initial={intent} />
-            </section>
-      {/* Intent ボタン行 */}
 
-      {/* タグランキング & 本サイトについて */}
+      {/* タグランキング */}
       <section className="mt-4 grid gap-4 md:grid-cols-2">
         <Card>
-          <div className="mb-2"><Pill color="green">タグランキング（TOP5）</Pill></div>
+          <div className="mb-2">
+            <Pill color="green">タグランキング（TOP5）</Pill>
+          </div>
           <ul className="flex flex-wrap gap-2">
             {topTags.map((t) => (
               <li key={t.id}>
-                <Link href={`/tags/${encodeURIComponent(t.name)}`} className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs">
+                <Link
+                  href={baseQuery({ tag: t.name })}
+                  className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs"
+                >
                   {t.name}（{t.count}）
                 </Link>
               </li>
             ))}
+            {topTags.length === 0 && <li className="text-sm text-gray-600">データがありません</li>}
           </ul>
-          <Link href="/tags" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50 inline-block">
-            タグ一覧へ
-          </Link>
         </Card>
 
         <Card>
-          <div className="mb-2"><Pill color="gray">本サイトについて</Pill></div>
+          <div className="mb-2">
+            <Pill color="gray">このページについて</Pill>
+          </div>
           <p className="text-sm text-gray-700">
-            「みんなで考える未来」は、匿名で
-            <strong>キャッチフレーズ / ビジョン / 相談 / 提案</strong>を投稿し、
-            いいねや推薦で可視化・実現を後押しするためのコミュニティサイトです。
+            ここは「{(muni.prefecture ? `${muni.prefecture} ` : "") + muni.name}」に紐づく投稿のハブです。
+            一覧から探すか、種別ごとに新規投稿してみてください。
           </p>
         </Card>
       </section>
