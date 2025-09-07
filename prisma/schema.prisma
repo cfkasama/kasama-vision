@@ -223,6 +223,11 @@ model Intent {
   identityId String
   identity   Identity   @relation(fields: [identityId], references: [id], onDelete: Cascade)
 
+municipalityId String
+  municipality   Municipality  @relation(fields:[municipalityId], references:[id], onDelete: Cascade)
+
+  @@index([municipalityId, kind])
+
   // 何を押したか
   kind       IntentKind
 
