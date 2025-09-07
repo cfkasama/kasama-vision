@@ -27,6 +27,8 @@ function parseParams(searchParams: Record<string, string | string[] | undefined>
   const minLikes = get("minLikes") ? Number(get("minLikes")) : undefined;
   const page = Math.max(1, Number(get("page") ?? "1"));
   const take = 20;
+  // 追加: 自治体 slug
+  const municipality = get("municipality") ?? undefined;
   const skip = (page - 1) * take;
 
   const orderBy =
@@ -43,6 +45,7 @@ function parseParams(searchParams: Record<string, string | string[] | undefined>
     ...(type ? { type } : {}),
     ...(tag ? { tags: { some: { tag: { name: tag } } } } : {}),
     ...(minLikes ? { likeCount: { gte: minLikes } } : {}),
+    ...(municipality ? { municipality: { slug: municipality } } : {}),
   };
 
   return { type, tag, status, sort, minLikes, page, take, skip, orderBy, where };
