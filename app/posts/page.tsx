@@ -48,7 +48,7 @@ function parseParams(searchParams: Record<string, string | string[] | undefined>
     ...(municipality ? { municipality: { slug: municipality } } : {}),
   };
 
-  return { type, tag, status, sort, minLikes, page, take, skip, orderBy, where };
+  return { type, tag, status, sort, minLikes, municipality,page, take, skip, orderBy, where };
 }
 
 export default async function PostsPage({ searchParams }: { searchParams: Record<string, string | string[] | undefined> }) {
