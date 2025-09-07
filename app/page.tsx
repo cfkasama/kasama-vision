@@ -88,33 +88,38 @@ async function getTopTags() {
   }));
 }
 
+// 直近1週間の自治体ランキング（投稿数）
 async function getTopMunicipalitiesWeekly(limit = 10, days = 7) {
   const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
 
+  // まずは全件 groupBy（DB ではソートしない）
   const rows = await prisma.post.groupBy({
     by: ["municipalityId"],
     where: {
       status: "PUBLISHED",
-      // municipalityId: { not: null }, // ← 型的にNGなので外す
       createdAt: { gte: since },
     },
     _count: { _all: true },
-    orderBy: { _count: { _all: "desc" } },
-    take: limit,
   });
 
-  // null/undefined を除外（古いデータがあっても安全）
-  const ids = rows.map(r => r.municipalityId).filter((id): id is string => !!id);
-  if (!ids.length) return [];
+  // null を除外して件数で降順ソート → 上位だけ採用
+  const topRows = rows
+    .filter(r => !!r.municipalityId)
+    .sort((a, b) => b._count._all - a._count._all)
+    .slice(0, limit);
+
+  const ids = topRows.map(r => r.municipalityId!) ;
+
+  if (ids.length === 0) return [];
 
   const municipalities = await prisma.municipality.findMany({
     where: { id: { in: ids } },
     select: { id: true, name: true, slug: true },
   });
 
-  return rows
+  // rows 順のまま名称を合成
+  return topRows
     .map(r => {
-      if (!r.municipalityId) return null; // 念のため
       const m = municipalities.find(mm => mm.id === r.municipalityId);
       return m ? { id: m.id, name: m.name, slug: m.slug, count: r._count._all } : null;
     })
