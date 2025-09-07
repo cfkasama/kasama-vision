@@ -348,7 +348,7 @@ export default async function Home() {
         <Card>
           <div className="mb-2"><Pill color="gray">本サイトについて</Pill></div>
           <p className="text-sm text-gray-700">
-            「みんなで考える笠間の未来」は、匿名で
+            「みんなで考える未来」は、匿名で
             <strong>キャッチフレーズ / ビジョン / 相談 / 提案</strong>を投稿し、
             いいねや推薦で可視化・実現を後押しするためのコミュニティサイトです。
           </p>
