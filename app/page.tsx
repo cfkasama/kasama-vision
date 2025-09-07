@@ -2,7 +2,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { Card, Pill, Chip } from "@/components/ui";
-import IntentButtons from "@/components/IntentButtons";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -88,21 +87,6 @@ async function getRealizedProposalsCount() {
   return prisma.post.count({
     where: { status: "REALIZED", type: "PROPOSAL" },
   });
-}
-
-// Intent（住みたい/働きたい/行きたい）の押下回数を集計（なければ 0）
-async function getIntentCounts() {
-  const actions = ["INTENT_LIVE", "INTENT_WORK", "INTENT_TOURISM"] as const;
-  const rows = await prisma.intent.groupBy({
-    by: ["kind"],
-    _count: { _all: true },
-  });
-  const map = Object.fromEntries(rows.map(r => [r.kind, r._count._all]));
-  return {
-    live: (map["LIVE"] ?? 0) as number,
-    work: (map["WORK"] ?? 0) as number,
-    tourism: (map["TOURISM"] ?? 0) as number,
-  };
 }
 
 // タグランキング：TagTop5 優先、無ければ PostTag から集計
@@ -265,56 +249,6 @@ export default async function Home() {
             実現一覧へ
           </Link>
         </Card>
-      </section>
-
-      {/* Intent（住みたい/働きたい/行きたい） */}
-      <section className="mt-4">
-        {/* IntentButtons コンポーネントを使っているならここに配置 */}
-        {/* <IntentButtons initial={intent} /> */}
-        <div className="grid gap-4 md:grid-cols-3">
-          <Card>
-            <div className="mb-2 flex items-center justify-between">
-              <Pill>笠間に住みたい</Pill>
-              <span className="text-xs text-gray-500">押された数 {intent.live}</span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <Link href="/new?type=REPORT_LIVE" className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700">
-                住めなかった報告を投稿
-              </Link>
-              <Link href="/posts?type=REPORT_LIVE" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
-                報告一覧へ
-              </Link>
-            </div>
-          </Card>
-          <Card>
-            <div className="mb-2 flex items-center justify-between">
-              <Pill>笠間で働きたい</Pill>
-              <span className="text-xs text-gray-500">押された数 {intent.work}</span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <Link href="/new?type=REPORT_WORK" className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700">
-                働けなかった報告を投稿
-              </Link>
-              <Link href="/posts?type=REPORT_WORK" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
-                報告一覧へ
-              </Link>
-            </div>
-          </Card>
-          <Card>
-            <div className="mb-2 flex items-center justify-between">
-              <Pill>笠間に行きたい</Pill>
-              <span className="text-xs text-gray-500">押された数 {intent.tourism}</span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <Link href="/new?type=REPORT_TOURISM" className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700">
-                不満がある報告を投稿
-              </Link>
-              <Link href="/posts?type=REPORT_TOURISM" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
-                報告一覧へ
-              </Link>
-            </div>
-          </Card>
-        </div>
       </section>
 
       {/* タグランキング & 本サイトについて */}
