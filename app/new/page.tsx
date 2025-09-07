@@ -10,19 +10,26 @@ export default async function NewPage({
 }: {
   searchParams: Record<string, string | string[] | undefined>;
 }) {
-  // 種別はクエリ ?type=CONSULTATION 等で初期化できるように
   const typeFromQuery = typeof searchParams.type === "string" ? searchParams.type : undefined;
 
-  // 自治体一覧（名前順）
   const municipalities = await prisma.municipality.findMany({
     select: { id: true, name: true, slug: true },
     orderBy: { name: "asc" },
   });
 
+  // 日本/本サイトを先頭へ（存在すれば）
+  const bySlug = Object.fromEntries(municipalities.map(m => [m.slug, m]));
+  const prioritized = [
+    ...(bySlug["japan"] ? [bySlug["japan"]] : []),
+    ...(bySlug["site"] ? [bySlug["site"]] : []),
+    ...municipalities.filter(m => m.slug !== "japan" && m.slug !== "site"),
+  ];
+
   return (
     <NewPostClient
       initialType={typeFromQuery}
-      municipalities={municipalities}
+      municipalities={prioritized}
+      initialMunicipalitySlug="japan" // ← デフォルトを日本に固定
     />
   );
 }
