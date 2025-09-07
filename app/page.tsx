@@ -130,10 +130,6 @@ export default async function Home() {
     counts,
     topCatch,
     topVis,
-    newCons,
-    newPros,
-    hundredLikes,
-    realizeds,    
     hundredLikeCount,
     realizedCount,
     intent,
@@ -142,10 +138,6 @@ export default async function Home() {
     countsByType(),
     getTopCatchphrase(),
     getTopVisions(),
-    getNewConsultations(),
-    getNewProposals(),
-    getHundredLikeProposals(),
-    getRealizedProposals(),
     getHundredLikeProposalsCount(),
     getRealizedProposalsCount(),
     getIntentCounts(),
@@ -155,7 +147,7 @@ export default async function Home() {
   return (
     <>
       <section className="mb-6">
-        <h1 className="text-2xl font-bold">みんなで創る未来</h1>
+        <h1 className="text-2xl font-bold">みんなで創る、笠間の未来</h1>
         <p className="text-sm text-gray-600">匿名で投稿、いいね/推薦で可視化、実現へ。</p>
       </section>
 
@@ -173,6 +165,9 @@ export default async function Home() {
                   {topCatch.title}
                 </Link>
               </h3>
+              <p className="text-sm text-gray-600">
+                {topCatch.content?.slice(0, 120)}
+              </p>
             </div>
           ) : (
             <p className="text-sm">まだありません。</p>
@@ -198,7 +193,7 @@ export default async function Home() {
                 <li key={v.id} className="mb-1">
                   <Link href={`/posts/${v.id}`} className="hover:underline">
                     {v.title}
-                  </Link>{" "}
+                  </Link>
                 </li>
               ))}
             </ol>
@@ -223,19 +218,6 @@ export default async function Home() {
             <Pill>相談</Pill>
             <span className="text-xs text-gray-500">投稿数 {counts.consultation}</span>
           </div>
-                    {newCons.length ? (
-            <ol className="list-disc pl-5 text-sm">
-              {newCons.map((v) => (
-                <li key={v.id} className="mb-1">
-                  <Link href={`/posts/${v.id}`} className="hover:underline">
-                    {v.title}
-                  </Link>{" "}
-                </li>
-              ))}
-            </ol>
-          ) : (
-            <p className="text-sm">まだありません。</p>
-          )}
           <div className="mt-1 flex gap-2">
             <Link href="/posts?type=CONSULTATION" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
               一覧を見る
@@ -251,19 +233,6 @@ export default async function Home() {
             <Pill>提案</Pill>
             <span className="text-xs text-gray-500">投稿数 {counts.proposal}</span>
           </div>
-         {newPros.length ? (
-            <ol className="list-disc pl-5 text-sm">
-              {newPros.map((v) => (
-                <li key={v.id} className="mb-1">
-                  <Link href={`/posts/${v.id}`} className="hover:underline">
-                    {v.title}
-                  </Link>{" "}
-                </li>
-              ))}
-            </ol>
-          ) : (
-            <p className="text-sm">まだありません。</p>
-          )}
           <div className="mt-1 flex gap-2">
             <Link href="/posts?type=PROPOSAL" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
               一覧を見る
@@ -282,52 +251,78 @@ export default async function Home() {
             <Pill color="gold">いいね100提案</Pill>
             <span className="text-xs text-gray-500">件数 {hundredLikeCount}</span>
           </div>
-           {hundredLikes.length ? (
-            <ol className="list-disc pl-5 text-sm">
-              {hundredLikes.map((v) => (
-                <li key={v.id} className="mb-1">
-                  <Link href={`/posts/${v.id}`} className="hover:underline">
-                    {v.title}
-                  </Link>{" "}
-                </li>
-              ))}
-            </ol>
-          ) : (
-            <p className="text-sm">まだありません。</p>
-          )}
           <Link href="/posts?type=PROPOSAL&minLikes=100" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50 inline-block">
             提案一覧へ
           </Link>
         </Card>
+
         <Card>
           <div className="mb-2 flex items-center justify-between">
             <Pill color="green">実現提案</Pill>
             <span className="text-xs text-gray-500">件数 {realizedCount}</span>
           </div>
-           {realizeds.length ? (
-            <ol className="list-disc pl-5 text-sm">
-              {realizeds.map((v) => (
-                <li key={v.id} className="mb-1">
-                  <Link href={`/posts/${v.id}`} className="hover:underline">
-                    {v.title}
-                  </Link>{" "}
-                </li>
-              ))}
-            </ol>
-          ) : (
-            <p className="text-sm">まだありません。</p>
-          )}
           <Link href="/posts?type=PROPOSAL&status=REALIZED" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50 inline-block">
             実現一覧へ
           </Link>
         </Card>
       </section>
-            <section className="mt-4 grid gap-4">
+
+      {/* Intent（住みたい/働きたい/行きたい） */}
+      <section className="mt-4">
+        {/* IntentButtons コンポーネントを使っているならここに配置 */}
+        {/* <IntentButtons initial={intent} /> */}
+        <div className="grid gap-4 md:grid-cols-3">
+          <Card>
+            <div className="mb-2 flex items-center justify-between">
+              <Pill>笠間に住みたい</Pill>
+              <span className="text-xs text-gray-500">押された数 {intent.live}</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Link href="/new?type=REPORT_LIVE" className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700">
+                住めなかった報告を投稿
+              </Link>
+              <Link href="/posts?type=REPORT_LIVE" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
+                報告一覧へ
+              </Link>
+            </div>
+          </Card>
+          <Card>
+            <div className="mb-2 flex items-center justify-between">
+              <Pill>笠間で働きたい</Pill>
+              <span className="text-xs text-gray-500">押された数 {intent.work}</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Link href="/new?type=REPORT_WORK" className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700">
+                働けなかった報告を投稿
+              </Link>
+              <Link href="/posts?type=REPORT_WORK" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
+                報告一覧へ
+              </Link>
+            </div>
+          </Card>
+          <Card>
+            <div className="mb-2 flex items-center justify-between">
+              <Pill>笠間に行きたい</Pill>
+              <span className="text-xs text-gray-500">押された数 {intent.tourism}</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Link href="/new?type=REPORT_TOURISM" className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700">
+                不満がある報告を投稿
+              </Link>
+              <Link href="/posts?type=REPORT_TOURISM" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
+                報告一覧へ
+              </Link>
+            </div>
+          </Card>
+        </div>
+      </section>
 
       {/* タグランキング & 本サイトについて */}
       <section className="mt-4 grid gap-4 md:grid-cols-2">
         <Card>
-          <div className="mb-2"><Pill color="green">タグランキング（TOP5）</Pill></div>
+          <div className="mb-2">
+            <Pill color="green">タグランキング（TOP5）</Pill>
+          </div>
           <ul className="flex flex-wrap gap-2">
             {topTags.map((t) => (
               <li key={t.id}>
@@ -337,13 +332,12 @@ export default async function Home() {
               </li>
             ))}
           </ul>
-          <Link href="/tags" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50 inline-block">
-            タグ一覧へ
-          </Link>
         </Card>
 
         <Card>
-          <div className="mb-2"><Pill color="gray">本サイトについて</Pill></div>
+          <div className="mb-2">
+            <Pill color="gray">本サイトについて</Pill>
+          </div>
           <p className="text-sm text-gray-700">
             「みんなで考える未来」は、匿名で
             <strong>キャッチフレーズ / ビジョン / 相談 / 提案</strong>を投稿し、
