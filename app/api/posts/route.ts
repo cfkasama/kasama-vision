@@ -1,84 +1,13 @@
-// app/api/posts/route.ts
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import { verifyRecaptcha } from "@/lib/recaptcha";
-import { hashDeleteKey } from "@/lib/hash";
-import { getOrCreateIdentityId } from "@/lib/identity";
-
-export const dynamic = "force-dynamic"; // SSG/ISRに巻き込まれないように
-export const runtime ="nodejs";
-export const revalidate = 0;
-
-type SortKey = "new" | "likes" | "comments" | "hot";
-
-type CreatePostBody = {
-  type:
-    | "CATCHPHRASE"
-    | "VISION"
-    | "CONSULTATION"
-    | "PROPOSAL"
-    | "REPORT_LIVE"
-    | "REPORT_WORK"
-    | "REPORT_TOURISM";
-  title: string;
-  content?: string;
-  tags?: string[];
-  deleteKey: string;
-  recaptchaToken: string;
-};
-
-export async function GET(req: Request) {
-  try {
-    const { searchParams } = new URL(req.url);
-    const type = searchParams.get("type") ?? undefined;
-    const tag = searchParams.get("tag") ?? undefined;
-    const sort = (searchParams.get("sort") as SortKey) ?? "new";
-    const page = Math.max(1, Number(searchParams.get("page") ?? "1"));
-    const take = 20;
-    const skip = (page - 1) * take;
-
-    const orderBy =
-      sort === "likes"
-        ? { likeCount: "desc" as const }
-        : sort === "comments"
-        ? { cmtCount: "desc" as const }
-        : sort === "hot"
-        ? { hotScore: "desc" as const }
-        : { createdAt: "desc" as const };
-
-    const where: any = {
-      status: "PUBLISHED",
-      ...(type ? { type } : {}),
-      ...(tag ? { tags: { some: { tag: { name: tag } } } } : {}),
-    };
-
-    const posts = await prisma.post.findMany({
-      where,
-      orderBy,
-      take,
-      skip,
-      include: { tags: { include: { tag: true } } },
-    });
-
-    return NextResponse.json({ ok: true, posts });
-  } catch (err) {
-    console.error("[GET /api/posts] error:", err);
-    return NextResponse.json({ ok: false, error: "internal_error" }, { status: 500 });
-  }
-}
-
+// app/api/posts/route.ts（POSTだけ差し替え）
 export async function POST(req: Request) {
   try {
-    const body = (await req.json()) as CreatePostBody;
+    const body = (await req.json()) as CreatePostBody & { municipalitySlug?: string };
 
-    const { type, title, deleteKey, recaptchaToken } = body;
+    const { type, title, deleteKey, recaptchaToken, municipalitySlug } = body;
     const content = body.content ?? "";
-    const tags = (body.tags ?? [])
-      .map((s) => s.trim())
-      .filter(Boolean)
-      .slice(0, 5); // 念のため最大5件
+    const tags = (body.tags ?? []).map((s) => s.trim()).filter(Boolean).slice(0, 5);
 
-    // 基本バリデーション
+    // バリデーション
     if (!type || !title || !deleteKey || !recaptchaToken) {
       return NextResponse.json({ ok: false, error: "bad_request" }, { status: 400 });
     }
@@ -86,25 +15,47 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: "title_too_long" }, { status: 400 });
     }
 
-    // reCAPTCHA検証
+    // reCAPTCHA
     const recaptchaOk = await verifyRecaptcha(recaptchaToken);
     if (!recaptchaOk) {
       return NextResponse.json({ ok: false, error: "recaptcha" }, { status: 400 });
     }
 
-    // 必要ならここでdeleteKeyをハッシュ化に差し替え
-    // const hashed = await bcrypt.hash(deleteKey, 10);
-const hashed = await hashDeleteKey(deleteKey);
-     const identityId = await getOrCreateIdentityId();
+    // 削除キーをハッシュ化
+    const hashed = await hashDeleteKey(deleteKey);
 
+    // 投稿者の identity
+    const identityId = await getOrCreateIdentityId();
+
+    // 自治体IDを確定（slug 指定があればそれを、無ければ "all" を使う。無ければ作る）
+    let municipalityId: string;
+    if (municipalitySlug) {
+      const m = await prisma.municipality.findUnique({ where: { slug: municipalitySlug } });
+      if (!m) {
+        return NextResponse.json({ ok: false, error: "municipality_not_found" }, { status: 404 });
+      }
+      municipalityId = m.id;
+    } else {
+      const globalSlug = "all";
+      let m = await prisma.municipality.findUnique({ where: { slug: globalSlug } });
+      if (!m) {
+        m = await prisma.municipality.create({
+          data: { slug: globalSlug, name: "全国" },
+        });
+      }
+      municipalityId = m.id;
+    }
+
+    // Post 作成（municipalityId を必ず渡す）
     const post = await prisma.post.create({
       data: {
         type,
         title,
         content,
-        deleteKey: hashed, // 実運用はハッシュに！
+        deleteKey: hashed,
         identityId,
-        // status は Prisma の default(PUBLISHED) に任せる
+        municipalityId, // ← これが必須！
+        // status は Prisma 側の default(PUBLISHED) に任せるなら省略OK
       },
     });
 
