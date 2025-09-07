@@ -53,20 +53,20 @@ export default async function MunicipalitiesPage() {
                 <span className="text-xs text-gray-500">投稿数 {total}</span>
               </div>
               <h3 className="mb-2 text-lg font-semibold">
-                <Link href={`/municipalities/${m.slug}`} className="hover:underline">
+                <Link href={`/m/${m.slug}`} className="hover:underline">
                   {m.name}
                 </Link>
               </h3>
 
               <div className="mt-auto flex gap-2">
                 <Link
-                  href={`/municipalities/${m.slug}`}
+                  href={`/m/${m.slug}`}
                   className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700"
                 >
                   自治体ページへ
                 </Link>
                 <Link
-                  href={`/posts?municipality=${encodeURIComponent(m.slug)}`}
+                  href={`/posts?m=${encodeURIComponent(m.slug)}`}
                   className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50"
                 >
                   投稿一覧
