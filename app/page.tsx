@@ -159,6 +159,14 @@ async function getTopMunicipalitiesWeekly(limit = 10, days = 7) {
     .filter(Boolean) as { id: string; name: string; slug: string; count: number }[];
 }
 
+// クエリ文字列を作るヘルパー（未定義だった baseQuery を補完）
+const baseQuery = (q: Record<string, string | number | undefined>) =>
+  "/posts?" +
+  Object.entries(q)
+    .filter(([, v]) => v !== undefined && v !== "")
+    .map(([k, v]) => `${k}=${encodeURIComponent(String(v))}`)
+    .join("&");
+
 export default async function Home() {
   const [
     counts,
