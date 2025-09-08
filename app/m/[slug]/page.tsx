@@ -175,13 +175,6 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
     getIntentCounts(mId),
     getTopTags(mId),
   ]);
-  
-  const baseQuery = (q: Record<string, string | number | undefined>) =>
-    "/posts?" +
-    Object.entries({ municipality: slug, ...q })
-      .filter(([, v]) => v !== undefined && v !== "")
-      .map(([k, v]) => `${k}=${encodeURIComponent(String(v))}`)
-      .join("&");
 
   return (
     <>
@@ -274,7 +267,7 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
             <ol className="list-disc pl-5 text-sm">
               {newCons.map((v) => (
                 <li key={v.id} className="mb-1">
-                  <Link href={`/posts/${v.id}`} className="hover:underline">
+                  <Link href={`/m/${slug}/posts/${v.id}`} className="hover:underline">
                     {v.title}
                   </Link>{" "}
                 </li>
@@ -284,11 +277,11 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
             <p className="text-sm">まだありません。</p>
           )}
           <div className="mt-1 flex gap-2">
-            <Link href={baseQuery({ type: "CONSULTATION" })} className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
+            <Link href={`/m/${slug}/posts?type=CONSULTATION`} className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
               一覧を見る
             </Link>
             <Link
-              href={`/new?type=CONSULTATION&municipality=${encodeURIComponent(slug)}`}
+              href={`/m/${slug}/new?type=CONSULTATION`}
               className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700"
             >
               投稿する
@@ -305,7 +298,7 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
             <ol className="list-disc pl-5 text-sm">
               {newPros.map((v) => (
                 <li key={v.id} className="mb-1">
-                  <Link href={`/posts/${v.id}`} className="hover:underline">
+                  <Link href={`/m/${slug}/posts/${v.id}`} className="hover:underline">
                     {v.title}
                   </Link>{" "}
                 </li>
@@ -315,11 +308,11 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
             <p className="text-sm">まだありません。</p>
           )}
           <div className="mt-1 flex gap-2">
-            <Link href={baseQuery({ type: "PROPOSAL" })} className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
+            <Link href={`/m/${slug}/posts?type=PROPOSAL`} className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
               一覧を見る
             </Link>
             <Link
-              href={`/new?type=PROPOSAL&municipality=${encodeURIComponent(slug)}`}
+              href={`/m/${slug}/new?type=PROPOSAL`}
               className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700"
             >
               投稿する
@@ -339,7 +332,7 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
             <ol className="list-disc pl-5 text-sm">
            {hundredLikes.map((v) => (
                 <li key={v.id} className="mb-1">
-                  <Link href={`/posts/${v.id}`} className="hover:underline">
+                  <Link href={`/m/${slug}/posts/${v.id}`} className="hover:underline">
                     {v.title}
                   </Link>{" "}
                 </li>
@@ -349,7 +342,7 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
             <p className="text-sm">まだありません。</p>
           )}
           <Link
-            href={baseQuery({ type: "PROPOSAL", minLikes: 100 })}
+            href={`/m/${slug}/posts?type=PROPOSAL&minLikes=100`}
             className="inline-block rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50"
           >
             提案一覧へ
@@ -365,7 +358,7 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
             <ol className="list-disc pl-5 text-sm">
          {realizeds.map((v) => (
                 <li key={v.id} className="mb-1">
-                  <Link href={`/posts/${v.id}`} className="hover:underline">
+                  <Link href={`/m/${slug}/posts/${v.id}`} className="hover:underline">
                     {v.title}
                   </Link>{" "}
                 </li>
@@ -375,7 +368,7 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
             <p className="text-sm">まだありません。</p>
           )}
           <Link
-            href={baseQuery({ type: "PROPOSAL", status: "REALIZED" })}
+            href={`/m/${slug}/posts?type=PROPOSAL&status=REALIZED`}
             className="inline-block rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50"
           >
             実現一覧へ
@@ -395,7 +388,7 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
             {topTags.map((t) => (
               <li key={t.id}>
                 <Link
-                  href={baseQuery({ tag: t.name })}
+                  href={`/m/${slug}/tags/${t.name}`}
                   className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs"
                 >
                   {t.name}（{t.count}）
@@ -404,7 +397,7 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
             ))}
             {topTags.length === 0 && <li className="text-sm text-gray-600">データがありません</li>}
           </ul>
-                    <Link href="/tags" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50 inline-block">
+                    <Link href=`/m/${slug}/tags` className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50 inline-block">
             タグ一覧へ
           </Link>
         </Card>
