@@ -33,7 +33,7 @@ export default function IntentButtons({
         TOURISM: localStorage.getItem(LS_KEY(mslug,"TOURISM")) === "1",
       });
     } catch {}
-  }, [mmslug]);
+  }, [mslug]);
 
   async function press(kind: Kind) {
     if (busy[kind] || pressed[kind]) return;
