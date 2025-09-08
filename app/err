@@ -1,62 +1,54 @@
-[11:15:59.570] Running build in Washington, D.C., USA (East) – iad1
-[11:15:59.570] Build machine configuration: 2 cores, 8 GB
-[11:15:59.602] Cloning github.com/cfkasama/kasama-vision (Branch: main, Commit: 5fc3541)
-[11:16:00.083] Cloning completed: 481.000ms
-[11:16:00.868] Restored build cache from previous deployment (867WJUE4i3kNU8ekZEPoi3FvWnt6)
-[11:16:01.259] Running "vercel build"
-[11:16:01.662] Vercel CLI 47.0.5
-[11:16:01.983] Installing dependencies...
-[11:16:03.030] 
-[11:16:03.030] > kasama-future@0.1.0 postinstall
-[11:16:03.030] > prisma generate
-[11:16:03.030] 
-[11:16:03.543] Prisma schema loaded from prisma/schema.prisma
-[11:16:04.116] 
-[11:16:04.117] ✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 267ms
-[11:16:04.117] 
-[11:16:04.117] Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
-[11:16:04.117] 
-[11:16:04.117] Tip: Want real-time updates to your database without manual polling? Discover how with Pulse: https://pris.ly/tip-0-pulse
-[11:16:04.117] 
-[11:16:04.313] 
-[11:16:04.313] up to date in 2s
-[11:16:04.313] 
-[11:16:04.313] 43 packages are looking for funding
-[11:16:04.313]   run `npm fund` for details
-[11:16:04.343] Detected Next.js version: 14.2.5
-[11:16:04.347] Running "npm run build"
-[11:16:04.464] 
-[11:16:04.464] > kasama-future@0.1.0 build
-[11:16:04.465] > next build
-[11:16:04.465] 
-[11:16:05.200]   ▲ Next.js 14.2.5
-[11:16:05.201] 
-[11:16:05.269]    Creating an optimized production build ...
-[11:16:05.411]  ⚠ Found lockfile missing swc dependencies, run next locally to automatically patch
-[11:16:09.336]  ✓ Compiled successfully
-[11:16:09.338]    Linting and checking validity of types ...
-[11:16:09.733] 
-[11:16:09.734]    We detected TypeScript in your project and reconfigured your tsconfig.json file for you. Strict-mode is set to false by default.
-[11:16:09.734]    The following suggested values were added to your tsconfig.json. These values can be changed to fit your project's needs:
-[11:16:09.734] 
-[11:16:09.734]    	- include was updated to add '.next/types/**/*.ts'
-[11:16:09.734]    	- plugins was updated to add { name: 'next' }
-[11:16:09.734] 
-[11:16:09.734]    The following mandatory changes were made to your tsconfig.json:
-[11:16:09.734] 
-[11:16:09.734]    	- isolatedModules was set to true (requirement for SWC / Babel)
-[11:16:09.734] 
-[11:16:15.826] Failed to compile.
-[11:16:15.826] 
-[11:16:15.827] ./app/m/[slug]/page.tsx:399:33
-[11:16:15.827] Type error: Type '{ initial: { live: number; work: number; tourism: number; }; mname: string; mslug: string; }' is not assignable to type 'IntrinsicAttributes & { municipalitySlug: string; municipalityName: string; initial: Counts; }'.
-[11:16:15.828]   Property 'mname' does not exist on type 'IntrinsicAttributes & { municipalitySlug: string; municipalityName: string; initial: Counts; }'.
-[11:16:15.828] 
-[11:16:15.828] [0m [90m 397 |[39m       [33m<[39m[33m/[39m[33msection[39m[33m>[39m[0m
-[11:16:15.828] [0m [90m 398 |[39m             [33m<[39m[33msection[39m className[33m=[39m[32m"mt-4 grid gap-4"[39m[33m>[39m[0m
-[11:16:15.828] [0m[31m[1m>[22m[39m[90m 399 |[39m [33m<[39m[33mIntentButtons[39m initial[33m=[39m{intent} mname[33m=[39m{muni[33m.[39mname} mslug[33m=[39m{muni[33m.[39mslug}[33m/[39m[33m>[39m[0m
-[11:16:15.829] [0m [90m     |[39m                                 [31m[1m^[22m[39m[0m
-[11:16:15.829] [0m [90m 400 |[39m             [33m<[39m[33m/[39m[33msection[39m[33m>[39m[0m
-[11:16:15.829] [0m [90m 401 |[39m[0m
-[11:16:15.829] [0m [90m 402 |[39m       [33m<[39m[33msection[39m className[33m=[39m[32m"mt-4 grid gap-4 md:grid-cols-2"[39m[33m>[39m[0m
-[11:16:15.895] Error: Command "npm run build" exited with 1
+[14:30:27.465] Running build in Washington, D.C., USA (East) – iad1
+[14:30:27.466] Build machine configuration: 2 cores, 8 GB
+[14:30:27.480] Cloning github.com/cfkasama/kasama-vision (Branch: main, Commit: deb87c4)
+[14:30:28.003] Cloning completed: 522.000ms
+[14:30:28.764] Restored build cache from previous deployment (J9HnqNscVNWQCoHGvV823TtcKAm2)
+[14:30:29.116] Running "vercel build"
+[14:30:29.493] Vercel CLI 47.0.5
+[14:30:29.801] Installing dependencies...
+[14:30:30.749] 
+[14:30:30.750] > kasama-future@0.1.0 postinstall
+[14:30:30.751] > prisma generate
+[14:30:30.751] 
+[14:30:31.175] Prisma schema loaded from prisma/schema.prisma
+[14:30:31.716] 
+[14:30:31.717] ✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 270ms
+[14:30:31.718] 
+[14:30:31.718] Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+[14:30:31.718] 
+[14:30:31.719] Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
+[14:30:31.719] 
+[14:30:31.913] 
+[14:30:31.914] up to date in 2s
+[14:30:31.915] 
+[14:30:31.915] 43 packages are looking for funding
+[14:30:31.915]   run `npm fund` for details
+[14:30:31.941] Detected Next.js version: 14.2.5
+[14:30:31.945] Running "npm run build"
+[14:30:32.053] 
+[14:30:32.054] > kasama-future@0.1.0 build
+[14:30:32.054] > next build
+[14:30:32.055] 
+[14:30:32.718]   ▲ Next.js 14.2.5
+[14:30:32.719] 
+[14:30:32.784]    Creating an optimized production build ...
+[14:30:32.926]  ⚠ Found lockfile missing swc dependencies, run next locally to automatically patch
+[14:30:37.255]  ✓ Compiled successfully
+[14:30:37.256]    Linting and checking validity of types ...
+[14:30:37.588] 
+[14:30:37.589]    We detected TypeScript in your project and reconfigured your tsconfig.json file for you. Strict-mode is set to false by default.
+[14:30:37.589]    The following suggested values were added to your tsconfig.json. These values can be changed to fit your project's needs:
+[14:30:37.590] 
+[14:30:37.590]    	- include was updated to add '.next/types/**/*.ts'
+[14:30:37.590]    	- plugins was updated to add { name: 'next' }
+[14:30:37.590] 
+[14:30:37.591]    The following mandatory changes were made to your tsconfig.json:
+[14:30:37.592] 
+[14:30:37.592]    	- isolatedModules was set to true (requirement for SWC / Babel)
+[14:30:37.592] 
+[14:30:43.306] Failed to compile.
+[14:30:43.307] 
+[14:30:43.308] app/m/[slug]/about/page.tsx
+[14:30:43.308] Type error: File '/vercel/path0/app/m/[slug]/about/page.tsx' is not a module.
+[14:30:43.308] 
+[14:30:43.373] Error: Command "npm run build" exited with 1
