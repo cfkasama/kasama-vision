@@ -108,7 +108,7 @@ async function getRealizedProposalsCount(muniSlug: string) {
 }
 async function getIntentCounts(muniSlug: string) {
   const muni = await prisma.municipality.findUnique({
-    where: { slug: muniSlug },
+    where: { municipalityId: muni.id },
     select: { id: true },
   });
   if (!muni) return { live: 0, work: 0, tourism: 0 };
