@@ -225,24 +225,6 @@ model Intent {
 
   identity     Identity      @relation(fields: [identityId], references: [id], onDelete: Cascade)
   municipality Municipality  @relation(fields: [municipalityId], references: [id], onDelete: Cascade)
-
-  @@unique([identityId, municipalityId, kind]) 
-
-model Intent {
-  id         String     @id @default(cuid())
-  createdAt  DateTime   @default(now())
-  // 誰が
-  identityId String
-  identity   Identity   @relation(fields: [identityId], references: [id], onDelete: Cascade)
-
-municipalityId String
-  municipality   Municipality  @relation(fields:[municipalityId], references:[id], onDelete: Cascade)
-
   @@index([municipalityId, kind])
-
-  // 何を押したか
-  kind       IntentKind
-
-  @@unique([identityId, kind])          // 同一 identity は各種1回だけ
-  @@index([kind, createdAt])            // 集計・時系列用
+  @@unique([identityId, municipalityId, kind]) 
 }
