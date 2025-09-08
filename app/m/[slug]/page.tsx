@@ -132,6 +132,8 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
   });
   if (!muni) notFound();
 
+  const mId=mucicipality.id;
+  
   const [
     counts,
     topCatch,
