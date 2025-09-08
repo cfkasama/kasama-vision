@@ -211,6 +211,17 @@ export default async function Home() {
           ) : (
             <p className="text-sm">まだありません。</p>
           )}
+         <div className="mt-3 flex gap-2">
+            <Link href={baseQuery({ type: "CATCHPHRASE" })} className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
+              一覧を見る
+            </Link>
+            <Link
+              href={`/new?type=CATCHPHRASE`}
+              className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700"
+            >
+              投稿する
+            </Link>
+          </div>
         </Card>
 
         <Card>
@@ -233,9 +244,59 @@ export default async function Home() {
           ) : (
             <p className="text-sm">まだありません。</p>
           )}
+                    <div className="mt-3 flex gap-2">
+            <Link href={baseQuery({ type: "VISION" })} className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
+              一覧を見る
+            </Link>
+            <Link
+              href={`/new?type=VISION`}
+              className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700"
+            >
+              投稿する
+            </Link>
+          </div>
         </Card>
       </section>
 
+       {/* 相談 & 提案 */}
+      <section className="mt-4 grid gap-4 md:grid-cols-2">
+        <Card>
+          <div className="mb-2 flex items-center justify-between">
+            <Pill>相談</Pill>
+            <span className="text-xs text-gray-500">投稿数 {counts.consultation}</span>
+          </div>
+          <div className="mt-1 flex gap-2">
+            <Link href={baseQuery({ type: "CONSULTATION" })} className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
+              一覧を見る
+            </Link>
+            <Link
+              href={`/new?type=CONSULTATION`}
+              className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700"
+            >
+              投稿する
+            </Link>
+          </div>
+        </Card>
+
+        <Card>
+          <div className="mb-2 flex items-center justify-between">
+            <Pill>提案</Pill>
+            <span className="text-xs text-gray-500">投稿数 {counts.proposal}</span>
+          </div>
+          <div className="mt-1 flex gap-2">
+            <Link href={baseQuery({ type: "PROPOSAL" })} className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
+              一覧を見る
+            </Link>
+            <Link
+              href={`/new?type=PROPOSAL`}
+              className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700"
+            >
+              投稿する
+            </Link>
+          </div>
+        </Card>
+      </section>
+      
       {/* 100いいね提案 & 実現提案 */}
       <section className="mt-4 grid gap-4 md:grid-cols-2">
         <Card>
