@@ -215,8 +215,6 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
                   {topCatch.title}
                 </Link>
               </h3>
-                ))}
-              </div>
             </div>
           ) : (
             <p className="text-sm">まだありません。</p>
