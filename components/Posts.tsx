@@ -6,6 +6,7 @@ import PostReactions from "@/components/PostReactions";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
+
 type SortKey = "new" | "likes" | "comments" | "hot";
 type PostType =
   | "CATCHPHRASE"
