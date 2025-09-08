@@ -1,6 +1,6 @@
 // app/m/[slug]/posts/page.tsx
 import { prisma } from "@/lib/db";
-import PostsList from "@/components/posts/PostsList";
+import PostsList from "@/components/posts";
 import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
