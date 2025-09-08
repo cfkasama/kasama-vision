@@ -167,7 +167,6 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
 
   return (
     <>
-      {/* ヘッダ */}
       <section className="mb-6">
         <h1 className="text-2xl font-bold">
           {(muni.prefecture ? `${muni.prefecture} ` : "") + muni.name} の投稿
