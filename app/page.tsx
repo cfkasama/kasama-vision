@@ -306,6 +306,19 @@ export default async function Home() {
             <Pill>相談</Pill>
             <span className="text-xs text-gray-500">投稿数 {counts.consultation}</span>
           </div>
+           {newCons.length ? (
+            <ol className="list-disc pl-5 text-sm">
+              {newCons.map((v) => (
+                <li key={v.id} className="mb-1">
+                  <Link href={`/posts/${v.id}`} className="hover:underline">
+                    {v.title}
+                  </Link>{" "}
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className="text-sm">まだありません。</p>
+          )}
           <div className="mt-1 flex gap-2">
             <Link href={baseQuery({ type: "CONSULTATION" })} className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
               一覧を見る
@@ -324,6 +337,19 @@ export default async function Home() {
             <Pill>提案</Pill>
             <span className="text-xs text-gray-500">投稿数 {counts.proposal}</span>
           </div>
+          {newPros.length ? (
+            <ol className="list-disc pl-5 text-sm">
+              {newPros.map((v) => (
+                <li key={v.id} className="mb-1">
+                  <Link href={`/posts/${v.id}`} className="hover:underline">
+                    {v.title}
+                  </Link>{" "}
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className="text-sm">まだありません。</p>
+          )}
           <div className="mt-1 flex gap-2">
             <Link href={baseQuery({ type: "PROPOSAL" })} className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
               一覧を見る
@@ -347,6 +373,19 @@ export default async function Home() {
               件数 {hundredLikeCount}
             </span>
           </div>
+           {hundredLikes.length ? (
+            <ol className="list-disc pl-5 text-sm">
+              {hundredLikes.map((v) => (
+                <li key={v.id} className="mb-1">
+                  <Link href={`/posts/${v.id}`} className="hover:underline">
+                    {v.title}
+                  </Link>{" "}
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className="text-sm">まだありません。</p>
+          )}
           <Link
             href="/posts?type=PROPOSAL&minLikes=100"
             className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50 inline-block"
@@ -362,6 +401,19 @@ export default async function Home() {
               件数 {realizedCount}
             </span>
           </div>
+          {realizeds.length ? (
+            <ol className="list-disc pl-5 text-sm">
+              {realizeds.map((v) => (
+                <li key={v.id} className="mb-1">
+                  <Link href={`/posts/${v.id}`} className="hover:underline">
+                    {v.title}
+                  </Link>{" "}
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className="text-sm">まだありません。</p>
+          )}
           <Link
             href="/posts?type=PROPOSAL&status=REALIZED"
             className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50 inline-block"
@@ -389,6 +441,9 @@ export default async function Home() {
               </li>
             ))}
           </ul>
+          <Link href="/tags" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50 inline-block">
+            タグ一覧へ
+          </Link>
         </Card>
 
         <Card>
