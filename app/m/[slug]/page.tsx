@@ -62,6 +62,38 @@ async function getTopVisions(muniSlug: string) {
   });
 }
 
+async function getNewConsultations() {
+  return prisma.post.findMany({
+    where: { status: "PUBLISHED", type: "CONSULTATION" },
+    orderBy: { createdAt: "desc" },
+    take: 3,
+  });
+}
+
+async function getNewProposals() {
+  return prisma.post.findMany({
+    where: { status: "PUBLISHED", type: "PROPOSAL" },
+    orderBy: { createdAt: "desc" },
+    take: 3,
+  });
+}
+
+async function getHundredLikeProposals() {
+  return prisma.post.findMany({
+    where: { status: "PUBLISHED", type: "PROPOSAL", likeCount: { gte: 100 } },
+    orderBy: { createdAt: "desc" },
+    take: 3,
+  });
+}
+
+async function getRealizedProposals() {
+  return prisma.post.findMany({
+    where: { status: "REALIZED", type: "PROPOSAL" },
+    orderBy: { createdAt: "desc" },
+    take: 3,
+  });
+}
+
 async function getHundredLikeProposalsCount(muniSlug: string) {
   return prisma.post.count({
     where: { status: "PUBLISHED", type: "PROPOSAL", municipality: { slug: muniSlug }, likeCount: { gte: 100 } },
@@ -100,15 +132,33 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
   });
   if (!muni) notFound();
 
-  const [counts, topCatch, topVis, hundredLikeCount, realizedCount, topTags] = await Promise.all([
-    countsByType(slug),
-    getTopCatchphrase(slug),
-    getTopVisions(slug),
-    getHundredLikeProposalsCount(slug),
-    getRealizedProposalsCount(slug),
-    getTopTags(slug),
+export default async function Home() {
+  const [
+    counts,
+    topCatch,
+    topVis,
+    newCons,
+    newPros,
+    hundredLikes,
+    realizeds,    
+    hundredLikeCount,
+    realizedCount,
+    intent,
+    topTags,
+  ] = await Promise.all([
+    countsByType(),
+    getTopCatchphrase(),
+    getTopVisions(),
+    getNewConsultations(),
+    getNewProposals(),
+    getHundredLikeProposals(),
+    getRealizedProposals(),
+    getHundredLikeProposalsCount(),
+    getRealizedProposalsCount(),
+    getIntentCounts(),
+    getTopTags(),
   ]);
-
+  
   const baseQuery = (q: Record<string, string | number | undefined>) =>
     "/posts?" +
     Object.entries({ municipality: slug, ...q })
@@ -132,12 +182,6 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
             className="inline-flex items-center rounded-lg border bg-white px-3 py-1.5 text-sm hover:bg-gray-50"
           >
             ← 自治体一覧へ
-          </Link>
-          <Link
-            href={baseQuery({})}
-            className="inline-flex items-center rounded-lg border bg-white px-3 py-1.5 text-sm hover:bg-gray-50"
-          >
-            この自治体の投稿一覧
           </Link>
         </div>
       </section>
@@ -221,6 +265,19 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
             <Pill>相談</Pill>
             <span className="text-xs text-gray-500">投稿数 {counts.consultation}</span>
           </div>
+          {newCons.length ? (
+            <ol className="list-disc pl-5 text-sm">
+              {newCons.map((v) => (
+                <li key={v.id} className="mb-1">
+                  <Link href={`/posts/${v.id}`} className="hover:underline">
+                    {v.title}
+                  </Link>{" "}
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className="text-sm">まだありません。</p>
+          )}
           <div className="mt-1 flex gap-2">
             <Link href={baseQuery({ type: "CONSULTATION" })} className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
               一覧を見る
@@ -239,6 +296,17 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
             <Pill>提案</Pill>
             <span className="text-xs text-gray-500">投稿数 {counts.proposal}</span>
           </div>
+           {newPros.map((v) => (
+                <li key={v.id} className="mb-1">
+                  <Link href={`/posts/${v.id}`} className="hover:underline">
+                    {v.title}
+                  </Link>{" "}
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className="text-sm">まだありません。</p>
+          )}
           <div className="mt-1 flex gap-2">
             <Link href={baseQuery({ type: "PROPOSAL" })} className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
               一覧を見る
@@ -260,6 +328,17 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
             <Pill color="gold">いいね100提案</Pill>
             <span className="text-xs text-gray-500">件数 {hundredLikeCount}</span>
           </div>
+           {hundredLikes.map((v) => (
+                <li key={v.id} className="mb-1">
+                  <Link href={`/posts/${v.id}`} className="hover:underline">
+                    {v.title}
+                  </Link>{" "}
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className="text-sm">まだありません。</p>
+          )}
           <Link
             href={baseQuery({ type: "PROPOSAL", minLikes: 100 })}
             className="inline-block rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50"
@@ -273,6 +352,17 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
             <Pill color="green">実現提案</Pill>
             <span className="text-xs text-gray-500">件数 {realizedCount}</span>
           </div>
+         {realizeds.map((v) => (
+                <li key={v.id} className="mb-1">
+                  <Link href={`/posts/${v.id}`} className="hover:underline">
+                    {v.title}
+                  </Link>{" "}
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className="text-sm">まだありません。</p>
+          )}
           <Link
             href={baseQuery({ type: "PROPOSAL", status: "REALIZED" })}
             className="inline-block rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50"
@@ -281,7 +371,11 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
           </Link>
         </Card>
       </section>
-
+            <section className="mt-4 grid gap-4">
+<IntentButtons initial={intent} />
+            </section>
+      {/* Intent ボタン行 */}
+  
       {/* タグランキング */}
       <section className="mt-4 grid gap-4 md:grid-cols-2">
         <Card>
@@ -301,6 +395,9 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
             ))}
             {topTags.length === 0 && <li className="text-sm text-gray-600">データがありません</li>}
           </ul>
+                    <Link href="/tags" className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50 inline-block">
+            タグ一覧へ
+          </Link>
         </Card>
 
         <Card>
@@ -308,8 +405,10 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
             <Pill color="gray">このページについて</Pill>
           </div>
           <p className="text-sm text-gray-700">
-            ここは「{(muni.prefecture ? `${muni.prefecture} ` : "") + muni.name}」に紐づく投稿のハブです。
-            一覧から探すか、種別ごとに新規投稿してみてください。
+            「みんなで考える未来」は、匿名で
+            <strong>キャッチフレーズ / ビジョン / 相談 / 提案</strong>を投稿し、
+            いいねや推薦で可視化・実現を後押しするためのコミュニティサイトです。
+            ここでは「{(muni.prefecture ? `${muni.prefecture} ` : "") + muni.name}」に関する投稿や相談ができます。
           </p>
         </Card>
       </section>
