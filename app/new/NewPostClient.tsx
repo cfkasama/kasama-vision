@@ -7,7 +7,7 @@ type Municipality = { id: string; name: string; slug: string };
 const TYPES: [string, string][] = [
   ["CONSULTATION", "相談"],
   ["PROPOSAL", "提案"],
-  ["CATCHPHRASE", "キャッチ"],
+  ["CATCHPHRASE", "キャッチフレーズ"],
   ["VISION", "ビジョン"],
   ["REPORT_LIVE", "住めなかった報告"],
   ["REPORT_WORK", "働けなかった報告"],
