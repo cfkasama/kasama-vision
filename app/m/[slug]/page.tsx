@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { Card, Pill, Chip } from "@/components/ui";
 import IntentButtons from "@/components/IntentButtons";
-import { usePathname } from 'next/navigation';
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -142,7 +141,6 @@ async function getTopTags(muniId: string) {
 
 export default async function MunicipalityPage({ params }: { params: { slug: string} }) {
   const slug = params.slug;
-  const pathname = usePathname();
 
   const muni = await prisma.municipality.findUnique({
     where: { slug },
@@ -213,7 +211,7 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
           {topCatch ? (
             <div>
               <h3 className="mb-1 font-semibold">
-                <Link href={`${pathname}/posts/${topCatch.id}`} className="hover:underline">
+                <Link href={`/m/${slug}/posts/${topCatch.id}`} className="hover:underline">
                   {topCatch.title}
                 </Link>
               </h3>
@@ -226,7 +224,7 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
               一覧を見る
             </Link>
             <Link
-              href={`new?type=CATCHPHRASE}`}
+              href={`/m/${slug}/new?type=CATCHPHRASE}`}
               className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700"
             >
               投稿する
