@@ -141,7 +141,7 @@ export default function IntentButtons({
             disabled={busy.WORK || pressed.WORK}
             className={`${btn} bg-blue-600 hover:bg-blue-700`}
           >
-            {busy.WORK ? "⏳ 送信中…" : "💼 ${mname}で働きたい"}
+            {busy.WORK ? "⏳ 送信中…" : `💼 ${mname}で働きたい`}
           </button>
           <div className="flex flex-wrap gap-2 text-sm">
             <Link href="/new?type=REPORT_WORK" className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">
@@ -163,7 +163,7 @@ export default function IntentButtons({
             disabled={busy.TOURISM || pressed.TOURISM}
             className={`${btn} bg-orange-600 hover:bg-orange-700`}
           >
-            {busy.TOURISM ? "⏳ 送信中…" : "🚆 {mname}に行きたい"}
+            {busy.TOURISM ? "⏳ 送信中…" : `🚆 ${mname}に行きたい`}
           </button>
           <div className="flex flex-wrap gap-2 text-sm">
             <Link href="/new?type=REPORT_TOURISM" className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">
