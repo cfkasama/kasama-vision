@@ -99,6 +99,91 @@ export default function IntentButtons({
       setBusy(b => ({ ...b, [kind]: false }));
     }
   }
+  
+  const btn =
+    "w-full rounded-2xl px-4 py-5 text-white text-lg font-semibold shadow transition disabled:opacity-60";
+  const box = "rounded-xl border bg-white p-4 flex flex-col gap-3";
+  
+  return (
+    <>
+      <section className="grid gap-4 md:grid-cols-3">
+        {/* LIVE */}
+        <div className={box}>
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-gray-600">押された数 {counts.live}</span>
+          </div>
+          <button
+            onClick={() => press("LIVE")}
+            disabled={busy.LIVE || pressed.LIVE}
+            className={`${btn} bg-emerald-600 hover:bg-emerald-700`}
+          >
+            {busy.LIVE ? "⏳ 送信中…" : "🏠 笠間に住みたい"}
+          </button>
+          <div className="flex flex-wrap gap-2 text-sm">
+            <Link href="/new?type=REPORT_LIVE" className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">
+              住めなかった報告を投稿
+            </Link>
+            <Link href="/posts?type=REPORT_LIVE" className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">
+              報告一覧へ
+            </Link>
+          </div>
+        </div>
 
-  // …ボタンUIはそのまま。press("LIVE"/"WORK"/"TOURISM") を呼ぶだけ…
+        {/* WORK */}
+        <div className={box}>
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-gray-600">押された数 {counts.work}</span>
+          </div>
+          <button
+            onClick={() => press("WORK")}
+            disabled={busy.WORK || pressed.WORK}
+            className={`${btn} bg-blue-600 hover:bg-blue-700`}
+          >
+            {busy.WORK ? "⏳ 送信中…" : "💼 笠間で働きたい"}
+          </button>
+          <div className="flex flex-wrap gap-2 text-sm">
+            <Link href="/new?type=REPORT_WORK" className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">
+              働けなかった報告を投稿
+            </Link>
+            <Link href="/posts?type=REPORT_WORK" className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">
+              報告一覧へ
+            </Link>
+          </div>
+        </div>
+
+        {/* TOURISM */}
+        <div className={box}>
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-gray-600">押された数 {counts.tourism}</span>
+          </div>
+          <button
+            onClick={() => press("TOURISM")}
+            disabled={busy.TOURISM || pressed.TOURISM}
+            className={`${btn} bg-orange-600 hover:bg-orange-700`}
+          >
+            {busy.TOURISM ? "⏳ 送信中…" : "🚆 笠間に行きたい"}
+          </button>
+          <div className="flex flex-wrap gap-2 text-sm">
+            <Link href="/new?type=REPORT_TOURISM" className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">
+              不満がある報告を投稿
+            </Link>
+            <Link href="/posts?type=REPORT_TOURISM" className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">
+              報告一覧へ
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* トースト */}
+      {toast && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-black/80 px-3 py-2 text-xs text-white"
+        >
+          {toast}
+        </div>
+      )}
+    </>
+  );
 }
