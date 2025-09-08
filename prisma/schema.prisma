@@ -215,6 +215,18 @@ enum IntentKind {
   WORK
   TOURISM
 }
+// prisma/schema.prisma の Intent を置き換え
+model Intent {
+  id              String   @id @default(uuid())
+  identityId      String
+  municipalityId  String   // ★ 追加
+  kind            IntentKind
+  createdAt       DateTime @default(now())
+
+  identity     Identity      @relation(fields: [identityId], references: [id], onDelete: Cascade)
+  municipality Municipality  @relation(fields: [municipalityId], references: [id], onDelete: Cascade)
+
+  @@unique([identityId, municipalityId, kind]) 
 
 model Intent {
   id         String     @id @default(cuid())
