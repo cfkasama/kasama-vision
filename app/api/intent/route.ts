@@ -1,4 +1,3 @@
-// app/api/intent/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getOrCreateIdentityId } from "@/lib/identity";
@@ -6,79 +5,86 @@ import { getOrCreateIdentityId } from "@/lib/identity";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-type Kind = "LIVE" | "WORK" | "TOURISM";
+const VALID = new Set(["LIVE", "WORK", "TOURISM"]);
 
+function bad(status: number, error: string) {
+  return NextResponse.json({ ok: false, error }, { status });
+}
+
+/** POST /api/intent
+ *  body: { kind: "LIVE"|"WORK"|"TOURISM", mslug: string }
+ *  409: 同一 identity × municipality × kind は一度だけ
+ */
 export async function POST(req: Request) {
+  let body: any;
   try {
-    const { kind, municipalitySlug } = (await req.json()) as {
-      kind: Kind;
-      municipalitySlug?: string;
-    };
+    body = await req.json();
+  } catch {
+    return bad(400, "bad_json");
+  }
 
-    if (!kind || !["LIVE","WORK","TOURISM"].includes(kind)) {
-      return NextResponse.json({ ok:false, error:"bad_kind" }, { status:400 });
-    }
-    if (!municipalitySlug) {
-      return NextResponse.json({ ok:false, error:"municipality_required" }, { status:400 });
-    }
+  const kind = String(body?.kind ?? "").toUpperCase();
+  // 後方互換: mslug / municipalitySlug / slug のいずれでもOKに
+  const mslug = String(body?.mslug ?? body?.municipalitySlug ?? body?.slug ?? "").trim();
 
-    const muni = await prisma.municipality.findUnique({ where: { slug: municipalitySlug } });
-    if (!muni) {
-      return NextResponse.json({ ok:false, error:"municipality_not_found" }, { status:404 });
-    }
+  if (!VALID.has(kind) || !mslug) {
+    return bad(400, "bad_request");
+  }
 
-    const identityId = await getOrCreateIdentityId();
+  // slug → municipalityId 解決
+  const muni = await prisma.municipality.findUnique({
+    where: { slug: mslug },
+    select: { id: true },
+  });
+  if (!muni) return bad(404, "municipality_not_found");
 
-    // 既存チェック（同一 identity × municipality × kind で1回だけ）
-    const exists = await prisma.intent.findFirst({
-      where: { identityId, municipalityId: muni.id, kind }
-    });
-    if (exists) {
-      return NextResponse.json({ ok:false, error:"already_pressed" }, { status:409 });
-    }
+  const identityId = await getOrCreateIdentityId();
 
+  try {
     await prisma.intent.create({
-      data: { identityId, municipalityId: muni.id, kind }
+      data: {
+        kind: kind as any,          // Prisma enum
+        identityId,
+        municipalityId: muni.id,    // ★ slug ではなく id で保存
+      },
     });
-
-    return NextResponse.json({ ok:true });
-  } catch (e) {
-    console.error("[POST /api/intent] err:", e);
-    return NextResponse.json({ ok:false, error:"internal_error" }, { status:500 });
+    return NextResponse.json({ ok: true });
+  } catch (e: any) {
+    // 一意制約違反（すでに押している）
+    if (e?.code === "P2002") {
+      return bad(409, "already_pressed");
+    }
+    console.error("[POST /api/intent] error:", e);
+    return bad(500, "internal_error");
   }
 }
 
-// GET /api/intent?municipality=slug
+/** GET /api/intent?mslug=xxx
+ *  → { ok:true, counts: { live, work, tourism } }
+ */
 export async function GET(req: Request) {
-  try {
-    const { searchParams } = new URL(req.url);
-    const slug = searchParams.get("municipality");
-    if (!slug) {
-      return NextResponse.json({ ok:false, error:"municipality_required" }, { status:400 });
-    }
+  const { searchParams } = new URL(req.url);
+  const mslug = searchParams.get("mslug")?.trim();
+  if (!mslug) return bad(400, "bad_request");
 
-    const muni = await prisma.municipality.findUnique({ where: { slug } });
-    if (!muni) {
-      return NextResponse.json({ ok:false, error:"municipality_not_found" }, { status:404 });
-    }
+  const muni = await prisma.municipality.findUnique({
+    where: { slug: mslug },
+    select: { id: true },
+  });
+  if (!muni) return bad(404, "municipality_not_found");
 
-    const rows = await prisma.intent.groupBy({
-      by: ["kind"],
-      where: { municipalityId: muni.id },
-      _count: { _all: true },
-    });
+  const rows = await prisma.intent.groupBy({
+    by: ["kind"],
+    where: { municipalityId: muni.id }, // ★ id で絞り込み
+    _count: { _all: true },
+  });
 
-    const map = Object.fromEntries(rows.map(r => [r.kind, r._count._all]));
-    return NextResponse.json({
-      ok: true,
-      counts: {
-        live: map.LIVE ?? 0,
-        work: map.WORK ?? 0,
-        tourism: map.TOURISM ?? 0,
-      },
-    });
-  } catch (e) {
-    console.error("[GET /api/intent] err:", e);
-    return NextResponse.json({ ok:false, error:"internal_error" }, { status:500 });
+  const counts = { live: 0, work: 0, tourism: 0 };
+  for (const r of rows) {
+    if (r.kind === "LIVE") counts.live = r._count._all;
+    if (r.kind === "WORK") counts.work = r._count._all;
+    if (r.kind === "TOURISM") counts.tourism = r._count._all;
   }
+
+  return NextResponse.json({ ok: true, counts });
 }
