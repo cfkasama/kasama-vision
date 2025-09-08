@@ -24,11 +24,11 @@ export default async function MunicipalityPostsPage({
 
   return (
     <>
-      <h1 className="mb-3 text-2xl font-bold">{muni.name} の投稿一覧</h1>
       <PostsList
         municipalitySlug={slug}
         basePath={`/m/${slug}/posts`}
         searchParams={searchParams}
+        mname={muni.name}
       />
     </>
   );
