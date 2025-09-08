@@ -62,33 +62,33 @@ async function getTopVisions(muniSlug: string) {
   });
 }
 
-async function getNewConsultations() {
+async function getNewConsultations(muniSlug: string) {
   return prisma.post.findMany({
-    where: { status: "PUBLISHED", type: "CONSULTATION" },
+    where: { status: "PUBLISHED", type: "CONSULTATION", municipality: { slug: muniSlug } },
     orderBy: { createdAt: "desc" },
     take: 3,
   });
 }
 
-async function getNewProposals() {
+async function getNewProposals(muniSlug: string) {
   return prisma.post.findMany({
-    where: { status: "PUBLISHED", type: "PROPOSAL" },
+    where: { status: "PUBLISHED", type: "PROPOSAL", municipality: { slug: muniSlug } },
     orderBy: { createdAt: "desc" },
     take: 3,
   });
 }
 
-async function getHundredLikeProposals() {
+async function getHundredLikeProposals(muniSlug: string) {
   return prisma.post.findMany({
-    where: { status: "PUBLISHED", type: "PROPOSAL", likeCount: { gte: 100 } },
+    where: { status: "PUBLISHED", type: "PROPOSAL", municipality: { slug: muniSlug }, likeCount: { gte: 100 } },
     orderBy: { createdAt: "desc" },
     take: 3,
   });
 }
 
-async function getRealizedProposals() {
+async function getRealizedProposals(muniSlug: string) {
   return prisma.post.findMany({
-    where: { status: "REALIZED", type: "PROPOSAL" },
+    where: { status: "REALIZED", type: "PROPOSAL", municipality: { slug: muniSlug } },
     orderBy: { createdAt: "desc" },
     take: 3,
   });
@@ -145,17 +145,17 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
     intent,
     topTags,
   ] = await Promise.all([
-    countsByType(),
-    getTopCatchphrase(),
-    getTopVisions(),
-    getNewConsultations(),
-    getNewProposals(),
-    getHundredLikeProposals(),
-    getRealizedProposals(),
-    getHundredLikeProposalsCount(),
-    getRealizedProposalsCount(),
-    getIntentCounts(),
-    getTopTags(),
+    countsByType(mId),
+    getTopCatchphrase(mId)),
+    getTopVisions(mId)),
+    getNewConsultations(mId)),
+    getNewProposals(mId)),
+    getHundredLikeProposals(mId)),
+    getRealizedProposals(mId)),
+    getHundredLikeProposalsCount(mId)),
+    getRealizedProposalsCount(mId)),
+    getIntentCounts(mId)),
+    getTopTags(mId)),
   ]);
   
   const baseQuery = (q: Record<string, string | number | undefined>) =>
