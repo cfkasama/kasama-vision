@@ -1,5 +1,5 @@
 // app/posts/page.tsx
-import PostsList from "@/components/posts/PostsList";
+import PostsList from "@/components/posts";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
