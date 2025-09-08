@@ -16,7 +16,6 @@ type PostType =
   | "REPORT_WORK"
   | "REPORT_TOURISM";
 
-
 const labelByType: Record<PostType, string> = {
   CATCHPHRASE: "キャッチフレーズ",
   VISION: "ビジョン",
@@ -107,11 +106,12 @@ async function getRealizedProposalsCount(muniSlug: string) {
 }
 
 // Intent（住みたい/働きたい/行きたい）の押下回数を集計（なければ 0）
-async function getIntentCounts() {
+async function getIntentCounts(muniSlug: string) {
   const actions = ["INTENT_LIVE", "INTENT_WORK", "INTENT_TOURISM"] as const;
   const rows = await prisma.intent.groupBy({
     by: ["kind"],
     _count: { _all: true },
+    municipality: { slug: muniSlug } 
   });
   const map = Object.fromEntries(rows.map(r => [r.kind, r._count._all]));
   return {
