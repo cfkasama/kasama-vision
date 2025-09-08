@@ -51,6 +51,39 @@ async function getTopVisions() {
   });
 }
 
+async function getNewConsultations() {
+  return prisma.post.findMany({
+    where: { status: "PUBLISHED", type: "CONSULTATION" },
+    orderBy: { createdAt: "desc" },
+    take: 3,
+  });
+}
+
+async function getNewProposals() {
+  return prisma.post.findMany({
+    where: { status: "PUBLISHED", type: "PROPOSAL" },
+    orderBy: { createdAt: "desc" },
+    take: 3,
+  });
+}
+
+async function getHundredLikeProposals() {
+  return prisma.post.findMany({
+    where: { status: "PUBLISHED", type: "PROPOSAL", likeCount: { gte: 100 } },
+    orderBy: { createdAt: "desc" },
+    take: 3,
+  });
+}
+
+async function getRealizedProposals() {
+  return prisma.post.findMany({
+    where: { status: "REALIZED", type: "PROPOSAL" },
+    orderBy: { createdAt: "desc" },
+    take: 3,
+  });
+}
+
+
 async function getHundredLikeProposalsCount() {
   return prisma.post.count({
     where: { status: "PUBLISHED", type: "PROPOSAL", likeCount: { gte: 100 } },
@@ -131,18 +164,26 @@ export default async function Home() {
     counts,
     topCatch,
     topVis,
+    newCons,
+    newPros,
+    hundredLikes,
+    realizeds,    
     hundredLikeCount,
     realizedCount,
+    intent,
     topTags,
-    topMunicipalities,
   ] = await Promise.all([
     countsByType(),
     getTopCatchphrase(),
     getTopVisions(),
+    getNewConsultations(),
+    getNewProposals(),
+    getHundredLikeProposals(),
+    getRealizedProposals(),
     getHundredLikeProposalsCount(),
     getRealizedProposalsCount(),
+    getIntentCounts(),
     getTopTags(),
-    getTopMunicipalitiesWeekly(10, 7),
   ]);
 
   return (
