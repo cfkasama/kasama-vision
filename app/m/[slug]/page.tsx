@@ -220,11 +220,11 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
             <p className="text-sm">まだありません。</p>
           )}
           <div className="mt-3 flex gap-2">
-            <Link href={baseQuery({ type: "CATCHPHRASE" })} className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
+            <Link href={`/m/${slug}/posts/?type=CATCHPHRASE`} className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
               一覧を見る
             </Link>
             <Link
-              href={`/m/${slug}/new?type=CATCHPHRASE}`}
+              href={`/m/${slug}/new?type=CATCHPHRASE`}
               className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700"
             >
               投稿する
@@ -241,7 +241,7 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
             <ol className="list-decimal pl-5 text-sm">
               {topVis.map((v) => (
                 <li key={v.id} className="mb-1">
-                  <Link href={`/posts/${v.id}`} className="hover:underline">
+                  <Link href={`/m/${slug}/posts/${v.id}`} className="hover:underline">
                     {v.title}
                   </Link>
                 </li>
@@ -251,11 +251,11 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
             <p className="text-sm">まだありません。</p>
           )}
           <div className="mt-3 flex gap-2">
-            <Link href={baseQuery({ type: "VISION" })} className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
+            <Link href={`/m/${slug}/posts?type=VISION`} className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
               一覧を見る
             </Link>
             <Link
-              href={`/new?type=VISION}`}
+              href={`/m/${slug}/new?type=VISION`}
               className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700"
             >
               投稿する
