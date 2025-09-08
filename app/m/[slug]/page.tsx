@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { Card, Pill, Chip } from "@/components/ui";
-import IntentButtons from "@/components/IntentButtons"
+import IntentButtons from "@/components/IntentButtons";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
