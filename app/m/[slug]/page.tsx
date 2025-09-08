@@ -139,7 +139,7 @@ async function getTopTags(muniId: string) {
   }));
 }
 
-export default async function MunicipalityPage({ params }: { params: { muniId: string} }) {
+export default async function MunicipalityPage({ params }: { params: { slug: string} }) {
   const slug = params.slug;
 
   const muni = await prisma.municipality.findUnique({
