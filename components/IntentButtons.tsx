@@ -9,10 +9,12 @@ type Kind = "LIVE" | "WORK" | "TOURISM";
 const LS_KEY = (slug: string, k: Kind) => `intent_${slug}_${k}`;
 
 export default function IntentButtons({
-  municipalitySlug,
+  mslug,
+  mname,
   initial,
 }: {
   municipalitySlug: string;   // ★ 追加
+  municipalityName: string;   // ★ 追加
   initial: Counts;
 }) {
   const [counts, setCounts] = useState<Counts>(initial);
@@ -117,7 +119,7 @@ export default function IntentButtons({
             disabled={busy.LIVE || pressed.LIVE}
             className={`${btn} bg-emerald-600 hover:bg-emerald-700`}
           >
-            {busy.LIVE ? "⏳ 送信中…" : "🏠 笠間に住みたい"}
+            {busy.LIVE ? "⏳ 送信中…" : "🏠 {muni.name}に住みたい"}
           </button>
           <div className="flex flex-wrap gap-2 text-sm">
             <Link href="/new?type=REPORT_LIVE" className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">
@@ -139,7 +141,7 @@ export default function IntentButtons({
             disabled={busy.WORK || pressed.WORK}
             className={`${btn} bg-blue-600 hover:bg-blue-700`}
           >
-            {busy.WORK ? "⏳ 送信中…" : "💼 笠間で働きたい"}
+            {busy.WORK ? "⏳ 送信中…" : "💼 {muni.name}で働きたい"}
           </button>
           <div className="flex flex-wrap gap-2 text-sm">
             <Link href="/new?type=REPORT_WORK" className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">
@@ -161,7 +163,7 @@ export default function IntentButtons({
             disabled={busy.TOURISM || pressed.TOURISM}
             className={`${btn} bg-orange-600 hover:bg-orange-700`}
           >
-            {busy.TOURISM ? "⏳ 送信中…" : "🚆 笠間に行きたい"}
+            {busy.TOURISM ? "⏳ 送信中…" : "🚆 {muni.name}に行きたい"}
           </button>
           <div className="flex flex-wrap gap-2 text-sm">
             <Link href="/new?type=REPORT_TOURISM" className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">
