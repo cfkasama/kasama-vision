@@ -82,7 +82,7 @@ const labelByType: Partial<Record<PostType, string>> = {
   REPORT_TOURISM: "不満がある報告",
 };
 
-export default async function PostsList({ municipalitySlug, basePath, searchParams }: Props) {
+export default async function PostsList({ municipalitySlug, basePath, searchParams, mname }: Props) {
   const { type, tag, status, sort, minLikes, page, take, skip, orderBy, where } = parseParams(
     searchParams,
     municipalitySlug
@@ -102,7 +102,7 @@ export default async function PostsList({ municipalitySlug, basePath, searchPara
   const totalPages = Math.max(1, Math.ceil(total / take));
 
   const title =
-    (municipalitySlug ? "自治体別 " : "") +
+    (municipalitySlug ? ${mname} : "") +
     ((type ? labelByType[type] : tag ? `タグ: ${tag}` : "投稿") +
       (status === "REALIZED" ? "（実現）" : minLikes ? `（いいね${minLikes}+）` : ""));
 
