@@ -243,7 +243,7 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
             <ol className="list-decimal pl-5 text-sm">
               {topVis.map((v) => (
                 <li key={v.id} className="mb-1">
-                  <Link href={`router.asPath + \/posts/${v.id}`} className="hover:underline">
+                  <Link href={`/posts/${v.id}`} className="hover:underline">
                     {v.title}
                   </Link>
                 </li>
@@ -257,7 +257,7 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
               一覧を見る
             </Link>
             <Link
-              href={`router.asPath + \/new?type=VISION}`}
+              href={`/new?type=VISION}`}
               className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700"
             >
               投稿する
