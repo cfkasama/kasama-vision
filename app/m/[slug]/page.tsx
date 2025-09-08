@@ -126,24 +126,6 @@ async function getIntentCounts(muniSlug: string) {
     tourism: (map["TOURISM"] ?? 0) as number,
   };
 }
-// Intent（住みたい/働きたい/行きたい）の押下回数を集計（なければ 0）
-async function getIntentCounts(muniSlug: string) {
-  const rows = await prisma.intent.groupBy({
-    by: ["kind"],
-    _count: { _all: true },
-    where: {
-      municipality: { slug: muniSlug },
-    },
-  });
-
-  const map = Object.fromEntries(rows.map(r => [r.kind, r._count._all]));
-
-  return {
-    live: map["LIVE"] ?? 0,
-    work: map["WORK"] ?? 0,
-    tourism: map["TOURISM"] ?? 0,
-  };
-}
 
 // タグTOP5（TagTop5が自治体別で無い想定なので PostTag から集計）
 async function getTopTags(muniSlug: string) {
