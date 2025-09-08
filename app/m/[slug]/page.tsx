@@ -16,6 +16,7 @@ type PostType =
   | "REPORT_WORK"
   | "REPORT_TOURISM";
 
+
 const labelByType: Record<PostType, string> = {
   CATCHPHRASE: "キャッチフレーズ",
   VISION: "ビジョン",
@@ -25,6 +26,10 @@ const labelByType: Record<PostType, string> = {
   REPORT_WORK: "働けなかった報告",
   REPORT_TOURISM: "不満がある報告",
 };
+
+async function getMunicipalityBySlug(slug: string) {
+  return prisma.municipality.findUnique({ where: { slug } });
+}
 
 async function countsByType(muniSlug: string) {
   const rows = await prisma.post.groupBy({
