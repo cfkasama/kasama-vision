@@ -170,7 +170,6 @@ export default async function Home() {
     realizeds,    
     hundredLikeCount,
     realizedCount,
-    intent,
     topTags,
   ] = await Promise.all([
     countsByType(),
@@ -182,7 +181,6 @@ export default async function Home() {
     getRealizedProposals(),
     getHundredLikeProposalsCount(),
     getRealizedProposalsCount(),
-    getIntentCounts(),
     getTopTags(),
   ]);
 
