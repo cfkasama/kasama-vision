@@ -171,6 +171,7 @@ export default async function Home() {
     hundredLikeCount,
     realizedCount,
     topTags,
+    topMunicipalities,
   ] = await Promise.all([
     countsByType(),
     getTopCatchphrase(),
@@ -182,6 +183,7 @@ export default async function Home() {
     getHundredLikeProposalsCount(),
     getRealizedProposalsCount(),
     getTopTags(),
+    getTopMunicipalitiesWeekly(10, 7),
   ]);
 
   return (
