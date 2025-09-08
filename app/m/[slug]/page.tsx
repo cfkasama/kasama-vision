@@ -396,7 +396,7 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
         </Card>
       </section>
             <section className="mt-4 grid gap-4">
-<IntentButtons initial={intent} />
+<IntentButtons initial={intent} mname={muni.name} mslug={muni.slug}/>
             </section>
 
       <section className="mt-4 grid gap-4 md:grid-cols-2">
