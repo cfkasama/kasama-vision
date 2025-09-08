@@ -300,7 +300,7 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
                 <li key={v.id} className="mb-1">
                   <Link href={`/m/${slug}/posts/${v.id}`} className="hover:underline">
                     {v.title}
-                  </Link>{" "}
+                  </Link>
                 </li>
               ))}
             </ol>
@@ -321,7 +321,6 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
         </Card>
       </section>
 
-      {/* 100いいね提案 & 実現提案 */}
       <section className="mt-4 grid gap-4 md:grid-cols-2">
         <Card>
           <div className="mb-2 flex items-center justify-between">
@@ -397,7 +396,7 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
             ))}
             {topTags.length === 0 && <li className="text-sm text-gray-600">データがありません</li>}
           </ul>
-                    <Link href=`/m/${slug}/tags` className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50 inline-block">
+                    <Link href={`/m/${slug}/tags`} className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50 inline-block">
             タグ一覧へ
           </Link>
         </Card>
