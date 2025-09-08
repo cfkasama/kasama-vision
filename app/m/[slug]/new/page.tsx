@@ -1,6 +1,6 @@
 // app/new/page.tsx
 import { prisma } from "@/lib/db";
-import NewPostClient from "./NewPostClient";
+import NewPostClient from "@/components/NewPostClient";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
