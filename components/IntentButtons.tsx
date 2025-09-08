@@ -13,8 +13,8 @@ export default function IntentButtons({
   mname,
   initial,
 }: {
-  municipalitySlug: string;   // ★ 追加
-  municipalityName: string;   // ★ 追加
+  mslug: string;   // ★ 追加
+  mname: string;   // ★ 追加
   initial: Counts;
 }) {
   const [counts, setCounts] = useState<Counts>(initial);
@@ -28,12 +28,12 @@ export default function IntentButtons({
   useEffect(() => {
     try {
       setPressed({
-        LIVE: localStorage.getItem(LS_KEY(municipalitySlug,"LIVE")) === "1",
-        WORK: localStorage.getItem(LS_KEY(municipalitySlug,"WORK")) === "1",
-        TOURISM: localStorage.getItem(LS_KEY(municipalitySlug,"TOURISM")) === "1",
+        LIVE: localStorage.getItem(LS_KEY(mslug,"LIVE")) === "1",
+        WORK: localStorage.getItem(LS_KEY(mslug,"WORK")) === "1",
+        TOURISM: localStorage.getItem(LS_KEY(mslug,"TOURISM")) === "1",
       });
     } catch {}
-  }, [municipalitySlug]);
+  }, [mmslug]);
 
   async function press(kind: Kind) {
     if (busy[kind] || pressed[kind]) return;
@@ -52,7 +52,7 @@ export default function IntentButtons({
       const r = await fetch("/api/intent", {
         method: "POST",
         headers: { "Content-Type":"application/json" },
-        body: JSON.stringify({ kind, municipalitySlug }),
+        body: JSON.stringify({ kind, mslug }),
       });
       const j = await r.json().catch(()=> ({}));
 
@@ -65,7 +65,7 @@ export default function IntentButtons({
           if (kind === "TOURISM") n.tourism = Math.max(n.tourism - 1, 0);
           return n;
         });
-        try { localStorage.setItem(LS_KEY(municipalitySlug, kind), "1"); } catch {}
+        try { localStorage.setItem(LS_KEY(mslug, kind), "1"); } catch {}
         setPressed(p => ({ ...p, [kind]: true }));
         showToast("この意向は既に送信済みです");
         return;
@@ -85,7 +85,7 @@ export default function IntentButtons({
       }
 
       // 成功
-      try { localStorage.setItem(LS_KEY(municipalitySlug, kind), "1"); } catch {}
+      try { localStorage.setItem(LS_KEY(mslug, kind), "1"); } catch {}
       setPressed(p => ({ ...p, [kind]: true }));
       showToast("ありがとうございます！");
     } catch {
@@ -119,7 +119,7 @@ export default function IntentButtons({
             disabled={busy.LIVE || pressed.LIVE}
             className={`${btn} bg-emerald-600 hover:bg-emerald-700`}
           >
-            {busy.LIVE ? "⏳ 送信中…" : "🏠 {muni.name}に住みたい"}
+            {busy.LIVE ? "⏳ 送信中…" : "🏠 {mname}に住みたい"}
           </button>
           <div className="flex flex-wrap gap-2 text-sm">
             <Link href="/new?type=REPORT_LIVE" className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">
@@ -141,7 +141,7 @@ export default function IntentButtons({
             disabled={busy.WORK || pressed.WORK}
             className={`${btn} bg-blue-600 hover:bg-blue-700`}
           >
-            {busy.WORK ? "⏳ 送信中…" : "💼 {muni.name}で働きたい"}
+            {busy.WORK ? "⏳ 送信中…" : "💼 {mname}で働きたい"}
           </button>
           <div className="flex flex-wrap gap-2 text-sm">
             <Link href="/new?type=REPORT_WORK" className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">
@@ -163,7 +163,7 @@ export default function IntentButtons({
             disabled={busy.TOURISM || pressed.TOURISM}
             className={`${btn} bg-orange-600 hover:bg-orange-700`}
           >
-            {busy.TOURISM ? "⏳ 送信中…" : "🚆 {muni.name}に行きたい"}
+            {busy.TOURISM ? "⏳ 送信中…" : "🚆 {mname}に行きたい"}
           </button>
           <div className="flex flex-wrap gap-2 text-sm">
             <Link href="/new?type=REPORT_TOURISM" className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">
