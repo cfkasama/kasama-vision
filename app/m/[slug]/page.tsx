@@ -184,7 +184,6 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
         </div>
       </section>
 
-      {/* キャッチフレーズ & ビジョン */}
       <section className="mt-4 grid gap-4 md:grid-cols-2">
         <Card>
           <div className="mb-2 flex items-center justify-between">
@@ -199,7 +198,6 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
                 </Link>
               </h3>
               <p className="text-sm text-gray-600">{topCatch.content?.slice(0, 120)}</p>
-              {/* タグ表示（任意） */}
               <div className="mt-2 flex flex-wrap gap-1">
                 {topCatch.tags.map((t) => (
                   <Link key={t.tagId} href={baseQuery({ tag: t.tag.name })}>
@@ -256,7 +254,6 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
         </Card>
       </section>
 
-      {/* 相談 & 提案 */}
       <section className="mt-4 grid gap-4 md:grid-cols-2">
         <Card>
           <div className="mb-2 flex items-center justify-between">
@@ -294,7 +291,9 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
             <Pill>提案</Pill>
             <span className="text-xs text-gray-500">投稿数 {counts.proposal}</span>
           </div>
-           {newPros.map((v) => (
+ {newPros.length ? (
+            <ol className="list-disc pl-5 text-sm">
+              {newPros.map((v) => (
                 <li key={v.id} className="mb-1">
                   <Link href={`/posts/${v.id}`} className="hover:underline">
                     {v.title}
@@ -326,6 +325,8 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
             <Pill color="gold">いいね100提案</Pill>
             <span className="text-xs text-gray-500">件数 {hundredLikeCount}</span>
           </div>
+                     {hundredLikes.length ? (
+            <ol className="list-disc pl-5 text-sm">
            {hundredLikes.map((v) => (
                 <li key={v.id} className="mb-1">
                   <Link href={`/posts/${v.id}`} className="hover:underline">
@@ -350,6 +351,8 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
             <Pill color="green">実現提案</Pill>
             <span className="text-xs text-gray-500">件数 {realizedCount}</span>
           </div>
+                     {realizeds.length ? (
+            <ol className="list-disc pl-5 text-sm">
          {realizeds.map((v) => (
                 <li key={v.id} className="mb-1">
                   <Link href={`/posts/${v.id}`} className="hover:underline">
@@ -372,9 +375,7 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
             <section className="mt-4 grid gap-4">
 <IntentButtons initial={intent} />
             </section>
-      {/* Intent ボタン行 */}
-  
-      {/* タグランキング */}
+
       <section className="mt-4 grid gap-4 md:grid-cols-2">
         <Card>
           <div className="mb-2">
