@@ -1,0 +1,61 @@
+[09:42:44.147] Running build in Washington, D.C., USA (East) – iad1
+[09:42:44.147] Build machine configuration: 2 cores, 8 GB
+[09:42:44.166] Cloning github.com/cfkasama/kasama-vision (Branch: main, Commit: 474d6a7)
+[09:42:44.680] Cloning completed: 514.000ms
+[09:42:45.455] Restored build cache from previous deployment (5BXpc2PBUf24cLu21gHszAHcR3Gm)
+[09:42:45.837] Running "vercel build"
+[09:42:46.221] Vercel CLI 47.0.5
+[09:42:46.525] Installing dependencies...
+[09:42:47.721] 
+[09:42:47.722] > kasama-future@0.1.0 postinstall
+[09:42:47.722] > prisma generate
+[09:42:47.722] 
+[09:42:48.164] Prisma schema loaded from prisma/schema.prisma
+[09:42:48.722] 
+[09:42:48.723] ✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 257ms
+[09:42:48.723] 
+[09:42:48.724] Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+[09:42:48.724] 
+[09:42:48.725] Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
+[09:42:48.725] 
+[09:42:48.918] 
+[09:42:48.919] up to date in 2s
+[09:42:48.919] 
+[09:42:48.920] 43 packages are looking for funding
+[09:42:48.920]   run `npm fund` for details
+[09:42:48.947] Detected Next.js version: 14.2.5
+[09:42:48.951] Running "npm run build"
+[09:42:49.060] 
+[09:42:49.060] > kasama-future@0.1.0 build
+[09:42:49.061] > next build
+[09:42:49.061] 
+[09:42:49.731]   ▲ Next.js 14.2.5
+[09:42:49.732] 
+[09:42:49.803]    Creating an optimized production build ...
+[09:42:49.972]  ⚠ Found lockfile missing swc dependencies, run next locally to automatically patch
+[09:42:54.182]  ✓ Compiled successfully
+[09:42:54.183]    Linting and checking validity of types ...
+[09:42:54.592] 
+[09:42:54.592]    We detected TypeScript in your project and reconfigured your tsconfig.json file for you. Strict-mode is set to false by default.
+[09:42:54.592]    The following suggested values were added to your tsconfig.json. These values can be changed to fit your project's needs:
+[09:42:54.593] 
+[09:42:54.593]    	- include was updated to add '.next/types/**/*.ts'
+[09:42:54.593]    	- plugins was updated to add { name: 'next' }
+[09:42:54.593] 
+[09:42:54.594]    The following mandatory changes were made to your tsconfig.json:
+[09:42:54.594] 
+[09:42:54.594]    	- isolatedModules was set to true (requirement for SWC / Babel)
+[09:42:54.595] 
+[09:43:00.519] Failed to compile.
+[09:43:00.519] 
+[09:43:00.521] ./app/m/[slug]/page.tsx:148:5
+[09:43:00.521] Type error: Expected 1 arguments, but got 0.
+[09:43:00.521] 
+[09:43:00.522] [0m [90m 146 |[39m     topTags[33m,[39m[0m
+[09:43:00.522] [0m [90m 147 |[39m   ] [33m=[39m [36mawait[39m [33mPromise[39m[33m.[39mall([[0m
+[09:43:00.522] [0m[31m[1m>[22m[39m[90m 148 |[39m     countsByType()[33m,[39m[0m
+[09:43:00.523] [0m [90m     |[39m     [31m[1m^[22m[39m[0m
+[09:43:00.523] [0m [90m 149 |[39m     getTopCatchphrase()[33m,[39m[0m
+[09:43:00.523] [0m [90m 150 |[39m     getTopVisions()[33m,[39m[0m
+[09:43:00.524] [0m [90m 151 |[39m     getNewConsultations()[33m,[39m[0m
+[09:43:00.585] Error: Command "npm run build" exited with 1
