@@ -215,12 +215,6 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
                   {topCatch.title}
                 </Link>
               </h3>
-              <p className="text-sm text-gray-600">{topCatch.content?.slice(0, 120)}</p>
-              <div className="mt-2 flex flex-wrap gap-1">
-                {topCatch.tags.map((t) => (
-                  <Link key={t.tagId} href={baseQuery({ tag: t.tag.name })}>
-                    <Chip>{t.tag.name}</Chip>
-                  </Link>
                 ))}
               </div>
             </div>
