@@ -211,7 +211,7 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
           {topCatch ? (
             <div>
               <h3 className="mb-1 font-semibold">
-                <Link href={`./posts/${topCatch.id}`} className="hover:underline">
+                <Link href={`posts/${topCatch.id}`} className="hover:underline">
                   {topCatch.title}
                 </Link>
               </h3>
@@ -224,7 +224,7 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
               一覧を見る
             </Link>
             <Link
-              href={`./new?type=CATCHPHRASE}`}
+              href={`new?type=CATCHPHRASE}`}
               className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700"
             >
               投稿する
