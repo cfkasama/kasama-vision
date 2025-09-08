@@ -148,12 +148,38 @@ export default async function Home() {
   return (
     <>
       <section className="mb-6">
-        <h1 className="text-2xl font-bold">みんなで創る、未来の自治体</h1>
+        <h1 className="text-2xl font-bold">みんなで創る、自治体の未来</h1>
         <p className="text-sm text-gray-600">
           匿名で投稿、いいねで可視化、実現へ。
         </p>
       </section>
 
+      {/* 自治体ランキング */}
+      <section className="mt-6">
+        <Card>
+        <div className="mb-2 flex items-center justify-between">
+          <Pill color="green">自治体別 投稿数ランキング（直近7日）</Pill>
+          <Link href="/m" className="text-sm text-blue-600 hover:underline">
+            自治体一覧を見る →
+          </Link>
+        </div>
+        {topMunicipalities.length ? (
+          <ol className="list-decimal pl-5 text-sm">
+            {topMunicipalities.map((m) => (
+              <li key={m.id} className="mb-1">
+                <Link href={`/m/${m.slug}`} className="hover:underline">
+                  {m.name}
+                </Link>{" "}
+                — {m.count} 件
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <p className="text-sm">直近7日間の投稿はまだありません。</p>
+        )}
+        </Card>
+      </section>
+      
       {/* キャッチフレーズ & ビジョン */}
       <section className="mt-4 grid gap-4 md:grid-cols-2">
         <Card>
@@ -236,30 +262,6 @@ export default async function Home() {
             実現一覧へ
           </Link>
         </Card>
-      </section>
-
-      {/* 自治体ランキング */}
-      <section className="mt-6">
-        <div className="mb-2 flex items-center justify-between">
-          <Pill color="green">自治体別 投稿数ランキング（直近7日）</Pill>
-          <Link href="/m" className="text-sm text-blue-600 hover:underline">
-            自治体一覧を見る →
-          </Link>
-        </div>
-        {topMunicipalities.length ? (
-          <ol className="list-decimal pl-5 text-sm">
-            {topMunicipalities.map((m) => (
-              <li key={m.id} className="mb-1">
-                <Link href={`/m/${m.slug}`} className="hover:underline">
-                  {m.name}
-                </Link>{" "}
-                — {m.count} 件
-              </li>
-            ))}
-          </ol>
-        ) : (
-          <p className="text-sm">直近7日間の投稿はまだありません。</p>
-        )}
       </section>
 
       {/* タグランキング & 本サイトについて */}
