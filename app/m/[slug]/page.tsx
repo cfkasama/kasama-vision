@@ -106,7 +106,26 @@ async function getRealizedProposalsCount(muniSlug: string) {
     where: { status: "REALIZED", type: "PROPOSAL", municipality: { slug: muniSlug } },
   });
 }
+async function getIntentCounts(muniSlug: string) {
+  const muni = await prisma.municipality.findUnique({
+    where: { slug: muniSlug },
+    select: { id: true },
+  });
+  if (!muni) return { live: 0, work: 0, tourism: 0 };
 
+  const rows = await prisma.intent.groupBy({
+    by: ["kind"],
+    where: { municipalityId: muni.id }, // ← ここがポイント
+    _count: { _all: true },
+  });
+
+  const map = Object.fromEntries(rows.map(r => [r.kind, r._count._all]));
+  return {
+    live: (map["LIVE"] ?? 0) as number,
+    work: (map["WORK"] ?? 0) as number,
+    tourism: (map["TOURISM"] ?? 0) as number,
+  };
+}
 // Intent（住みたい/働きたい/行きたい）の押下回数を集計（なければ 0）
 async function getIntentCounts(muniSlug: string) {
   const rows = await prisma.intent.groupBy({
