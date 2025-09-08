@@ -146,16 +146,16 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
     topTags,
   ] = await Promise.all([
     countsByType(mId),
-    getTopCatchphrase(mId)),
-    getTopVisions(mId)),
-    getNewConsultations(mId)),
-    getNewProposals(mId)),
-    getHundredLikeProposals(mId)),
-    getRealizedProposals(mId)),
-    getHundredLikeProposalsCount(mId)),
-    getRealizedProposalsCount(mId)),
-    getIntentCounts(mId)),
-    getTopTags(mId)),
+    getTopCatchphrase(mId),
+    getTopVisions(mId),
+    getNewConsultations(mId),
+    getNewProposals(mId),
+    getHundredLikeProposals(mId),
+    getRealizedProposals(mId),
+    getHundredLikeProposalsCount(mId),
+    getRealizedProposalsCount(mId),
+    getIntentCounts(mId),
+    getTopTags(mId),
   ]);
   
   const baseQuery = (q: Record<string, string | number | undefined>) =>
