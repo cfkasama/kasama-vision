@@ -16,6 +16,7 @@ type PostType =
   | "REPORT_WORK"
   | "REPORT_TOURISM";
 
+
 const labelByType: Record<PostType, string> = {
   CATCHPHRASE: "キャッチフレーズ",
   VISION: "ビジョン",
