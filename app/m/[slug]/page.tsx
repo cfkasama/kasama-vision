@@ -28,10 +28,10 @@ const labelByType: Record<PostType, string> = {
   REPORT_TOURISM: "不満がある報告",
 };
 
-async function countsByType(muniSlug: string) {
+async function countsByType(muniId: string) {
   const rows = await prisma.post.groupBy({
     by: ["type"],
-    where: { status: "PUBLISHED", municipality: { slug: muniSlug } },
+    where: { status: "PUBLISHED", municipality: { id: muniId } },
     _count: { _all: true },
   });
   const map = Object.fromEntries(rows.map((r) => [r.type, r._count._all]));
@@ -47,75 +47,69 @@ async function countsByType(muniSlug: string) {
   };
 }
 
-async function getTopCatchphrase(muniSlug: string) {
+async function getTopCatchphrase(muniId: string) {
   return prisma.post.findFirst({
-    where: { status: "PUBLISHED", type: "CATCHPHRASE", municipality: { slug: muniSlug } },
+    where: { status: "PUBLISHED", type: "CATCHPHRASE", municipality: { id: muniId } },
     orderBy: { likeCount: "desc" },
     include: { tags: { include: { tag: true } } },
   });
 }
 
-async function getTopVisions(muniSlug: string) {
+async function getTopVisions(muniId: string) {
   return prisma.post.findMany({
-    where: { status: "PUBLISHED", type: "VISION", municipality: { slug: muniSlug } },
+    where: { status: "PUBLISHED", type: "VISION", municipality: { id: muniId } },
     orderBy: { likeCount: "desc" },
     take: 3,
     include: { tags: { include: { tag: true } } },
   });
 }
 
-async function getNewConsultations(muniSlug: string) {
+async function getNewConsultations(muniId: string) {
   return prisma.post.findMany({
-    where: { status: "PUBLISHED", type: "CONSULTATION", municipality: { slug: muniSlug } },
+    where: { status: "PUBLISHED", type: "CONSULTATION", municipality: { id: muniId } },
     orderBy: { createdAt: "desc" },
     take: 3,
   });
 }
 
-async function getNewProposals(muniSlug: string) {
+async function getNewProposals(muniId: string) {
   return prisma.post.findMany({
-    where: { status: "PUBLISHED", type: "PROPOSAL", municipality: { slug: muniSlug } },
+    where: { status: "PUBLISHED", type: "PROPOSAL", municipality: { id: muniId } },
     orderBy: { createdAt: "desc" },
     take: 3,
   });
 }
 
-async function getHundredLikeProposals(muniSlug: string) {
+async function getHundredLikeProposals(muniId: string) {
   return prisma.post.findMany({
-    where: { status: "PUBLISHED", type: "PROPOSAL", municipality: { slug: muniSlug }, likeCount: { gte: 100 } },
+    where: { status: "PUBLISHED", type: "PROPOSAL", municipality: { id: muniId }, likeCount: { gte: 100 } },
     orderBy: { createdAt: "desc" },
     take: 3,
   });
 }
 
-async function getRealizedProposals(muniSlug: string) {
+async function getRealizedProposals(muniId: string) {
   return prisma.post.findMany({
-    where: { status: "REALIZED", type: "PROPOSAL", municipality: { slug: muniSlug } },
+    where: { status: "REALIZED", type: "PROPOSAL", municipality: { id: muniId } },
     orderBy: { createdAt: "desc" },
     take: 3,
   });
 }
 
-async function getHundredLikeProposalsCount(muniSlug: string) {
+async function getHundredLikeProposalsCount(muniId: string) {
   return prisma.post.count({
-    where: { status: "PUBLISHED", type: "PROPOSAL", municipality: { slug: muniSlug }, likeCount: { gte: 100 } },
+    where: { status: "PUBLISHED", type: "PROPOSAL", municipality: { id: muniId }, likeCount: { gte: 100 } },
   });
 }
-async function getRealizedProposalsCount(muniSlug: string) {
+async function getRealizedProposalsCount(muniId: string) {
   return prisma.post.count({
-    where: { status: "REALIZED", type: "PROPOSAL", municipality: { slug: muniSlug } },
+    where: { status: "REALIZED", type: "PROPOSAL", municipality: { id: muniId } },
   });
 }
-async function getIntentCounts(muniSlug: string) {
-  const muni = await prisma.municipality.findUnique({
-    where: { municipalityId: muni.id },
-    select: { id: true },
-  });
-  if (!muni) return { live: 0, work: 0, tourism: 0 };
-
+async function getIntentCounts(muniId: string) {
   const rows = await prisma.intent.groupBy({
     by: ["kind"],
-    where: { municipalityId: muni.id }, // ← ここがポイント
+    where: { municipalityId: muniId }, // ← ここがポイント
     _count: { _all: true },
   });
 
@@ -128,10 +122,10 @@ async function getIntentCounts(muniSlug: string) {
 }
 
 // タグTOP5（TagTop5が自治体別で無い想定なので PostTag から集計）
-async function getTopTags(muniSlug: string) {
+async function getTopTags(muniId: string) {
   const grouped = await prisma.postTag.groupBy({
     by: ["tagId"],
-    where: { post: { status: "PUBLISHED", municipality: { slug: muniSlug } } },
+    where: { post: { status: "PUBLISHED", municipality: { id: muniId } } },
     _count: { tagId: true },
     orderBy: { _count: { tagId: "desc" } },
     take: 5,
@@ -145,7 +139,7 @@ async function getTopTags(muniSlug: string) {
   }));
 }
 
-export default async function MunicipalityPage({ params }: { params: { slug: string } }) {
+export default async function MunicipalityPage({ params }: { params: { muniId: string} }) {
   const slug = params.slug;
 
   const muni = await prisma.municipality.findUnique({
