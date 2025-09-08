@@ -27,10 +27,6 @@ const labelByType: Record<PostType, string> = {
   REPORT_TOURISM: "不満がある報告",
 };
 
-async function getMunicipalityBySlug(slug: string) {
-  return prisma.municipality.findUnique({ where: { slug } });
-}
-
 async function countsByType(muniSlug: string) {
   const rows = await prisma.post.groupBy({
     by: ["type"],
@@ -137,7 +133,7 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
   });
   if (!muni) notFound();
 
-  const mId=municipality.id;
+  const mId=muni.id;
   
   const [
     counts,
