@@ -132,7 +132,6 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
   });
   if (!muni) notFound();
 
-export default async function Home() {
   const [
     counts,
     topCatch,
