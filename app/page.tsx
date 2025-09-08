@@ -245,9 +245,6 @@ export default async function Home() {
                   {topCatch.title}
                 </Link>
               </h3>
-              <p className="text-sm text-gray-600">
-                {topCatch.content?.slice(0, 120)}
-              </p>
             </div>
           ) : (
             <p className="text-sm">まだありません。</p>
