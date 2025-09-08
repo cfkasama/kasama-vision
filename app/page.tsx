@@ -159,10 +159,8 @@ export default async function Home() {
         <Card>
         <div className="mb-2 flex items-center justify-between">
           <Pill color="green">自治体別 投稿数ランキング（直近7日）</Pill>
-          <Link href="/m" className="text-sm text-blue-600 hover:underline">
-            自治体一覧を見る →
-          </Link>
         </div>
+                      <div>
         {topMunicipalities.length ? (
           <ol className="list-decimal pl-5 text-sm">
             {topMunicipalities.map((m) => (
@@ -177,6 +175,13 @@ export default async function Home() {
         ) : (
           <p className="text-sm">直近7日間の投稿はまだありません。</p>
         )}
+                                </div>
+          <Link
+            href="/m"
+            className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50 inline-block"
+          >
+            自治体一覧へ
+          </Link>
         </Card>
       </section>
       
