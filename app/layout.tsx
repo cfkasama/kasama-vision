@@ -11,6 +11,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body>
         <Header municipality={null} />
         <main className="mx-auto max-w-5xl p-4">{children}</main>
+        <footer className="mt-10 border-t">
+          <div className="container py-6 text-xs text-gray-500">©cfkasama</div>
+        </footer>
       </body>
     </html>
   );
