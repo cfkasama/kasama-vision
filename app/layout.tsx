@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import Header from "@/components/Header";
-import "./globals.css";
+import "./../styles/globals.css";
 
 export const dynamic = "force-static"; // ここは静的でOK
 export const runtime = "nodejs";
