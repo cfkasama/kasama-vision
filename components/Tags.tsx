@@ -8,6 +8,7 @@ export const runtime = "nodejs";
 type Props = {
   /** 自治体スコープにしたい場合だけ指定（IDのほうが早い） */
   municipalityId?: string;
+  municipalityName?: string;
   /** ボタンやリンク生成に使う slug（/m/[slug]/posts?tag=.. を作る用） */
   municipalitySlug?: string;
   /** 見出し */
