@@ -12,7 +12,6 @@ export default async function PostsPage({
   return (
     <Posts
       municipalitySlug={undefined}
-      basePath="/posts"
       searchParams={searchParams}
     />
   );
