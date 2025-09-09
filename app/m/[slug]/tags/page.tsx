@@ -26,7 +26,6 @@ export default async function MunicipalityTagsPage({
     <>
       <PostsList
         municipalitySlug={slug}
-        searchParams={searchParams}
         mname={muni.name}
       />
     </>
