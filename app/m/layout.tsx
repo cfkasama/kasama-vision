@@ -14,16 +14,9 @@ export default async function MLayout({
   children: ReactNode;
   params: { slug: string };
 }) {
-  const muni = await prisma.municipality.findUnique({
-    where: { slug: params.slug },
-    select: { id: true, slug: true, name: true, prefecture: true },
-  });
-
-  if (!muni) notFound();
-
   return (
     <>
-      <Header municipality={muni} />
+      <Header />
       <main className="mx-auto max-w-5xl p-4">{children}</main>
     </>
   );
