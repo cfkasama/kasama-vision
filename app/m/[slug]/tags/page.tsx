@@ -1,4 +1,4 @@
-// app/m/[slug]/tagss/page.tsx
+// app/m/[slug]/tags/page.tsx
 import { prisma } from "@/lib/db";
 import PostsList from "@/components/Tags";
 import { notFound } from "next/navigation";
