@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 export const dynamic = "force-static";
 export const runtime = "nodejs";
+import "./../styles/globals.css";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
