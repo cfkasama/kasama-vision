@@ -1,5 +1,5 @@
 // app/tags/page.tsx
-import TagsList from "@/components/TagsList";
+import TagsList from "@/components/Tags";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
