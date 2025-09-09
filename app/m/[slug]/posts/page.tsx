@@ -1,6 +1,6 @@
 // app/m/[slug]/posts/page.tsx
 import { prisma } from "@/lib/db";
-import PostsList from "@/components/Posts";
+import Posts from "@/components/Posts";
 import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
@@ -23,13 +23,11 @@ export default async function MunicipalityPostsPage({
   if (!muni) return notFound();
 
   return (
-    <>
-      <PostsList
+      <Posts
         municipalitySlug={slug}
         basePath={`/m/${slug}/posts`}
         searchParams={searchParams}
-        mname={muni.name}
+        municipalityName={muni.name}
       />
-    </>
   );
 }
