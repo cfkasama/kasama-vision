@@ -10,10 +10,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body>
         {/* ← Headerはここで描画しない */}
         {children}
-      </body>
-      <footer className="mt-10 border-t">
+        <footer className="mt-10 border-t">
           <div className="container py-6 text-xs text-gray-500">©cfkasama</div>
         </footer>
+      </body>
     </html>
   );
 }
