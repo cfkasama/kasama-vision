@@ -21,6 +21,7 @@ type Props = {
 export default async function TagsList({
   municipalityId,
   municipalitySlug,
+  municipalityName,
   title = "タグ一覧",
   limit = 200,
   showCreateButton = true,
