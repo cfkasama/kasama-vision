@@ -1,5 +1,5 @@
 // app/posts/page.tsx
-import PostsList from "@/components/Posts";
+import Posts from "@/components/Posts";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -10,7 +10,7 @@ export default async function PostsPage({
   searchParams: Record<string, string | string[] | undefined>;
 }) {
   return (
-    <PostsList
+    <Posts
       municipalitySlug={undefined}
       basePath="/posts"
       searchParams={searchParams}
