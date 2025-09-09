@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 export const runtime = "nodejs";
 
-export default async function TagsIndexPage() {
+export default async function TagsList() {
   try {
     // 1) PostTag を PUBLISHED の Post に絞って集計
     const grouped = await prisma.postTag.groupBy({
