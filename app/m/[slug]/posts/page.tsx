@@ -25,7 +25,6 @@ export default async function MunicipalityPostsPage({
   return (
       <Posts
         municipalitySlug={slug}
-        basePath={`/m/${slug}/posts`}
         searchParams={searchParams}
         municipalityName={muni.name}
       />
