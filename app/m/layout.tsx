@@ -1,19 +1,15 @@
 import type { ReactNode } from "react";
-import { notFound } from "next/navigation";
-import { prisma } from "@/lib/db";
 import Header from "@/components/Header";
+import { prisma } from "@/lib/db";
 
-export const dynamic = "force-dynamic"; // ← 動的
-export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 export const revalidate = 0;
+export const runtime = "nodejs";
 
-export default async function MLayout({
-  children,
-  params,
-}: {
-  children: ReactNode;
-  params: { slug: string };
-}) {
+export default async function MLayout(
+  { children, params }: { children: ReactNode; params: { slug: string } }
+) {
+
   return (
     <>
       <Header />
