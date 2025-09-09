@@ -22,7 +22,6 @@ export default async function TagsList({
   municipalityId,
   municipalitySlug,
   municipalityName,
-  title = "タグ一覧",
   limit = 200,
   showCreateButton = true,
 }: Props) {
@@ -39,6 +38,9 @@ export default async function TagsList({
     orderBy: { _count: { tagId: "desc" } },
     take: limit,
   });
+
+   const title =
+    (municipalityName ? `${municipalityName} のタグ一覧` : "タグ一覧");
 
   if (grouped.length === 0) {
     return (
