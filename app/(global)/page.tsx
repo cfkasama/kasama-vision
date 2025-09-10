@@ -253,9 +253,9 @@ export default async function Home() {
                   {topCatch.title}
                 </Link>
               </h3>
-               li>
+               <li>
                 <Link
-                  href={`/m/${topCatch.municipality.slug}}`}
+                  href={`/m/${topCatch.municipality.slug}`}
                   className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs"
                 >
                   {topCatch.municipality.name}
