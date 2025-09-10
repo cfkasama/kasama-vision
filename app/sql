@@ -1,24 +1,11 @@
--- 1) カラム追加（NULL許容→埋めて→NOT NULLへ）
-ALTER TABLE "Intent" ADD COLUMN "municipalityId" uuid;
+-- 1. enum型を追加（まだ存在しない場合）
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'commentkind') THEN
+    CREATE TYPE "CommentKind" AS ENUM ('COMMENT', 'CHALLENGE', 'ACHIEVEMENT');
+  END IF;
+END$$;
 
--- 2) 既存行の一時埋め（全部「日本」(slug='japan')に寄せる例）
---   先に municipalities に 'japan' がある前提
-UPDATE "Intent" i
-SET "municipalityId" = m.id
-FROM "Municipality" m
-WHERE m.slug = 'japan' AND i."municipalityId" IS NULL;
-
--- 3) NOT NULL 制約付与
-ALTER TABLE "Intent" ALTER COLUMN "municipalityId" SET NOT NULL;
-
--- 4) 旧ユニーク制約があれば DROP（名前はDBに合わせて）
--- 例: DROP INDEX IF EXISTS "Intent_identityId_kind_key";
-
--- 5) 新ユニーク制約作成
-CREATE UNIQUE INDEX "Intent_identity_muni_kind_key"
-  ON "Intent"("identityId","municipalityId","kind");
-
--- 6) 外部キー
-ALTER TABLE "Intent"
-  ADD CONSTRAINT "Intent_municipality_fkey"
-  FOREIGN KEY ("municipalityId") REFERENCES "Municipality"("id") ON DELETE CASCADE;
+-- 2. Commentテーブルにkindカラムを追加（デフォルトはCOMMENT）
+ALTER TABLE "Comment"
+  ADD COLUMN "kind" "CommentKind" NOT NULL DEFAULT 'COMMENT';
