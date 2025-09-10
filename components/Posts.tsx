@@ -129,7 +129,7 @@ export default async function Posts({
             <header className="mb-1 flex items-center gap-2">
              <Chip>
               <Link
-                href={`${basePath}?type=${encodeURIComponent(post.type)}`}
+                href={`${basePath}?type=${encodeURIComponent(posts.type)}`}
                 className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs"
               >
                 {labelByType[post.type as PostType] ?? post.type}
