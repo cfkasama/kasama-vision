@@ -31,7 +31,7 @@ export default async function PostDetail({ id }: { id: string }) {
     where: { id },
     include: {
       tags: { include: { tag: true } },
-      municipality: { select: { slug: true, name: true } }, // ← slug を必ず取得
+      municipality: { select: { slug: true, name: true } },
     },
   });
 
@@ -39,13 +39,16 @@ export default async function PostDetail({ id }: { id: string }) {
     return <div>見つかりませんでした。</div>;
   }
 
-  const slug = post.municipality?.slug ?? "site";
+  // ベースとなる一覧URL（自治体スラッグがある＆site以外 → /m/[slug]/posts、それ以外は /posts）
+  const muniSlug = post.municipality?.slug;
+  const listBase =
+    muniSlug && muniSlug !== "site" ? `/m/${muniSlug}/posts` : `/posts`;
 
   return (
     <div className="mx-auto max-w-2xl">
-      {/* 一覧へ（常に /m/[slug]/posts に戻る） */}
+      {/* 一覧へ（自治体別 or 全体） */}
       <Link
-        href={`/m/${slug}/posts?type=${post.type}`}
+        href={`${listBase}?type=${encodeURIComponent(post.type)}`}
         className="text-sm text-gray-600 hover:underline"
       >
         ← 一覧へ
@@ -60,16 +63,19 @@ export default async function PostDetail({ id }: { id: string }) {
       <h2 className="mt-2 text-xl font-bold">{post.title}</h2>
 
       <div className="mt-1 flex flex-wrap gap-1">
-        {post.tags.map((t) => (
-          <Chip key={t.tagId}>
-            <Link
-              href={`/m/${slug}/tags/${encodeURIComponent(t.tag.name)}`}
-              className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs"
-            >
-              {t.tag.name}
-            </Link>
-          </Chip>
-        ))}
+        {post.tags.map((t) => {
+          const tagLink = `${listBase}?tag=${encodeURIComponent(t.tag.name)}`;
+          return (
+            <Chip key={t.tagId}>
+              <Link
+                href={tagLink}
+                className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs"
+              >
+                {t.tag.name}
+              </Link>
+            </Chip>
+          );
+        })}
       </div>
 
       <article className="prose-basic mt-3 text-[15px] text-gray-800">
