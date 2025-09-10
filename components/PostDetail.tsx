@@ -92,6 +92,7 @@ export default async function PostDetail({ id,slug }: { id: string ,slug?:string
       </article>
 
       <ReactionBar postId={post.id} likeCount={post.likeCount} />
+      <CommentComposer postId={post.id} postType={post.type as any} />
       <CommentList postId={post.id} />
       <ReportButton postId={post.id} />
     </div>
