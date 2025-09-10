@@ -76,7 +76,7 @@ export async function POST(req: Request, { params }: Params) {
      const identityId = await getOrCreateIdentityId();
     // コメント作成（identityId は匿名可なので null）
     const created = await prisma.comment.create({
-      data: { postId: id, content, identityId, deleteKey: hashed },
+      data: { postId: id, content ,kind: kind ?? "COMMENT", identityId, deleteKey: hashed },
       select: { id: true },
     });
 
