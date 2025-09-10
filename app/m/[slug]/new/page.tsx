@@ -11,7 +11,9 @@ export default async function NewPage({
   searchParams: Record<string, string | string[] | undefined>;
 }) {
   const typeFromQuery = typeof searchParams.type === "string" ? searchParams.type : undefined;
-
+  // 存在チェック（名前出したい場合など）
+    const slug = params.slug;
+  
   const municipalities = await prisma.municipality.findMany({
     select: { id: true, name: true, slug: true },
     orderBy: { name: "asc" },
@@ -29,7 +31,7 @@ export default async function NewPage({
     <NewPostClient
       initialType={typeFromQuery}
       municipalities={prioritized}
-      initialMunicipalitySlug="japan" // ← デフォルトを日本に固定
+      initialMunicipalitySlug={slug} 
     />
   );
 }
