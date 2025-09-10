@@ -127,7 +127,14 @@ export default async function Posts({
         {posts.map((p) => (
           <Card key={p.id} className="flex flex-col">
             <header className="mb-1 flex items-center gap-2">
-              <Pill>{labelByType[p.type as PostType] ?? p.type}</Pill>
+             <Chip>
+              <Link
+                href={`${listBase}?type=${encodeURIComponent(post.type)}`}
+                className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs"
+              >
+                {labelByType[post.type as PostType] ?? post.type}
+              </Link>
+            </Chip>
               {p.likeCount >= 100 && <Pill color="gold">100いいね</Pill>}
               {p.status === "REALIZED" && <Pill color="green">実現</Pill>}
             </header>
