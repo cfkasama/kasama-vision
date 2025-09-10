@@ -429,7 +429,7 @@ export default async function Home() {
       </section>
 
       {/* タグランキング & 本サイトについて */}
-      <section className="mt-6 grid gap-4 md:grid-cols-2">
+      <section className="mt-4 grid gap-4 md:grid-cols-2">
         <Card>
           <div className="mb-2">
             <Pill color="green">タグランキング（TOP5）</Pill>
