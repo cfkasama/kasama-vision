@@ -41,7 +41,7 @@ export default function CommentComposer({
 
   // reCAPTCHA v3 専用
   async function getRecaptchaV3Token(): Promise<string> {
-    const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_KEY;
+    const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!;
     const grecaptcha = (window as any).grecaptcha;
 
     if (!siteKey) {
