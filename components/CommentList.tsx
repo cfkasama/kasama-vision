@@ -60,56 +60,6 @@ export default function CommentList({ postId }: { postId: string }) {
     load();
   }, [postId]);
 
-  // コメント投稿（deleteKey 必須 & reCAPTCHA 必須）
-  async function submit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    if (!content.trim()) return showToast("本文を入力してください");
-    if (!deleteKey.trim()) return showToast("削除用パスワードを入力してください");
-    setBusy(true);
-    try {
-      // @ts-ignore
-      const grecaptcha = (window as any)?.grecaptcha;
-      if (!grecaptcha?.ready || !grecaptcha?.execute) {
-        showToast("reCAPTCHAの初期化待ちです。少し待って再実行してください。");
-        return;
-      }
-      const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!;
-      const token: string = await new Promise((resolve, reject) => {
-        try {
-          grecaptcha.ready(async () => {
-            try {
-              const t = await grecaptcha.execute(siteKey, { action: "comment" });
-              resolve(t);
-            } catch (err) {
-              reject(err);
-            }
-          });
-        } catch (err) {
-          reject(err);
-        }
-      });
-
-      const res = await fetch(`/api/posts/${postId}/comments`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content, deleteKey, recaptchaToken: token }),
-      });
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok || !json?.ok) {
-        showToast("コメント投稿に失敗しました");
-        return;
-      }
-      setContent("");
-      setDeleteKey("");
-      showToast("コメントを投稿しました");
-      await load();
-    } catch {
-      showToast("コメント投稿でエラーが発生しました");
-    } finally {
-      setBusy(false);
-    }
-  }
-
   // いいね（端末内で一度だけ）
   const like = async (id: string) => {
     if (pressedLike[id]) {
@@ -244,30 +194,6 @@ export default function CommentList({ postId }: { postId: string }) {
   return (
     <section className="mt-6">
       <h4 className="mb-2 text-lg font-semibold">コメント</h4>
-
-      <form onSubmit={submit} className="mb-3 space-y-2">
-        <textarea
-          rows={3}
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="気づき・応援・補足など"
-          className="w-full rounded-md border p-2"
-          required
-        />
-        <input
-          value={deleteKey}
-          onChange={(e) => setDeleteKey(e.target.value)}
-          placeholder="削除用パスワード（必須・後から削除に使います）"
-          className="w-full rounded-md border p-2"
-          required
-        />
-        <button
-          className="inline-flex items-center rounded-lg border bg-white px-3 py-1.5 hover:bg-gray-50 disabled:opacity-60"
-          disabled={busy}
-        >
-          {busy ? "送信中…" : "送信"}
-        </button>
-      </form>
 
       <ul className="flex flex-col gap-3">
         {comments.map((c) => (
