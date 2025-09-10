@@ -39,7 +39,7 @@ export default async function MunicipalitiesPage() {
       <section className="mb-6">
         <h1 className="text-2xl font-bold">自治体一覧</h1>
         <p className="text-sm text-gray-600">
-          全国の自治体ごとの相談・意見・提案を集めています。自治体カードをクリックして詳細へ。
+          全国の自治体ごとの相談・意見・提案が投稿できます。自治体名をクリックして詳細へ。
         </p>
       </section>
 
