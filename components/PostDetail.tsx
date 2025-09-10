@@ -1,21 +1,22 @@
 // components/PostDetail.tsx
-import Link from "next/link";
-import { Pill, Chip } from "@/components/ui";
+import { prisma } from "@/lib/db";
 import ReactionBar from "@/components/ReactionBar";
 import CommentList from "@/components/CommentList";
+import { Pill, Chip } from "@/components/ui";
 import ReportButton from "@/components/ReportButton";
-import type { Post, PostStatus } from "@prisma/client";
+import { PostStatus } from "@prisma/client";
+import Link from "next/link";
 
-type PostWithTags = Post & {
-  tags: { tagId: string; tag: { name: string } }[];
-};
+type PostType =
+  | "CATCHPHRASE"
+  | "VISION"
+  | "CONSULTATION"
+  | "PROPOSAL"
+  | "REPORT_LIVE"
+  | "REPORT_WORK"
+  | "REPORT_TOURISM";
 
-type Props = {
-  post: PostWithTags;
-  municipalitySlug?: string; // 自治体スコープ時は付与
-};
-
-const labelByType: Record<Post["type"], string> = {
+const labelByType: Partial<Record<PostType, string>> = {
   CATCHPHRASE: "キャッチフレーズ",
   VISION: "ビジョン",
   CONSULTATION: "相談",
@@ -25,44 +26,43 @@ const labelByType: Record<Post["type"], string> = {
   REPORT_TOURISM: "不満がある報告",
 };
 
-function buildPostsQuery(q: Record<string, string | number | undefined>) {
-  return (
-    "/posts?" +
-    Object.entries(q)
-      .filter(([, v]) => v !== undefined && v !== "")
-      .map(([k, v]) => `${k}=${encodeURIComponent(String(v))}`)
-      .join("&")
-  );
-}
-
-export default function PostDetail({ post, municipalitySlug }: Props) {
-  const backHref = buildPostsQuery({
-    type: post.type,
-    municipality: municipalitySlug, // 自治体ページから来た時はこのパラメータ付き一覧へ戻す
+export default async function PostDetail({ params }: { params: { id: string } }) {
+  const post = await prisma.post.findUnique({
+    where: { id: params.id },
+    include: {
+      tags: { include: { tag: true } },
+      municipality: { select: { slug: true, name: true } }, // ★自治体も取得
+    },
   });
+
+  if (!post || post.status !== "PUBLISHED") {
+    return <div>見つかりませんでした。</div>;
+  }
+
+  const slug = post.municipality?.slug ?? "site"; // fallback
 
   return (
     <div className="mx-auto max-w-2xl">
-      <Link href={backHref} className="text-sm text-gray-600 hover:underline">
+      <Link
+        href={`/m/${slug}/posts?type=${post.type}`}
+        className="text-sm text-gray-600 hover:underline"
+      >
         ← 一覧へ
       </Link>
 
       <div className="mt-2 flex items-center gap-2">
-        <Pill>{labelByType[post.type] ?? post.type}</Pill>
+        <Pill>{labelByType[post.type as PostType] ?? post.type}</Pill>
         {post.likeCount >= 100 && <Pill color="gold">100いいね</Pill>}
-        {post.status === "REALIZED" && <Pill color="green">実現</Pill>}
+        {post.status === PostStatus.REALIZED && <Pill color="green">実現</Pill>}
       </div>
 
       <h2 className="mt-2 text-xl font-bold">{post.title}</h2>
 
       <div className="mt-1 flex flex-wrap gap-1">
-        {post.tags.map((t) => (
+        {post.tags.map((t: any) => (
           <Chip key={t.tagId}>
             <Link
-              href={buildPostsQuery({
-                tag: t.tag.name,
-                municipality: municipalitySlug,
-              })}
+              href={`/m/${slug}/tags/${encodeURIComponent(t.tag.name)}`}
               className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs"
             >
               {t.tag.name}
@@ -75,17 +75,9 @@ export default function PostDetail({ post, municipalitySlug }: Props) {
         <p>{post.content}</p>
       </article>
 
-      <div className="mt-3">
-        <ReactionBar postId={post.id} likeCount={post.likeCount} />
-      </div>
-
-      <div className="mt-6">
-        <CommentList postId={post.id} />
-      </div>
-
-      <div className="mt-4">
-        <ReportButton postId={post.id} />
-      </div>
+      <ReactionBar postId={post.id} likeCount={post.likeCount} />
+      <CommentList postId={post.id} />
+      <ReportButton postId={post.id} />
     </div>
   );
 }
