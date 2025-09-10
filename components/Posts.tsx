@@ -81,7 +81,7 @@ export default async function Posts({
       orderBy,
       take,
       skip,
-      include: { tags: { include: { tag: true } } },
+      include:{ municipality: true },
     }),
     prisma.post.count({ where }),
   ]);
@@ -137,6 +137,14 @@ export default async function Posts({
               </Link>
             </h3>
             <footer className="mt-3 flex items-center justify-between text-xs text-gray-500">
+              <div className="flex flex-wrap gap-1">
+                <Link
+                  href={`/m/${p.municipality.slug}`}
+                  className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs"
+                >
+                  {p.municipality.name}
+                </Link>
+              </div>
               <div className="flex items-center gap-2">
                 <PostReactions postId={p.id} likeCount={p.likeCount} compact />
                 <span>💬 {p.cmtCount}</span>
