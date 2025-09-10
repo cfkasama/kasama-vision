@@ -38,7 +38,7 @@ async function getTopCatchphrase() {
   return prisma.post.findFirst({
     where: { status: "PUBLISHED", type: "CATCHPHRASE" },
     orderBy: { likeCount: "desc" },
-    include: { tags: { include: { tag: true } } },
+    include: { municipality: municipality: true } },
   });
 }
 
@@ -253,6 +253,14 @@ export default async function Home() {
                   {topCatch.title}
                 </Link>
               </h3>
+               li>
+                <Link
+                  href={`/m/${topCatch.municipality.slug}}`}
+                  className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs"
+                >
+                  {topCatch.municipality.name}
+                </Link>
+              </li>
             </div>
           ) : (
             <p className="text-sm">まだありません。</p>
@@ -384,7 +392,7 @@ export default async function Home() {
                 <li key={v.id} className="mb-1">
                   <Link href={`/posts/${v.id}`} className="hover:underline">
                     {v.title}
-                  </Link>{" "}
+                  </Link>
                 </li>
               ))}
             </ol>
@@ -412,7 +420,7 @@ export default async function Home() {
                 <li key={v.id} className="mb-1">
                   <Link href={`/posts/${v.id}`} className="hover:underline">
                     {v.title}
-                  </Link>{" "}
+                  </Link>
                 </li>
               ))}
             </ol>
