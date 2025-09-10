@@ -47,7 +47,7 @@ async function getTopVisions() {
     where: { status: "PUBLISHED", type: "VISION" },
     orderBy: { likeCount: "desc" },
     take: 3,
-    include: { tags: { include: { tag: true } } },
+    include: { municipality: true },
   });
 }
 
@@ -56,6 +56,7 @@ async function getNewConsultations() {
     where: { status: "PUBLISHED", type: "CONSULTATION" },
     orderBy: { createdAt: "desc" },
     take: 3,
+    include: { municipality: true },
   });
 }
 
@@ -64,6 +65,7 @@ async function getNewProposals() {
     where: { status: "PUBLISHED", type: "PROPOSAL" },
     orderBy: { createdAt: "desc" },
     take: 3,
+    include: { municipality: true },
   });
 }
 
@@ -72,6 +74,7 @@ async function getHundredLikeProposals() {
     where: { status: "PUBLISHED", type: "PROPOSAL", likeCount: { gte: 100 } },
     orderBy: { createdAt: "desc" },
     take: 3,
+    include: { municipality: true },
   });
 }
 
@@ -80,6 +83,7 @@ async function getRealizedProposals() {
     where: { status: "REALIZED", type: "PROPOSAL" },
     orderBy: { createdAt: "desc" },
     take: 3,
+    include: { municipality: true },
   });
 }
 
@@ -252,7 +256,7 @@ export default async function Home() {
                 >
                   {topCatch.title}
                 </Link>
-                                <Link
+                <Link
                   href={`/m/${topCatch.municipality.slug}`}
                   className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs"
                 >
@@ -290,6 +294,12 @@ export default async function Home() {
                   <Link href={`/posts/${v.id}`} className="hover:underline">
                     {v.title}
                   </Link>
+                <Link
+                  href={`/m/${topVis.municipality.slug}`}
+                  className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs"
+                >
+                  {topVis.municipality.name}
+                </Link>
                 </li>
               ))}
             </ol>
@@ -323,7 +333,13 @@ export default async function Home() {
                 <li key={v.id} className="mb-1">
                   <Link href={`/posts/${v.id}`} className="hover:underline">
                     {v.title}
-                  </Link>{" "}
+                  </Link>
+                 <Link
+                  href={`/m/${NewCons.municipality.slug}`}
+                  className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs"
+                >
+                  {NewCons.municipality.name}
+                </Link>
                 </li>
               ))}
             </ol>
@@ -356,6 +372,12 @@ export default async function Home() {
                     {v.title}
                   </Link>{" "}
                 </li>
+                <Link
+                  href={`/m/${newPros.municipality.slug}`}
+                  className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs"
+                >
+                  {newPros.municipality.name}
+                </Link>
               ))}
             </ol>
           ) : (
@@ -391,6 +413,12 @@ export default async function Home() {
                   <Link href={`/posts/${v.id}`} className="hover:underline">
                     {v.title}
                   </Link>
+                 <Link
+                  href={`/m/${hundredLikes.municipality.slug}`}
+                  className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs"
+                >
+                  {hundredLikes.municipality.name}
+                </Link>
                 </li>
               ))}
             </ol>
@@ -401,7 +429,7 @@ export default async function Home() {
             href="/posts?type=PROPOSAL&minLikes=100"
             className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50 inline-block"
           >
-            提案一覧へ
+            いいね100提案一覧へ
           </Link>
         </Card>
 
@@ -419,6 +447,12 @@ export default async function Home() {
                   <Link href={`/posts/${v.id}`} className="hover:underline">
                     {v.title}
                   </Link>
+                  <Link
+                  href={`/m/${realizeds.municipality.slug}`}
+                  className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs"
+                >
+                  {realizeds.municipality.name}
+                </Link>
                 </li>
               ))}
             </ol>
