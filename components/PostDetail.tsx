@@ -26,7 +26,7 @@ const labelByType: Partial<Record<PostType, string>> = {
   REPORT_TOURISM: "不満がある報告",
 };
 
-export default async function PostDetail({ id }: { id: string }) {
+export default async function PostDetail({ id,slug }: { id: string ,slug:string}) {
   const post = await prisma.post.findUnique({
     where: { id },
     include: {
@@ -39,10 +39,8 @@ export default async function PostDetail({ id }: { id: string }) {
     return <div>見つかりませんでした。</div>;
   }
 
-  // ベースとなる一覧URL（自治体スラッグがある＆site以外 → /m/[slug]/posts、それ以外は /posts）
-  const muniSlug = post.municipality?.slug;
   const listBase =
-    muniSlug && muniSlug !== "site" ? `/m/${muniSlug}/posts` : `/posts`;
+    slug ? `/m/${muniSlug}/posts` : `/posts`;
 
   return (
     <div className="mx-auto max-w-2xl">
