@@ -85,6 +85,12 @@ model Reaction {
   @@unique([postId, identityId, type])
 }
 
+enum CommentKind{
+COMMENT
+CHALLENGE
+ACHIEVEMENT
+}
+
 model Comment {
   id         String     @id @default(cuid())
   content    String     @db.Text
