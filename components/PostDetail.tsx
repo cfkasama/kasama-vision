@@ -44,16 +44,23 @@ export default async function PostDetail({ id,slug }: { id: string ,slug?:string
 
   return (
     <div className="mx-auto max-w-2xl">
-      {/* 一覧へ（自治体別 or 全体） */}
-      <Link
-        href={`${listBase}?type=${encodeURIComponent(post.type)}`}
-        className="text-sm text-gray-600 hover:underline"
-      >
-        ← 一覧へ
-      </Link>
-
       <div className="mt-2 flex items-center gap-2">
-        <Pill>{labelByType[post.type as PostType] ?? post.type}</Pill>
+            <Chip>
+              <Link
+                href={`${listBase}?type=${encodeURIComponent(post.type)}`}
+                className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs"
+              >
+                {labelByType[post.type as PostType] ?? post.type}
+              </Link>
+            </Chip>
+              <Chip>
+              <Link
+                href={`${listBase}?type=${encodeURIComponent(post.type)}`}
+                className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs"
+              >
+                {labelByType[post.type as PostType] ?? post.type}
+              </Link>
+            </Chip>
         {post.likeCount >= 100 && <Pill color="gold">100いいね</Pill>}
         {post.status === PostStatus.REALIZED && <Pill color="green">実現</Pill>}
       </div>
