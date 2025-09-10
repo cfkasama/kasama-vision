@@ -26,12 +26,12 @@ const labelByType: Partial<Record<PostType, string>> = {
   REPORT_TOURISM: "不満がある報告",
 };
 
-export default async function PostDetail({ params }: { params: { id: string } }) {
+export default async function PostDetail({ id }: { id: string }) {
   const post = await prisma.post.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       tags: { include: { tag: true } },
-      municipality: { select: { slug: true, name: true } }, // ★自治体も取得
+      municipality: { select: { slug: true, name: true } }, // ← slug を必ず取得
     },
   });
 
@@ -39,10 +39,11 @@ export default async function PostDetail({ params }: { params: { id: string } })
     return <div>見つかりませんでした。</div>;
   }
 
-  const slug = post.municipality?.slug ?? "site"; // fallback
+  const slug = post.municipality?.slug ?? "site";
 
   return (
     <div className="mx-auto max-w-2xl">
+      {/* 一覧へ（常に /m/[slug]/posts に戻る） */}
       <Link
         href={`/m/${slug}/posts?type=${post.type}`}
         className="text-sm text-gray-600 hover:underline"
@@ -59,7 +60,7 @@ export default async function PostDetail({ params }: { params: { id: string } })
       <h2 className="mt-2 text-xl font-bold">{post.title}</h2>
 
       <div className="mt-1 flex flex-wrap gap-1">
-        {post.tags.map((t: any) => (
+        {post.tags.map((t) => (
           <Chip key={t.tagId}>
             <Link
               href={`/m/${slug}/tags/${encodeURIComponent(t.tag.name)}`}
