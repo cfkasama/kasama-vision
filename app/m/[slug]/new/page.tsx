@@ -9,6 +9,7 @@ export default async function NewPage({
   params,
   searchParams,
 }: {
+  params:{slug:string},
   searchParams: Record<string, string | string[] | undefined>;
 }) {
   const typeFromQuery = typeof searchParams.type === "string" ? searchParams.type : undefined;
