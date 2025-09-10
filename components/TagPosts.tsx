@@ -47,10 +47,6 @@ export default function TagPosts({
                   {p.title}
                 </Link>
               </h3>
-              <p className="text-sm text-gray-600">
-                {p.content?.slice(0, 140)}
-                {p.content && p.content.length > 140 ? "…" : ""}
-              </p>
               <div className="mt-2 flex items-center justify-between text-xs text-gray-500">
                 <div className="flex flex-wrap gap-1">
                   {p.tags.map((t) => (
@@ -64,7 +60,7 @@ export default function TagPosts({
                   ))}
                 </div>
                 <div>
-                  👍 {p.likeCount}　⭐ {p.recCount}　💬 {p.cmtCount}
+                  👍 {p.likeCount}　💬 {p.cmtCount}
                 </div>
               </div>
             </li>
