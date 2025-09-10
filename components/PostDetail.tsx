@@ -35,7 +35,7 @@ export default async function PostDetail({ id }: { id: string }) {
     },
   });
 
-  if (!post || post.status !== "PUBLISHED") {
+  if (!post || post.status === Poststatus.REMOVED) {
     return <div>見つかりませんでした。</div>;
   }
 
