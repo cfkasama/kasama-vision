@@ -2,5 +2,5 @@
 import PostDetail from "@/components/PostDetail";
 
 export default function Page({ params }: { params: { id: string } }) {
-  return <PostDetail id={params.id} slug=null />;
+  return <PostDetail id={params.id} />;
 }
