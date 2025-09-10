@@ -10,7 +10,7 @@ export default function Header() {
   const isScoped = !!slug;
 
   // ページ種別に合わせてリンクを切り替え
-  const title  = isScoped ? `みんなで創る、${slug}の未来` : `みんなで創る未来`;
+  const title  = isScoped ? `みんなで創る未来 in ${slug}` : `みんなで創る未来`;
   const homeHref  = isScoped ? `/m/${slug}` : `/`;
   const postsHref = isScoped ? `/m/${slug}/posts` : `/posts`;
   const newHref   = isScoped ? `/m/${slug}/new`   : `/new`;
