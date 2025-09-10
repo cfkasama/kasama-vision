@@ -137,17 +137,6 @@ export default async function Posts({
               </Link>
             </h3>
             <footer className="mt-3 flex items-center justify-between text-xs text-gray-500">
-              <div className="flex flex-wrap gap-1">
-                {p.tags.map((t: any) => (
-                  <Link
-                    key={t.tagId}
-                    href={queryBase({ page: 1, sort, type: undefined, tag: t.tag.name })}
-                  >
-                    <Chip>{t.tag.name}</Chip>
-                  </Link>
-                ))}
-              </div>
-
               <div className="flex items-center gap-2">
                 <PostReactions postId={p.id} likeCount={p.likeCount} compact />
                 <span>💬 {p.cmtCount}</span>
