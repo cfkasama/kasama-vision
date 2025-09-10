@@ -26,7 +26,7 @@ const labelByType: Partial<Record<PostType, string>> = {
   REPORT_TOURISM: "不満がある報告",
 };
 
-export default async function PostDetail({ id,slug }: { id: string ,slug:string?}) {
+export default async function PostDetail({ id,slug }: { id: string ,slug?:string}) {
   const post = await prisma.post.findUnique({
     where: { id },
     include: {
