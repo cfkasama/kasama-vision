@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
-import { Card, Pill, Chip } from "@/components/ui";
+import { Card, Pill } from "@/components/ui";
 import IntentButtons from "@/components/IntentButtons";
 
 export const dynamic = "force-dynamic";
@@ -17,25 +17,14 @@ type PostType =
   | "REPORT_WORK"
   | "REPORT_TOURISM";
 
-
-const labelByType: Record<PostType, string> = {
-  CATCHPHRASE: "キャッチフレーズ",
-  VISION: "ビジョン",
-  CONSULTATION: "相談",
-  PROPOSAL: "提案",
-  REPORT_LIVE: "住めなかった報告",
-  REPORT_WORK: "働けなかった報告",
-  REPORT_TOURISM: "不満がある報告",
-};
-
 async function countsByType(muniId: string) {
   const rows = await prisma.post.groupBy({
     by: ["type"],
-    where: { status: "PUBLISHED", municipality: { id: muniId } },
+    where: { status: "PUBLISHED", municipalityId: muniId },
     _count: { _all: true },
   });
   const map = Object.fromEntries(rows.map((r) => [r.type, r._count._all]));
-  const get = (t: PostType) => (map[t] ?? 0) as number;
+  const get = (t: PostType) => map[t] ?? 0;
   return {
     catchphrase: get("CATCHPHRASE"),
     vision: get("VISION"),
@@ -49,7 +38,7 @@ async function countsByType(muniId: string) {
 
 async function getTopCatchphrase(muniId: string) {
   return prisma.post.findFirst({
-    where: { status: "PUBLISHED", type: "CATCHPHRASE", municipality: { id: muniId } },
+    where: { status: "PUBLISHED", type: "CATCHPHRASE", municipalityId: muniId },
     orderBy: { likeCount: "desc" },
     include: { tags: { include: { tag: true } } },
   });
@@ -57,7 +46,7 @@ async function getTopCatchphrase(muniId: string) {
 
 async function getTopVisions(muniId: string) {
   return prisma.post.findMany({
-    where: { status: "PUBLISHED", type: "VISION", municipality: { id: muniId } },
+    where: { status: "PUBLISHED", type: "VISION", municipalityId: muniId },
     orderBy: { likeCount: "desc" },
     take: 3,
     include: { tags: { include: { tag: true } } },
@@ -66,7 +55,7 @@ async function getTopVisions(muniId: string) {
 
 async function getNewConsultations(muniId: string) {
   return prisma.post.findMany({
-    where: { status: "PUBLISHED", type: "CONSULTATION", municipality: { id: muniId } },
+    where: { status: "PUBLISHED", type: "CONSULTATION", municipalityId: muniId },
     orderBy: { createdAt: "desc" },
     take: 3,
   });
@@ -74,7 +63,7 @@ async function getNewConsultations(muniId: string) {
 
 async function getNewProposals(muniId: string) {
   return prisma.post.findMany({
-    where: { status: "PUBLISHED", type: "PROPOSAL", municipality: { id: muniId } },
+    where: { status: "PUBLISHED", type: "PROPOSAL", municipalityId: muniId },
     orderBy: { createdAt: "desc" },
     take: 3,
   });
@@ -82,15 +71,15 @@ async function getNewProposals(muniId: string) {
 
 async function getHundredLikeProposals(muniId: string) {
   return prisma.post.findMany({
-    where: { status: "PUBLISHED", type: "PROPOSAL", municipality: { id: muniId }, likeCount: { gte: 100 } },
-    orderBy: { createdAt: "desc" },
+    where: { status: "PUBLISHED", type: "PROPOSAL", municipalityId: muniId, likeCount: { gte: 100 } },
+    orderBy: { likeCount: "desc" },
     take: 3,
   });
 }
 
 async function getRealizedProposals(muniId: string) {
   return prisma.post.findMany({
-    where: { status: "REALIZED", type: "PROPOSAL", municipality: { id: muniId } },
+    where: { status: "REALIZED", type: "PROPOSAL", municipalityId: muniId },
     orderBy: { createdAt: "desc" },
     take: 3,
   });
@@ -98,12 +87,12 @@ async function getRealizedProposals(muniId: string) {
 
 async function getHundredLikeProposalsCount(muniId: string) {
   return prisma.post.count({
-    where: { status: "PUBLISHED", type: "PROPOSAL", municipality: { id: muniId }, likeCount: { gte: 100 } },
+    where: { status: "PUBLISHED", type: "PROPOSAL", municipalityId: muniId, likeCount: { gte: 100 } },
   });
 }
 async function getRealizedProposalsCount(muniId: string) {
   return prisma.post.count({
-    where: { status: "REALIZED", type: "PROPOSAL", municipality: { id: muniId } },
+    where: { status: "REALIZED", type: "PROPOSAL", municipalityId: muniId },
   });
 }
 async function getIntentCounts(muniId: string) {
@@ -125,7 +114,7 @@ async function getIntentCounts(muniId: string) {
 async function getTopTags(muniId: string) {
   const grouped = await prisma.postTag.groupBy({
     by: ["tagId"],
-    where: { post: { status: "PUBLISHED", municipality: { id: muniId } } },
+    where: { post: { status: "PUBLISHED", municipalityId: muniId } },
     _count: { tagId: true },
     orderBy: { _count: { tagId: "desc" } },
     take: 5,
@@ -213,7 +202,7 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
             <p className="text-sm">まだありません。</p>
           )}
           <div className="mt-3 flex gap-2">
-            <Link href={`/m/${slug}/posts/?type=CATCHPHRASE`} className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
+            <Link href={`/m/${slug}/posts?type=CATCHPHRASE`} className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
               一覧を見る
             </Link>
             <Link
@@ -374,9 +363,9 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
           </Link>
         </Card>
       </section>
-      {muni.slug != 'site' ? (
+      {muni.slug !== "site" ? (
             <section className="mt-4 grid gap-4">
-<IntentButtons initial=${intent} mname=${muni.name} mslug=${muni.slug}/>
+<IntentButtons initial={intent} mname={muni.name} mslug={muni.slug}/>
             </section>
 )}
       <section className="mt-4 grid gap-4 md:grid-cols-2">
@@ -388,7 +377,7 @@ export default async function MunicipalityPage({ params }: { params: { slug: str
             {topTags.map((t) => (
               <li key={t.id}>
                 <Link
-                  href={`/m/${slug}/tags/${t.name}`}
+                  href={`/m/${slug}/tags/${encodeURIComponent(t.name)}`}
                   className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs"
                 >
                   {t.name}（{t.count}）
