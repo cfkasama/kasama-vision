@@ -6,6 +6,7 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export default async function NewPage({
+  params,
   searchParams,
 }: {
   searchParams: Record<string, string | string[] | undefined>;
