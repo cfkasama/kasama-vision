@@ -206,8 +206,7 @@ export default async function Home() {
           匿名で投稿、いいねで可視化、実現へ。
         </p>
       </section>
-
-      {/* 自治体ランキング */}
+      
       <section className="mt-6">
         <Card>
         <div className="mb-2 flex items-center justify-between">
