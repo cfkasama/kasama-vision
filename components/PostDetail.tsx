@@ -42,6 +42,9 @@ export default async function PostDetail({ id,slug }: { id: string ,slug?:string
   const listBase =
     slug ? `/m/${slug}/posts` : `/posts`;
 
+  const muniSlug = post.municipality?.slug;
+  const muniName = post.municipality?.name;
+  
   return (
     <div className="mx-auto max-w-2xl">
       <div className="mt-2 flex items-center gap-2">
@@ -55,10 +58,10 @@ export default async function PostDetail({ id,slug }: { id: string ,slug?:string
             </Chip>
               <Chip>
               <Link
-                href={`${listBase}?type=${encodeURIComponent(post.type)}`}
+                href={`/m/${muniSlug}`}
                 className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs"
               >
-                {labelByType[post.type as PostType] ?? post.type}
+                {muniName}
               </Link>
             </Chip>
         {post.likeCount >= 100 && <Pill color="gold">100いいね</Pill>}
