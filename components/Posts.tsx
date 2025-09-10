@@ -132,14 +132,10 @@ export default async function Posts({
               {p.status === "REALIZED" && <Pill color="green">実現</Pill>}
             </header>
             <h3 className="mb-1 line-clamp-2 font-semibold">
-              <Link href={`/posts/${p.id}`} className="hover:underline">
+              <Link href={`${basePath}/${p.id}`} className="hover:underline">
                 {p.title}
               </Link>
             </h3>
-            <p className="flex-1 text-sm text-gray-600">
-              {p.content?.slice(0, 140)}
-              {p.content && p.content.length > 140 ? "…" : ""}
-            </p>
             <footer className="mt-3 flex items-center justify-between text-xs text-gray-500">
               <div className="flex flex-wrap gap-1">
                 {p.tags.map((t: any) => (
