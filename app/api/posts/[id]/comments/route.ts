@@ -1,7 +1,8 @@
+// app/api/posts/[id]/comments/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { verifyRecaptcha } from "@/lib/recaptcha";
-import { hashDeleteKey } from "@/lib/hash"; // argon2 導入済み前提
+import { hashDeleteKey } from "@/lib/hash";
 import { getOrCreateIdentityId } from "@/lib/identity";
 
 export const runtime = "nodejs";
@@ -9,6 +10,10 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 type Params = { params: { id: string } };
+
+// 許容するコメント種別
+const ALLOWED_KINDS = ["COMMENT", "CHALLENGE", "ACHIEVEMENT"] as const;
+type CommentKind = (typeof ALLOWED_KINDS)[number];
 
 // GET /api/posts/:id/comments
 export async function GET(_req: Request, { params }: Params) {
@@ -18,16 +23,17 @@ export async function GET(_req: Request, { params }: Params) {
   }
   try {
     const comments = await prisma.comment.findMany({
-      where: { postId: id, deletedAt: null },          // 論理削除を除外
+      where: { postId: id, deletedAt: null },
       orderBy: { createdAt: "desc" },
       select: {
         id: true,
         content: true,
         createdAt: true,
         likeCount: true,
-        recCount: true,                                 // 追加済みカラム
+        recCount: true,
         postId: true,
         identityId: true,
+        kind: true, // ← バッジ表示に必要
       },
     });
     return NextResponse.json({ ok: true, comments });
@@ -43,24 +49,31 @@ export async function GET(_req: Request, { params }: Params) {
 // POST /api/posts/:id/comments
 export async function POST(req: Request, { params }: Params) {
   const { id } = params;
-  if (!id) return NextResponse.json({ ok: false, error: "bad_request" }, { status: 400 });
+  if (!id) {
+    return NextResponse.json({ ok: false, error: "bad_request" }, { status: 400 });
+  }
 
-  let content = "";
-  let deleteKey = "";
-  let recaptchaToken = "";
+  // ここでスコープ外にならないように先に宣言
+  let body: any;
   try {
-    const body = await req.json();
-    content = String(body?.content ?? "").trim();
-    deleteKey = String(body?.deleteKey ?? "").trim();
-    recaptchaToken = String(body?.recaptchaToken ?? "").trim();
+    body = await req.json();
   } catch {
     return NextResponse.json({ ok: false, error: "bad_json" }, { status: 400 });
   }
 
+  const content = String(body?.content ?? "").trim();
+  const deleteKey = String(body?.deleteKey ?? "").trim();
+  const recaptchaToken = String(body?.recaptchaToken ?? "").trim();
+  const kindRaw = String(body?.kind ?? "COMMENT").trim().toUpperCase();
+  const kind: CommentKind = (ALLOWED_KINDS as readonly string[]).includes(kindRaw)
+    ? (kindRaw as CommentKind)
+    : "COMMENT";
+
   if (!content) return NextResponse.json({ ok: false, error: "content_required" }, { status: 400 });
   if (!deleteKey) return NextResponse.json({ ok: false, error: "deleteKey_required" }, { status: 400 });
   if (!recaptchaToken) return NextResponse.json({ ok: false, error: "recaptcha_required" }, { status: 400 });
-  if (content.length > 2000) return NextResponse.json({ ok: false, error: "content_too_long" }, { status: 400 });
+  if (content.length > 2000)
+    return NextResponse.json({ ok: false, error: "content_too_long" }, { status: 400 });
 
   try {
     // reCAPTCHA 検証
@@ -71,16 +84,25 @@ export async function POST(req: Request, { params }: Params) {
     const post = await prisma.post.findUnique({ where: { id }, select: { id: true } });
     if (!post) return NextResponse.json({ ok: false, error: "post_not_found" }, { status: 404 });
 
-    // 削除キーをハッシュ化して保存（平文は保存しない）
+    // 削除キーをハッシュ化
     const hashed = await hashDeleteKey(deleteKey);
-     const identityId = await getOrCreateIdentityId();
-    // コメント作成（identityId は匿名可なので null）
+
+    // 匿名識別子（存在しなければ作成）
+    const identityId = await getOrCreateIdentityId();
+
+    // コメント作成
     const created = await prisma.comment.create({
-      data: { postId: id, content ,kind: body?.kind ?? "COMMENT", identityId, deleteKey: hashed },
+      data: {
+        postId: id,
+        content,
+        kind,           // ← 正規化済み
+        identityId,
+        deleteKey: hashed,
+      },
       select: { id: true },
     });
 
-    // カウントは失敗しても致命ではない
+    // カウント更新（失敗しても致命ではない）
     prisma.post
       .update({ where: { id }, data: { cmtCount: { increment: 1 } } })
       .catch((err) => console.warn("[comments POST] cmtCount inc failed:", err));
