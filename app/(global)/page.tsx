@@ -38,7 +38,7 @@ async function getTopCatchphrase() {
   return prisma.post.findFirst({
     where: { status: "PUBLISHED", type: "CATCHPHRASE" },
     orderBy: { likeCount: "desc" },
-    include: { municipality: municipality: true } },
+    include: { municipality: true } },
   });
 }
 
