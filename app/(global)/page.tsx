@@ -370,13 +370,13 @@ export default async function Home() {
                   <Link href={`/posts/${v.id}`} className="hover:underline">
                     {v.title}
                   </Link>{" "}
-                </li>
                 <Link
                   href={`/m/${v.municipality.slug}`}
                   className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs"
                 >
                   {v.municipality.name}
                 </Link>
+                                </li>
               ))}
             </ol>
           ) : (
