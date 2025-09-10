@@ -2,6 +2,7 @@
 import { prisma } from "@/lib/db";
 import ReactionBar from "@/components/ReactionBar";
 import CommentList from "@/components/CommentList";
+import CommentComposer from "@/components/CommentComposer";
 import { Pill, Chip } from "@/components/ui";
 import ReportButton from "@/components/ReportButton";
 import { PostStatus } from "@prisma/client";
