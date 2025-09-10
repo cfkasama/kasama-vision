@@ -40,7 +40,7 @@ export default async function PostDetail({ id,slug }: { id: string ,slug:string}
   }
 
   const listBase =
-    slug ? `/m/${muniSlug}/posts` : `/posts`;
+    slug ? `/m/${slug}/posts` : `/posts`;
 
   return (
     <div className="mx-auto max-w-2xl">
