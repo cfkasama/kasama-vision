@@ -3,6 +3,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { Card, Pill } from "@/components/ui";
 import IntentButtons from "@/components/IntentButtons";
+import IntentRanking from "@/components/IntentRanking";
 
 type Scope = "GLOBAL" | "MUNI";
 type PostType =
@@ -456,6 +457,11 @@ export default async function HomeSections({ scope, muni }: { scope: Scope; muni
     />
   </section>
 ) : null}
+      {scope === "GLOBAL" && (
+    <section className="mt-4 grid gap-4">
+    <IntentRanking  />
+  </section>
+  ): null}
       
       {/* タグ TOP5 */}
       <section className="mt-4 grid gap-4 md:grid-cols-2">
