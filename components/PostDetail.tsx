@@ -55,8 +55,6 @@ export default async function PostDetail({ id,slug }: { id: string ,slug?:string
                 className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs"
               >
                 {labelByType[post.type as PostType] ?? post.type}
-{post.status === "CHALLENGE" && <div className="bg-amber-100 text-amber-700">挑戦中</div>}
-{post.status === "REALIZED" && <div className="bg-green-100 text-green-700">実現</div>}
               </Link>
             </Chip>
               <Chip>
@@ -69,6 +67,7 @@ export default async function PostDetail({ id,slug }: { id: string ,slug?:string
             </Chip>
         {post.likeCount >= 100 && <Pill color="gold">100いいね</Pill>}
         {post.status === PostStatus.REALIZED && <Pill color="green">実現</Pill>}
+         {post.status === PostStatus.CHALLENGE && <Pill color="orange">挑戦中</Pill>}
       </div>
 
       <h2 className="mt-2 text-xl font-bold">{post.title}</h2>
