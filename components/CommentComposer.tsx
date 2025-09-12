@@ -186,7 +186,7 @@ export default function CommentComposer({
       </div>
 
       {msg && <p className="text-xs text-red-600">{msg}</p>}
-      <p className="text-[11px] text-gray-500">※ パスワードはハッシュ化して保存します（平文は保存しません）</p>
+      <p className="text-[11px] text-gray-500">※ パスワードはハッシュ化して保存します</p>
     </div>
   );
 }
