@@ -1,72 +1,3 @@
-async function getTopTags(scope: Scope, muni?: Muni) {
-  const grouped = await prisma.postTag.groupBy({
-    by: ["tagId"],
-    where: {
-      post: {
-        status: "PUBLISHED",
-        ...(scope === "MUNI" && muni ? { municipalityId: muni.id } : {}),
-      },
-    },
-    _count: { tagId: true },
-    orderBy: { _count: { tagId: "desc" } },
-    take: 5,
-  });
-
-  if (!grouped.length) return [];
-
-  const tagIds = grouped.map(g => g.tagId);
-  const tags = await prisma.tag.findMany({
-    where: { id: { in: tagIds } },
-    select: { id: true, name: true },
-  });
-
-  const nameMap = new Map(tags.map(t => [t.id, t.name]));
-  return grouped.map(g => ({
-    id: g.tagId,
-    name: nameMap.get(g.tagId) ?? "",
-    count: g._count.tagId,
-  }));
-}
-<Card>
-  <div className="mb-2"><Pill color="green">タグランキング（TOP5）</Pill></div>
-  <ul className="flex flex-wrap gap-2">
-    {topTags.map(t => {
-      const tagHref =
-        scope === "MUNI" && muni
-          ? `/m/${muni.slug}/tags/${encodeURIComponent(t.name)}`
-          : `/tags/${encodeURIComponent(t.name)}`;
-      return (
-        <li key={t.id}>
-          <Link
-            href={tagHref}
-            className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs"
-          >
-            {t.name}（{t.count}）
-          </Link>
-        </li>
-      );
-    })}
-    {topTags.length === 0 && (
-      <li className="text-sm text-gray-600">データがありません</li>
-    )}
-  </ul>
-
-  <Link
-    href={scope === "MUNI" && muni ? `/m/${muni.slug}/tags` : `/tags`}
-    className="inline-block rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50"
-  >
-    タグ一覧へ
-  </Link>
-</Card>
-{scope === "MUNI" && muni && muni.slug !== "site" ? (
-  <section className="mt-4 grid gap-4">
-    <IntentButtons
-      initial={intent}
-      mname={muni.name}
-      mslug={muni.slug}
-    />
-  </section>
-) : null}
 // components/HomeSections.tsx
 import Link from "next/link";
 import { prisma } from "@/lib/db";
@@ -217,14 +148,31 @@ const countChallenge = (scope: Scope, muni?: Muni) =>
 async function getTopTags(scope: Scope, muni?: Muni) {
   const grouped = await prisma.postTag.groupBy({
     by: ["tagId"],
-    where: { post: { status: "PUBLISHED", ...(whereScope(scope, muni)) } },
+    where: {
+      post: {
+        status: "PUBLISHED",
+        ...(scope === "MUNI" && muni ? { municipalityId: muni.id } : {}),
+      },
+    },
     _count: { tagId: true },
     orderBy: { _count: { tagId: "desc" } },
     take: 5,
   });
+
   if (!grouped.length) return [];
-  const tags = await prisma.tag.findMany({ where: { id: { in: grouped.map(g => g.tagId) } } });
-  return grouped.map(g => ({ id: g.tagId, name: tags.find(t => t.id === g.tagId)?.name ?? "", count: g._count.tagId }));
+
+  const tagIds = grouped.map(g => g.tagId);
+  const tags = await prisma.tag.findMany({
+    where: { id: { in: tagIds } },
+    select: { id: true, name: true },
+  });
+
+  const nameMap = new Map(tags.map(t => [t.id, t.name]));
+  return grouped.map(g => ({
+    id: g.tagId,
+    name: nameMap.get(g.tagId) ?? "",
+    count: g._count.tagId,
+  }));
 }
 
 async function getIntentCounts(scope: Scope, muni?: Muni) {
@@ -499,39 +447,49 @@ export default async function HomeSections({ scope, muni }: { scope: Scope; muni
         </Card>
       </section>
       
-      {scope === "MUNI" && muni?.slug !== "site" ? (
-        <section className="mt-4 grid gap-4">
-          <IntentButtons initial={intent} mname={muni?.name} mslug={muni?.slug} />
-        </section>
-      ) : null}
+{scope === "MUNI" && muni && muni.slug !== "site" ? (
+  <section className="mt-4 grid gap-4">
+    <IntentButtons
+      initial={intent}
+      mname={muni.name}
+      mslug={muni.slug}
+    />
+  </section>
+) : null}
       
       {/* タグ TOP5 */}
       <section className="mt-4 grid gap-4 md:grid-cols-2">
-        <Card>
-          <div className="mb-2"><Pill color="green">タグランキング（TOP5）</Pill></div>
-          <ul className="flex flex-wrap gap-2">
-            {topTags.map(t => (
-              <li key={t.id}>
-                <Link
-                  href={scope === "MUNI"
-                    ? `/m/${muni!.slug}/tags/${encodeURIComponent(t.name)}`
-                    : `/tags/${encodeURIComponent(t.name)}`
-                  }
-                  className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs"
-                >
-                  {t.name}（{t.count}）
-                </Link>
-              </li>
-            ))}
-            {topTags.length === 0 && <li className="text-sm text-gray-600">データがありません</li>}
-          </ul>
+<Card>
+  <div className="mb-2"><Pill color="green">タグランキング（TOP5）</Pill></div>
+  <ul className="flex flex-wrap gap-2">
+    {topTags.map(t => {
+      const tagHref =
+        scope === "MUNI" && muni
+          ? `/m/${muni.slug}/tags/${encodeURIComponent(t.name)}`
+          : `/tags/${encodeURIComponent(t.name)}`;
+      return (
+        <li key={t.id}>
           <Link
-            href={scope === "MUNI" ? `/m/${muni!.slug}/tags` : `/tags`}
-            className="inline-block rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50"
+            href={tagHref}
+            className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs"
           >
-            タグ一覧へ
+            {t.name}（{t.count}）
           </Link>
-        </Card>
+        </li>
+      );
+    })}
+    {topTags.length === 0 && (
+      <li className="text-sm text-gray-600">データがありません</li>
+    )}
+  </ul>
+
+  <Link
+    href={scope === "MUNI" && muni ? `/m/${muni.slug}/tags` : `/tags`}
+    className="inline-block rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50"
+  >
+    タグ一覧へ
+  </Link>
+</Card>
 
         <Card>
           <div className="mb-2"><Pill color="gray">{scope === "MUNI" ? "このページについて" : "本サイトについて"}</Pill></div>
