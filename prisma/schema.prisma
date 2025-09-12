@@ -183,6 +183,7 @@ enum PostType {
 enum PostStatus {
   PUBLISHED
   REMOVED
+  CHALLENGE
   REALIZED
 }
 
