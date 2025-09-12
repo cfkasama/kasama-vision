@@ -34,9 +34,10 @@ function parseParams(
   const get = (k: string) =>
     Array.isArray(searchParams[k]) ? searchParams[k]?.[0] : searchParams[k];
 
+  const q = (get("q") ?? "").trim(); // ← 追加
   const type = (get("type") as PostType | undefined) || undefined;
   const tag = get("tag") ?? undefined;
-  const status = (get("status") as "PUBLISHED" | "REALIZED" | "REMOVED" | undefined) ?? undefined;
+  const status = (get("status") as "PUBLISHED" | "REALIZED" | "REMOVED" | "CHALLENGE" | undefined) ?? undefined;
   const sort = (get("sort") as SortKey | undefined) ?? "new";
   const minLikes = get("minLikes") ? Number(get("minLikes")) : undefined;
   const page = Math.max(1, Number(get("page") ?? "1"));
@@ -60,19 +61,24 @@ function parseParams(
     ...(municipalitySlug ? { municipality: { slug: municipalitySlug } } : {}),
   };
 
-  return { type, tag, status, sort, minLikes, page, take, skip, orderBy, where };
+  // ← タイトルのみ検索（q があれば）
+  if (q) {
+    where.title = { contains: q, mode: "insensitive" as const };
+  }
+
+  return { q, type, tag, status, sort, minLikes, page, take, skip, orderBy, where };
 }
 
 export default async function Posts({
   searchParams,
-  municipalitySlug,   // 例: "kasama"（自治体別ページから使用）
-  municipalityName,   // 例: "笠間市"（見出し用に任意）
+  municipalitySlug,
+  municipalityName,
 }: {
   searchParams: Record<string, string | string[] | undefined>;
   municipalitySlug?: string;
   municipalityName?: string;
 }) {
-  const { type, tag, status, sort, minLikes, page, take, skip, orderBy, where } =
+  const { q, type, tag, status, sort, minLikes, page, take, skip, orderBy, where } =
     parseParams(searchParams, municipalitySlug);
 
   const [posts, total] = await Promise.all([
@@ -81,23 +87,30 @@ export default async function Posts({
       orderBy,
       take,
       skip,
-      include:{ municipality: true },
+      include: { municipality: true },
     }),
     prisma.post.count({ where }),
   ]);
 
   const totalPages = Math.max(1, Math.ceil(total / take));
 
-  const title =
+  const titleBase =
     (municipalityName ? `${municipalityName} ` : "") +
-    ((type ? labelByType[type] : tag ? `タグ: ${tag}` : "投稿") +
-      (status === "REALIZED" ? "（実現）" : minLikes ? `（いいね${minLikes}+）` : ""));
+    (type ? labelByType[type] : tag ? `タグ: ${tag}` : "投稿");
+
+  const titleTail =
+    (status === "REALIZED" ? "（実現）" :
+     status === "CHALLENGE" ? "（挑戦中）" :
+     minLikes ? `（いいね${minLikes}+）` : "");
+
+  // ← 検索語があれば見出しにも小さく表示
+  const title = q ? `${titleBase} 一覧「${q}」` : `${titleBase} 一覧${titleTail}`;
 
   const basePath = municipalitySlug ? `/m/${municipalitySlug}/posts` : "/posts";
-  const queryBase = (q: Record<string, string | number | undefined>) =>
+  const queryBase = (qobj: Record<string, string | number | undefined>) =>
     basePath +
     "?" +
-    Object.entries({ type, tag, status, sort, ...q })
+    Object.entries({ q, type, tag, status, sort, ...qobj })
       .filter(([, v]) => v !== undefined && v !== "")
       .map(([k, v]) => `${k}=${encodeURIComponent(String(v))}`)
       .join("&");
@@ -105,11 +118,10 @@ export default async function Posts({
   return (
     <>
       <section className="mb-4">
-        <h1 className="text-2xl font-bold">{title} 一覧</h1>
+        <h1 className="text-2xl font-bold">{title}</h1>
         <p className="text-sm text-gray-600">全 {total} 件</p>
       </section>
 
-      {/* ソートタブ */}
       <div className="mb-4 flex gap-2 text-sm">
         {(["new", "hot", "likes", "comments"] as SortKey[]).map((key) => (
           <Link
@@ -122,27 +134,29 @@ export default async function Posts({
         ))}
       </div>
 
-      {/* リスト */}
       <section className="grid gap-4 md:grid-cols-3">
         {posts.map((p) => (
           <Card key={p.id} className="flex flex-col">
             <header className="mb-1 flex items-center gap-2">
-             <Chip>
-              <Link
-                href={`${basePath}?type=${encodeURIComponent(p.type)}`}
-                className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs"
-              >
-                {labelByType[p.type as PostType] ?? p.type}
-              </Link>
-            </Chip>
+              <Chip>
+                <Link
+                  href={`${basePath}?type=${encodeURIComponent(p.type)}`}
+                  className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs"
+                >
+                  {labelByType[p.type as PostType] ?? p.type}
+                </Link>
+              </Chip>
               {p.likeCount >= 100 && <Pill color="gold">100いいね</Pill>}
               {p.status === "REALIZED" && <Pill color="green">実現</Pill>}
+              {p.status === "CHALLENGE" && <Pill color="orange">挑戦中</Pill>}
             </header>
+
             <h3 className="mb-1 line-clamp-2 font-semibold">
               <Link href={`${basePath}/${p.id}`} className="hover:underline">
                 {p.title}
               </Link>
             </h3>
+
             <footer className="mt-3 flex items-center justify-between text-xs text-gray-500">
               <div className="flex flex-wrap gap-1">
                 <Link
@@ -161,7 +175,6 @@ export default async function Posts({
         ))}
       </section>
 
-      {/* ページネーション */}
       <div className="mt-6 flex items-center justify-center gap-2">
         <Link
           aria-disabled={page <= 1}
