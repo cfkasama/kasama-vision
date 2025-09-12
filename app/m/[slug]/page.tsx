@@ -385,8 +385,9 @@ export default async function MunicipalityPage({
         </Card>
       </section>
 
+      
       {/* 100いいね / 実現 */}
-      <section className="mt-4 grid gap-4 md:grid-cols-2">
+      <section className="mt-4 grid gap-4 md:grid-cols-3">
         <Card>
           <div className="mb-2 flex items-center justify-between">
             <Pill color="gold">いいね100提案</Pill>
@@ -444,8 +445,6 @@ export default async function MunicipalityPage({
             実現一覧へ
           </Link>
         </Card>
-        </section>
-              <section className="mt-4 grid gap-4 md:grid-cols-2">
                 <Card>
           <div className="mb-2 flex items-center justify-between">
             <Pill color="gold">挑戦中提案</Pill>
@@ -474,7 +473,19 @@ export default async function MunicipalityPage({
             挑戦中一覧へ
           </Link>
         </Card>
-                <Card>
+                          </section>
+
+
+
+      {/* INTENT（サイト全体ページでは非表示） */}
+      {muni.slug !== "site" && (
+        <section className="mt-4 grid gap-4">
+          <IntentButtons initial={intent} mname={muni.name} mslug={muni.slug} />
+        </section>
+      )}
+
+      <section className="mt-4 grid gap-4 md:grid-cols-2">
+                        <Card>
           <div className="mb-2">
             <Pill color="green">タグランキング（TOP5）</Pill>
           </div>
@@ -500,18 +511,8 @@ export default async function MunicipalityPage({
             タグ一覧へ
           </Link>
         </Card>
-      </section>
-
-      {/* INTENT（サイト全体ページでは非表示） */}
-      {muni.slug !== "site" && (
-        <section className="mt-4 grid gap-4">
-          <IntentButtons initial={intent} mname={muni.name} mslug={muni.slug} />
-        </section>
-      )}
-
-      <section className="mt-4 grid gap-4 md:grid-cols-2">
         <Card>
-          <div className="mb-1">
+          <div className="mb-2">
             <Pill color="gray">このページについて</Pill>
           </div>
           <p className="text-sm text-gray-700">
