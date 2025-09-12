@@ -161,10 +161,10 @@ async function getTopTags(scope: Scope, muni?: Muni) {
   return grouped.map(g => ({ id: g.tagId, name: tags.find(t => t.id === g.tagId)?.name ?? "", count: g._count.tagId }));
 }
 
-async function getIntentCounts(muniId: string) {
+async function getIntentCounts(scope: Scope, muni?: Muni) {
   const rows = await prisma.intent.groupBy({
     by: ["kind"],
-    where: { municipalityId: muniId },
+    where: { ...whereScope(scope, muni) },
     _count: { _all: true },
   });
   const map = Object.fromEntries(rows.map((r) => [r.kind, r._count._all]));
