@@ -216,7 +216,7 @@ export default async function HomeSections({ scope, muni }: { scope: Scope; muni
     countHundredLikes(scope, muni),
     countRealized(scope, muni),
     countChallenge(scope, muni),
-    getIntentCounts(mId),
+    getIntentCounts(scope, muni),
     getTopTags(scope, muni),
     getTopMunicipalitiesWeekly(scope, muni, 10, 7),
   ]);
