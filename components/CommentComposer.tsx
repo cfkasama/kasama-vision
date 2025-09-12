@@ -1,29 +1,6 @@
 // components/CommentComposer.tsx
 "use client";
-// components/CommentComposer.tsx（抜粋）
-"use client";
 import { useSWRConfig } from "swr";
-// ...
-export default function CommentComposer({ postId, postType }: { postId: string; postType: PostType; }) {
-  const { mutate } = useSWRConfig();
-// ...
-  async function submit() {
-    // ... バリデーションやトークン取得はそのまま
-    const r = await fetch(`/api/posts/${postId}/comments`, { /* ... */ });
-    const j = await r.json().catch(() => ({}));
-    if (!r.ok || !j?.ok) { /* エラー処理 */ return; }
-
-    // ✅ 成功時に一覧を再取得
-    await mutate(`/api/posts/${postId}/comments`);
-
-    // 入力クリア
-    setContent("");
-    setDeleteKey("");
-    setKind(isProposal ? "COMMENT" : "COMMENT");
-    // v3はreset不要だけど一応
-    try { (window as any).grecaptcha?.reset?.(); } catch {}
-  }
-}
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -45,9 +22,9 @@ export default function CommentComposer({
   postId: string;
   postType: PostType;
 }) {
+  const { mutate } = useSWRConfig();
   const router = useRouter();
   const isProposal = postType === "PROPOSAL";
-
   const [content, setContent] = useState("");
   const [deleteKey, setDeleteKey] = useState("");
   const [kind, setKind] = useState<Kind>(isProposal ? "COMMENT" : "COMMENT");
@@ -80,7 +57,7 @@ async function getRecaptchaV3Token(): Promise<string> {
   if (!token) throw new Error("Failed to obtain reCAPTCHA token.");
   return token;
 }
-
+  
   async function submit() {
     if (busy) return;
     setMsg("");
@@ -116,10 +93,13 @@ async function getRecaptchaV3Token(): Promise<string> {
         else setMsg("送信に失敗しました。時間をおいて再度お試しください。");
         return;
       }
-
+      
+    // ✅ 成功時に一覧を再取得
+    await mutate(`/api/posts/${postId}/comments`);
       // 成功
       setContent("");
       setDeleteKey("");
+      setKind(isProposal ? "COMMENT" : "COMMENT");
       try {
         (window as any).grecaptcha?.reset?.(); // v3 は no-op
       } catch {}
