@@ -4,9 +4,6 @@ import { prisma } from "@/lib/db";
 import { Card, Pill } from "@/components/ui";
 import IntentButtons from "@/components/IntentButtons";
 
-export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
-
 type Scope = "GLOBAL" | "MUNI";
 type PostType =
   | "CATCHPHRASE" | "VISION" | "CONSULTATION" | "PROPOSAL"
