@@ -41,7 +41,6 @@ async function getTopCatchphrase(muniId: string) {
   return prisma.post.findFirst({
     where: { status: "PUBLISHED", type: "CATCHPHRASE", municipalityId: muniId },
     orderBy: { likeCount: "desc" },
-    include: { tags: { include: { tag: true } } },
   });
 }
 
@@ -50,7 +49,6 @@ async function getTopVisions(muniId: string) {
     where: { status: "PUBLISHED", type: "VISION", municipalityId: muniId },
     orderBy: { likeCount: "desc" },
     take: 3,
-    include: { tags: { include: { tag: true } } },
   });
 }
 
@@ -451,7 +449,7 @@ export default async function MunicipalityPage({
             <Pill color="gold">挑戦中提案</Pill>
             <span className="text-xs text-gray-500">件数 {challengeCount}</span>
           </div>
-          {realizeds.length ? (
+          {challenge.length ? (
             <ol className="list-disc pl-5 text-sm">
               {challenge.map((v) => (
                 <li key={v.id} className="mb-1">
@@ -471,7 +469,7 @@ export default async function MunicipalityPage({
             href={listUrl({ type: "PROPOSAL", status: "CHALLENGE" })}
             className="inline-block rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50"
           >
-            実現一覧へ
+            挑戦中一覧へ
           </Link>
         </Card>
       </section>
