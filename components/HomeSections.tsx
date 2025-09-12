@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { Card, Pill } from "@/components/ui";
+import IntentButtons from "@/components/IntentButtons";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
