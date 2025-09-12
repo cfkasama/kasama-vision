@@ -415,12 +415,16 @@ export default async function HomeSections({ scope, muni }: { scope: Scope; muni
           <Link href={buildQuery(listBase, { type: "PROPOSAL", status: "CHALLENGE" })} className="inline-block rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">挑戦中一覧へ</Link>
         </Card>
       </section>
+      
       {/* INTENT（サイト全体ページでは非表示） */}
+      {scope === "MUNI" ? (
       {muni.slug !== "site" && (
         <section className="mt-4 grid gap-4">
           <IntentButtons initial={intent} mname={muni.name} mslug={muni.slug} />
         </section>
       )}
+      ) : null}
+      
       {/* タグ TOP5 */}
       <section className="mt-4 grid gap-4 md:grid-cols-2">
         <Card>
