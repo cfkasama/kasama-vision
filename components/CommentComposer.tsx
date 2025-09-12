@@ -1,6 +1,6 @@
 // components/CommentComposer.tsx
 "use client";
-import { useSWRConfig } from "swr";
+
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -22,9 +22,9 @@ export default function CommentComposer({
   postId: string;
   postType: PostType;
 }) {
-  const { mutate } = useSWRConfig();
   const router = useRouter();
   const isProposal = postType === "PROPOSAL";
+
   const [content, setContent] = useState("");
   const [deleteKey, setDeleteKey] = useState("");
   const [kind, setKind] = useState<Kind>(isProposal ? "COMMENT" : "COMMENT");
@@ -38,26 +38,24 @@ export default function CommentComposer({
 
   const len = content.length;
   const over = len > 2000;
-  
-async function getRecaptchaV3Token(): Promise<string> {
-  const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!;
-  const grecaptcha = (window as any).grecaptcha;
 
-  if (!siteKey) throw new Error("NEXT_PUBLIC_RECAPTCHA_SITE_KEY is not set.");
-  if (typeof grecaptcha?.execute !== "function") {
-    throw new Error("reCAPTCHA v3 script not loaded yet.");
+  // reCAPTCHA v3 トークン取得
+  async function getRecaptchaV3Token(): Promise<string> {
+    const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!;
+    const grecaptcha = (window as any).grecaptcha;
+
+    if (!siteKey) throw new Error("NEXT_PUBLIC_RECAPTCHA_SITE_KEY is not set.");
+    if (typeof grecaptcha?.execute !== "function") {
+      throw new Error("reCAPTCHA v3 script not loaded yet.");
+    }
+    if (typeof grecaptcha.ready === "function") {
+      await new Promise<void>((resolve) => grecaptcha.ready(() => resolve()));
+    }
+    const token = await grecaptcha.execute(siteKey, { action: "comment_submit" });
+    if (!token) throw new Error("Failed to obtain reCAPTCHA token.");
+    return token;
   }
 
-  // ✅ ready はコールバック必須。Promise でラップして待つ
-  if (typeof grecaptcha.ready === "function") {
-    await new Promise<void>((resolve) => grecaptcha.ready(() => resolve()));
-  }
-
-  const token = await grecaptcha.execute(siteKey, { action: "comment_submit" });
-  if (!token) throw new Error("Failed to obtain reCAPTCHA token.");
-  return token;
-}
-  
   async function submit() {
     if (busy) return;
     setMsg("");
@@ -70,7 +68,7 @@ async function getRecaptchaV3Token(): Promise<string> {
     try {
       const recaptchaToken = await getRecaptchaV3Token();
 
-      // 提案以外はサーバー側でも COMMENT にフォールバックされますが、念のためクライアントでも制御
+      // 提案以外はサーバ側でも COMMENT にフォールバックされるが明示しておく
       const effectiveKind: Kind = isProposal ? kind : "COMMENT";
 
       const r = await fetch(`/api/posts/${postId}/comments`, {
@@ -93,17 +91,20 @@ async function getRecaptchaV3Token(): Promise<string> {
         else setMsg("送信に失敗しました。時間をおいて再度お試しください。");
         return;
       }
-      
-    // ✅ 成功時に一覧を再取得
-    await mutate(`/api/posts/${postId}/comments`);
-      // 成功
+
+      // 成功時：入力クリア＆コメント一覧へ更新イベント送信
       setContent("");
       setDeleteKey("");
       setKind(isProposal ? "COMMENT" : "COMMENT");
+
       try {
-        (window as any).grecaptcha?.reset?.(); // v3 は no-op
+        (window as any).grecaptcha?.reset?.(); // v3 は実質 no-op
       } catch {}
-      window.dispatchEvent(new CoutomEvent("comment:created",{detail:{postId}}));
+
+      // 一覧リロードのためのカスタムイベントを発火（CommentList 側で受けて load() 実行）
+      window.dispatchEvent(new CustomEvent("comment:created", { detail: { postId } }));
+
+      // ついでに Server Components 側も最新化
       router.refresh();
     } catch (err: any) {
       setMsg(err?.message ?? "ネットワークエラーが発生しました。");
