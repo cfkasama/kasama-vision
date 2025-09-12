@@ -2,6 +2,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import HeaderSearch from "@/components/HeaderSearch";
 
 export default function Header() {
   const pathname = usePathname() || "/";
@@ -27,6 +28,7 @@ export default function Header() {
           <Link href={newHref}   className="hover:underline">投稿する</Link>
           <Link href={tagsHref}  className="hover:underline">タグ</Link>
           <Link href="/m"        className="hover:underline">自治体一覧</Link>
+          <HeaderSearch />
         </nav>
       </div>
     </header>
