@@ -91,6 +91,14 @@ async function getRealizedProposals(muniId: string) {
   });
 }
 
+async function getChallengeProposals(muniId: string) {
+  return prisma.post.findMany({
+    where: { status: "CHALLENGE", type: "PROPOSAL", municipalityId: muniId },
+    orderBy: { createdAt: "desc" },
+    take: 3,
+  });
+}
+
 async function getHundredLikeProposalsCount(muniId: string) {
   return prisma.post.count({
     where: {
@@ -99,6 +107,12 @@ async function getHundredLikeProposalsCount(muniId: string) {
       municipalityId: muniId,
       likeCount: { gte: 100 },
     },
+  });
+}
+
+async function getChallengeProposalsCount(muniId: string) {
+  return prisma.post.count({
+    where: { status: "CHALLENGE", type: "PROPOSAL", municipalityId: muniId },
   });
 }
 
@@ -165,8 +179,10 @@ export default async function MunicipalityPage({
     newPros,
     hundredLikes,
     realizeds,
+    challenge,
     hundredLikeCount,
     realizedCount,
+    challengeCount,
     intent,
     topTags,
   ] = await Promise.all([
@@ -177,8 +193,10 @@ export default async function MunicipalityPage({
     getNewProposals(mId),
     getHundredLikeProposals(mId),
     getRealizedProposals(mId),
+    getChallengeProposals(mId),
     getHundredLikeProposalsCount(mId),
     getRealizedProposalsCount(mId),
+    getChallengeProposalsCount(mId),
     getIntentCounts(mId),
     getTopTags(mId),
   ]);
@@ -423,6 +441,34 @@ export default async function MunicipalityPage({
           )}
           <Link
             href={listUrl({ type: "PROPOSAL", status: "REALIZED" })}
+            className="inline-block rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50"
+          >
+            実現一覧へ
+          </Link>
+        </Card>
+                <Card>
+          <div className="mb-2 flex items-center justify-between">
+            <Pill color="gold">挑戦中提案</Pill>
+            <span className="text-xs text-gray-500">件数 {challengeCount}</span>
+          </div>
+          {realizeds.length ? (
+            <ol className="list-disc pl-5 text-sm">
+              {challenge.map((v) => (
+                <li key={v.id} className="mb-1">
+                  <Link
+                    href={`/m/${slug}/posts/${v.id}`}
+                    className="hover:underline"
+                  >
+                    {v.title}
+                  </Link>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className="text-sm">まだありません。</p>
+          )}
+          <Link
+            href={listUrl({ type: "PROPOSAL", status: "CHALLENGE" })}
             className="inline-block rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50"
           >
             実現一覧へ
