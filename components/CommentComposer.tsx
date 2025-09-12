@@ -103,6 +103,7 @@ async function getRecaptchaV3Token(): Promise<string> {
       try {
         (window as any).grecaptcha?.reset?.(); // v3 は no-op
       } catch {}
+      window.dispatchEvent(new CoutomEvent("comment:created",{detail:{postId}}));
       router.refresh();
     } catch (err: any) {
       setMsg(err?.message ?? "ネットワークエラーが発生しました。");
