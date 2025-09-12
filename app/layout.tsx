@@ -23,7 +23,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 <footer className="mt-10 border-t">
           <div className="container py-6 text-xs text-gray-500">©cfkasama</div>
         </footer>
-        </>
+        </ClientLayout>
       </body>
     </html>
   );
