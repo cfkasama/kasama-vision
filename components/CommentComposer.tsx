@@ -38,6 +38,7 @@ export default function CommentComposer({
 
   const len = content.length;
   const over = len > 2000;
+  
 async function getRecaptchaV3Token(): Promise<string> {
   const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!;
   const grecaptcha = (window as any).grecaptcha;
@@ -56,22 +57,6 @@ async function getRecaptchaV3Token(): Promise<string> {
   if (!token) throw new Error("Failed to obtain reCAPTCHA token.");
   return token;
 }
-  // reCAPTCHA v3 専用
-  async function getRecaptchaV3Token(): Promise<string> {
-    const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!;
-    const grecaptcha = (window as any).grecaptcha;
-
-    if (!siteKey) {
-      throw new Error("reCAPTCHA site key is not set (NEXT_PUBLIC_RECAPTCHA_KEY).");
-    }
-    if (!grecaptcha?.execute) {
-      // <Script src="https://www.google.com/recaptcha/api.js?render=SITE_KEY" /> を読み込んでおくこと
-      throw new Error("grecaptcha v3 is not loaded.");
-    }
-    await grecaptcha.ready?.();
-    const token = await grecaptcha.execute(siteKey, { action: "comment_submit" });
-    return String(token ?? "");
-  }
 
   async function submit() {
     if (busy) return;
