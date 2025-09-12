@@ -103,7 +103,7 @@ export async function POST(req: Request, { params }: Params) {
     });
 
 // ★ kind に応じて post.status を変更
-if (created.kind === "CHALLENGE") {
+if (created.data.kind === "CHALLENGE") {
   await prisma.post.update({
     where: { id },
     data: { status: "CHALLENGE" }, // Prisma schemaに追加必要
