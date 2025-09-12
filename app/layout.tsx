@@ -2,7 +2,13 @@
 import "./../styles/globals.css";
 import type { ReactNode } from "react";
 import Header from "@/components/Header";
-
+import type { Metadata } from "next";
+import ClientLayout from "@/components/ClientLayout"; // ← 追加
+const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!;
+export const metadata: Metadata = {
+  title: "みんなで創る、笠間の未来",
+  description: "投稿・評価で市民の声を可視化し、実現へつなげる。",
+};
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
