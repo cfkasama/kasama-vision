@@ -242,6 +242,7 @@ export default function CommentList({ postId }: { postId: string }) {
                 >
                   👍 {c.likeCount}
                 </button>
+      {c.kind === "COMMENT" && (
                 <button
                   onClick={() => recommend(c.id)}
                   disabled={!!acting[c.id] || !!pressedRec[c.id]}
@@ -250,7 +251,8 @@ export default function CommentList({ postId }: { postId: string }) {
                   title={pressedRec[c.id] ? "この端末では既に推薦済み" : "推薦"}
                 >
                   ⭐ {c.recCount ?? 0}
-                </button>
+                </button>  
+      )}
                 <button
                   onClick={() => report(c)}
                   className="rounded-full border px-2 py-0.5 text-xs hover:bg-gray-50"
