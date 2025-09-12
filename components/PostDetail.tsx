@@ -55,8 +55,8 @@ export default async function PostDetail({ id,slug }: { id: string ,slug?:string
                 className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs"
               >
                 {labelByType[post.type as PostType] ?? post.type}
-{post.status === "CHALLENGE" && <Pill color="orange">挑戦中</Pill>}
-{post.status === "REALIZED" && <Pill color="green">実現</Pill>}
+{post.status === "CHALLENGE" && <Pill className="bg-amber-100 text-amber-700">挑戦中</Pill>}
+{post.status === "REALIZED" && <Pill className="bg-green-100 text-green-700">実現</Pill>}
               </Link>
             </Chip>
               <Chip>
