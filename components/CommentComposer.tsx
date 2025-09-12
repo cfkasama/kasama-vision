@@ -38,7 +38,24 @@ export default function CommentComposer({
 
   const len = content.length;
   const over = len > 2000;
+async function getRecaptchaV3Token(): Promise<string> {
+  const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!;
+  const grecaptcha = (window as any).grecaptcha;
 
+  if (!siteKey) throw new Error("NEXT_PUBLIC_RECAPTCHA_SITE_KEY is not set.");
+  if (typeof grecaptcha?.execute !== "function") {
+    throw new Error("reCAPTCHA v3 script not loaded yet.");
+  }
+
+  // ✅ ready はコールバック必須。Promise でラップして待つ
+  if (typeof grecaptcha.ready === "function") {
+    await new Promise<void>((resolve) => grecaptcha.ready(() => resolve()));
+  }
+
+  const token = await grecaptcha.execute(siteKey, { action: "comment_submit" });
+  if (!token) throw new Error("Failed to obtain reCAPTCHA token.");
+  return token;
+}
   // reCAPTCHA v3 専用
   async function getRecaptchaV3Token(): Promise<string> {
     const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!;
