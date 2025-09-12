@@ -1,72 +1,61 @@
-[15:13:09.656] Running build in Washington, D.C., USA (East) – iad1
-[15:13:09.657] Build machine configuration: 2 cores, 8 GB
-[15:13:09.674] Cloning github.com/cfkasama/kasama-vision (Branch: main, Commit: 24e1b83)
-[15:13:10.241] Cloning completed: 567.000ms
-[15:13:10.643] Restored build cache from previous deployment (3dPUXaC8cqRqrqZGGsupPyR8N3M8)
-[15:13:10.990] Running "vercel build"
-[15:13:11.390] Vercel CLI 47.0.5
-[15:13:11.829] Installing dependencies...
-[15:13:12.842] 
-[15:13:12.843] > kasama-future@0.1.0 postinstall
-[15:13:12.844] > prisma generate
-[15:13:12.844] 
-[15:13:13.282] Prisma schema loaded from prisma/schema.prisma
-[15:13:13.856] 
-[15:13:13.858] ✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 274ms
-[15:13:13.858] 
-[15:13:13.859] Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
-[15:13:13.859] 
-[15:13:13.859] Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
-[15:13:13.860] 
-[15:13:14.053] 
-[15:13:14.054] up to date in 2s
-[15:13:14.054] 
-[15:13:14.054] 43 packages are looking for funding
-[15:13:14.055]   run `npm fund` for details
-[15:13:14.088] Detected Next.js version: 14.2.5
-[15:13:14.092] Running "npm run build"
-[15:13:14.202] 
-[15:13:14.202] > kasama-future@0.1.0 build
-[15:13:14.202] > next build
-[15:13:14.203] 
-[15:13:14.866]   ▲ Next.js 14.2.5
-[15:13:14.868] 
-[15:13:14.935]    Creating an optimized production build ...
-[15:13:15.109]  ⚠ Found lockfile missing swc dependencies, run next locally to automatically patch
-[15:13:17.550] Failed to compile.
-[15:13:17.550] 
-[15:13:17.551] ./app/(global)/page.tsx
-[15:13:17.551] Error: 
-[15:13:17.551]   [31mx[0m Expression expected
-[15:13:17.552]      ,-[[36;1;4m/vercel/path0/app/(global)/page.tsx[0m:199:1]
-[15:13:17.552]  [2m199[0m |   ]);
-[15:13:17.552]  [2m200[0m | 
-[15:13:17.552]  [2m201[0m |   return (
-[15:13:17.552]  [2m202[0m |     <>
-[15:13:17.553]      : [31;1m     ^[0m
-[15:13:17.553]  [2m203[0m |       <section className="mb-6">
-[15:13:17.553]  [2m204[0m |         <h1 className="text-2xl font-bold">みんなで創る、自治体の未来</h1>
-[15:13:17.553]  [2m205[0m |         <p className="text-sm text-gray-600">
-[15:13:17.553]      `----
-[15:13:17.553] 
-[15:13:17.553]   [31mx[0m Expected ',', got '{'
-[15:13:17.554]      ,-[[36;1;4m/vercel/path0/app/(global)/page.tsx[0m:207:1]
-[15:13:17.554]  [2m207[0m |         </p>
-[15:13:17.554]  [2m208[0m |       </section>
-[15:13:17.554]  [2m209[0m | 
-[15:13:17.554]  [2m210[0m |       {/* 自治体ランキング */}
-[15:13:17.554]      : [31;1m      ^[0m
-[15:13:17.555]  [2m211[0m |       <section className="mt-6">
-[15:13:17.555]  [2m212[0m |         <Card>
-[15:13:17.555]  [2m213[0m |         <div className="mb-2 flex items-center justify-between">
-[15:13:17.555]      `----
-[15:13:17.555] 
-[15:13:17.557] Caused by:
-[15:13:17.557]     Syntax Error
-[15:13:17.557] 
-[15:13:17.557] Import trace for requested module:
-[15:13:17.557] ./app/(global)/page.tsx
-[15:13:17.557] 
-[15:13:17.558] 
-[15:13:17.558] > Build failed because of webpack errors
-[15:13:17.583] Error: Command "npm run build" exited with 1
+[15:00:13.218] Running build in Washington, D.C., USA (East) – iad1
+[15:00:13.219] Build machine configuration: 2 cores, 8 GB
+[15:00:13.234] Cloning github.com/cfkasama/kasama-vision (Branch: main, Commit: f3e5df0)
+[15:00:13.907] Cloning completed: 673.000ms
+[15:00:14.038] Restored build cache from previous deployment (DxUJCRaL2T2YFQV9G8gACd9h7JCm)
+[15:00:14.431] Running "vercel build"
+[15:00:14.987] Vercel CLI 47.1.1
+[15:00:15.337] Installing dependencies...
+[15:00:17.008] 
+[15:00:17.009] > kasama-future@0.1.0 postinstall
+[15:00:17.010] > prisma generate
+[15:00:17.010] 
+[15:00:17.501] Prisma schema loaded from prisma/schema.prisma
+[15:00:18.091] 
+[15:00:18.092] ✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 297ms
+[15:00:18.092] 
+[15:00:18.092] Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+[15:00:18.092] 
+[15:00:18.092] Tip: Easily identify and fix slow SQL queries in your app. Optimize helps you enhance your visibility: https://pris.ly/--optimize
+[15:00:18.092] 
+[15:00:18.287] 
+[15:00:18.288] up to date in 2s
+[15:00:18.289] 
+[15:00:18.289] 43 packages are looking for funding
+[15:00:18.290]   run `npm fund` for details
+[15:00:18.319] Detected Next.js version: 14.2.5
+[15:00:18.324] Running "npm run build"
+[15:00:18.460] 
+[15:00:18.460] > kasama-future@0.1.0 build
+[15:00:18.460] > next build
+[15:00:18.461] 
+[15:00:19.168]   ▲ Next.js 14.2.5
+[15:00:19.169] 
+[15:00:19.263]    Creating an optimized production build ...
+[15:00:19.412]  ⚠ Found lockfile missing swc dependencies, run next locally to automatically patch
+[15:00:24.074]  ✓ Compiled successfully
+[15:00:24.076]    Linting and checking validity of types ...
+[15:00:24.529] 
+[15:00:24.529]    We detected TypeScript in your project and reconfigured your tsconfig.json file for you. Strict-mode is set to false by default.
+[15:00:24.530]    The following suggested values were added to your tsconfig.json. These values can be changed to fit your project's needs:
+[15:00:24.530] 
+[15:00:24.531]    	- include was updated to add '.next/types/**/*.ts'
+[15:00:24.531]    	- plugins was updated to add { name: 'next' }
+[15:00:24.532] 
+[15:00:24.532]    The following mandatory changes were made to your tsconfig.json:
+[15:00:24.532] 
+[15:00:24.533]    	- isolatedModules was set to true (requirement for SWC / Babel)
+[15:00:24.533] 
+[15:00:30.989] Failed to compile.
+[15:00:30.989] 
+[15:00:30.989] ./components/Posts.tsx:151:50
+[15:00:30.990] Type error: Type '"orange"' is not assignable to type '"green" | "gray" | "gold" | undefined'.
+[15:00:30.990] 
+[15:00:30.990] [0m [90m 149 |[39m               {p[33m.[39mlikeCount [33m>=[39m [35m100[39m [33m&&[39m [33m<[39m[33mPill[39m color[33m=[39m[32m"gold"[39m[33m>[39m[35m100[39mいいね[33m<[39m[33m/[39m[33mPill[39m[33m>[39m}[0m
+[15:00:30.990] [0m [90m 150 |[39m               {p[33m.[39mstatus [33m===[39m [32m"REALIZED"[39m [33m&&[39m [33m<[39m[33mPill[39m color[33m=[39m[32m"green"[39m[33m>[39m実現[33m<[39m[33m/[39m[33mPill[39m[33m>[39m}[0m
+[15:00:30.990] [0m[31m[1m>[22m[39m[90m 151 |[39m               {p[33m.[39mstatus [33m===[39m [32m"CHALLENGE"[39m [33m&&[39m [33m<[39m[33mPill[39m color[33m=[39m[32m"orange"[39m[33m>[39m挑戦中[33m<[39m[33m/[39m[33mPill[39m[33m>[39m}[0m
+[15:00:30.991] [0m [90m     |[39m                                                  [31m[1m^[22m[39m[0m
+[15:00:30.991] [0m [90m 152 |[39m             [33m<[39m[33m/[39m[33mheader[39m[33m>[39m[0m
+[15:00:30.991] [0m [90m 153 |[39m[0m
+[15:00:30.991] [0m [90m 154 |[39m             [33m<[39m[33mh3[39m className[33m=[39m[32m"mb-1 line-clamp-2 font-semibold"[39m[33m>[39m[0m
+[15:00:31.063] Error: Command "npm run build" exited with 1
