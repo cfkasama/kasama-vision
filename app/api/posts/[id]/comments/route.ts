@@ -109,7 +109,7 @@ if (created.kind === "CHALLENGE") {
     data: { status: "CHALLENGE" }, // Prisma schemaに追加必要
   });
 }
-if (created.kind === "ACHIEVED") {
+if (created.kind === "ACHIEVEMENT") {
   await prisma.post.update({
     where: { id },
     data: { status: "REALIZED" },
