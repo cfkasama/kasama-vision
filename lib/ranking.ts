@@ -20,7 +20,6 @@ export async function getIntentRankingMonthly(
     by: ["municipalityId"],
     where: {
       kind,
-      municipalityId: { not: null },
       createdAt: { gte: start, lt: end },
     },
     _count: { _all: true },
