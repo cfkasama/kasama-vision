@@ -435,7 +435,7 @@ export default async function HomeSections({ scope, muni }: { scope: Scope; muni
       
       {scope === "MUNI" && muni?.slug !== "site" ? (
         <section className="mt-4 grid gap-4">
-          <IntentButtons initial={intent} mname={muni.name} mslug={muni.slug} />
+          <IntentButtons initial={intent} mname={muni?.name} mslug={muni?.slug} />
         </section>
       ) : null}
       
