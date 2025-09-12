@@ -458,9 +458,7 @@ export default async function HomeSections({ scope, muni }: { scope: Scope; muni
   </section>
 ) : null}
       {scope === "GLOBAL" && (
-    <section className="mt-4 grid gap-4">
     <IntentRanking  />
-  </section>
   )}
       
       {/* タグ TOP5 */}
