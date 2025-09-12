@@ -1,4 +1,4 @@
-// components/GlobalMonthlyIntentRanking.tsx
+// components/IntentRanking.tsx
 import Link from "next/link";
 import { Card, Pill } from "@/components/ui";
 import { getIntentRankingMonthly } from "@/lib/ranking";
@@ -6,7 +6,7 @@ import { getIntentRankingMonthly } from "@/lib/ranking";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-export default async function GlobalMonthlyIntentRanking() {
+export default async function IntentRanking() {
   const [live, work, tourism] = await Promise.all([
     getIntentRankingMonthly("LIVE", 10),
     getIntentRankingMonthly("WORK", 10),
