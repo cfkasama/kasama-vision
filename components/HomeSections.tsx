@@ -461,7 +461,7 @@ export default async function HomeSections({ scope, muni }: { scope: Scope; muni
     <section className="mt-4 grid gap-4">
     <IntentRanking  />
   </section>
-  ): null}
+  )}
       
       {/* タグ TOP5 */}
       <section className="mt-4 grid gap-4 md:grid-cols-2">
