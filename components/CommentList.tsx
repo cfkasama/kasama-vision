@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 
+type Kind = "COMMENT" | "CHALLENGE" | "ACHIEVED";
+
 type Comment = {
   id: string;
   content: string;
@@ -9,6 +11,7 @@ type Comment = {
   recCount?: number;
   postId: string;
   identityId: string | null;
+  kind?: Kind; // ← バッジ表示用に追加（APIが返さない場合はundefined）
 };
 
 const LIKE_KEY = (id: string) => `c_like_${id}`;
@@ -16,15 +19,11 @@ const REC_KEY  = (id: string) => `c_rec_${id}`;
 
 export default function CommentList({ postId }: { postId: string }) {
   const [comments, setComments] = useState<Comment[]>([]);
-  const [content, setContent] = useState("");
-  const [deleteKey, setDeleteKey] = useState("");
-  const [busy, setBusy] = useState(false);
-
   const [acting, setActing] = useState<Record<string, boolean>>({});
   const [pressedLike, setPressedLike] = useState<Record<string, boolean>>({});
   const [pressedRec, setPressedRec] = useState<Record<string, boolean>>({});
-
   const [toast, setToast] = useState<string>("");
+
   const showToast = (msg: string) => {
     setToast(msg);
     setTimeout(() => setToast(""), 1800);
@@ -36,7 +35,7 @@ export default function CommentList({ postId }: { postId: string }) {
       const j = await r.json();
       if (!r.ok || !j?.ok) throw new Error("fetch_failed");
 
-      // サーバ返却の recCount を優先（無い場合だけ 0）
+      // APIの recCount を尊重。なければ 0 を初期。
       const list: Comment[] = (j.comments || []).map((c: any) => ({
         recCount: 0,
         ...c,
@@ -56,11 +55,25 @@ export default function CommentList({ postId }: { postId: string }) {
     }
   }
 
+  // 初期ロード
   useEffect(() => {
     load();
   }, [postId]);
 
-  // いいね（端末内で一度だけ）
+  // ✅ Composer からの投稿完了イベントで再読込
+  useEffect(() => {
+    const onCreated = (e: Event) => {
+      // postId が一致する時のみ再読込
+      const detail = (e as CustomEvent).detail as { postId?: string } | undefined;
+      if (!detail || !detail.postId || detail.postId === postId) {
+        load();
+      }
+    };
+    window.addEventListener("comment:created", onCreated as EventListener);
+    return () => window.removeEventListener("comment:created", onCreated as EventListener);
+  }, [postId]);
+
+  // いいね
   const like = async (id: string) => {
     if (pressedLike[id]) {
       showToast("この端末では既に『いいね』済みです");
@@ -98,7 +111,7 @@ export default function CommentList({ postId }: { postId: string }) {
     }
   };
 
-  // 推薦（端末内で一度だけ）
+  // 推薦
   const recommend = async (id: string) => {
     if (pressedRec[id]) {
       showToast("この端末では既に『推薦』済みです");
@@ -140,7 +153,7 @@ export default function CommentList({ postId }: { postId: string }) {
     }
   };
 
-  // 通報（コメント紐付け）
+  // 通報
   const report = async (c: Comment) => {
     const reason = prompt("通報理由を入力してください（任意）", "");
     if (reason === null) return; // キャンセル
@@ -167,7 +180,7 @@ export default function CommentList({ postId }: { postId: string }) {
     }
   };
 
-  // コメント削除（投稿者がパスワードで消す）
+  // 削除
   async function removeComment(id: string) {
     const key = prompt("このコメントの削除用パスワードを入力してください");
     if (key === null) return;
@@ -191,6 +204,22 @@ export default function CommentList({ postId }: { postId: string }) {
     }
   }
 
+  // 種別バッジ
+  const KindBadge = ({ kind }: { kind?: Kind }) => {
+    if (!kind || kind === "COMMENT") return null;
+    const isChallenge = kind === "CHALLENGE";
+    return (
+      <span
+        className={[
+          "mr-2 inline-flex items-center rounded-full px-2 py-0.5 text-[11px]",
+          isChallenge ? "bg-amber-100 text-amber-700" : "bg-green-100 text-green-700",
+        ].join(" ")}
+      >
+        {isChallenge ? "挑戦中" : "実現"}
+      </span>
+    );
+  };
+
   return (
     <section className="mt-6">
       <h4 className="mb-2 text-lg font-semibold">コメント</h4>
@@ -199,7 +228,10 @@ export default function CommentList({ postId }: { postId: string }) {
         {comments.map((c) => (
           <li key={c.id} className="rounded-xl border bg-white p-3">
             <div className="mb-1 flex items-center justify-between text-xs text-gray-500">
-              <span>匿名さん・{new Date(c.createdAt).toLocaleString()}</span>
+              <div className="flex items-center">
+                <KindBadge kind={c.kind} />
+                <span>匿名さん・{new Date(c.createdAt).toLocaleString()}</span>
+              </div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => like(c.id)}
@@ -235,7 +267,7 @@ export default function CommentList({ postId }: { postId: string }) {
                 </button>
               </div>
             </div>
-            <p className="prose-basic text-sm">{c.content}</p>
+            <p className="prose-basic text-sm whitespace-pre-wrap">{c.content}</p>
           </li>
         ))}
       </ul>
