@@ -52,7 +52,7 @@ export default function CommentComposer({
       throw new Error("grecaptcha v3 is not loaded.");
     }
     await grecaptcha.ready?.();
-    const token = await grecaptcha.execute(siteKey, { action: "comment" });
+    const token = await grecaptcha.execute(siteKey, { action: "comment_submit" });
     return String(token ?? "");
   }
 
