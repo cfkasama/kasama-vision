@@ -416,13 +416,10 @@ export default async function HomeSections({ scope, muni }: { scope: Scope; muni
         </Card>
       </section>
       
-      {/* INTENT（サイト全体ページでは非表示） */}
-      {scope === "MUNI" ? (
-      {muni.slug !== "site" && (
+      {scope === "MUNI" && muni.slug !== "site" ? (
         <section className="mt-4 grid gap-4">
           <IntentButtons initial={intent} mname={muni.name} mslug={muni.slug} />
         </section>
-      )}
       ) : null}
       
       {/* タグ TOP5 */}
