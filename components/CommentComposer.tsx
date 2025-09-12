@@ -13,7 +13,7 @@ type PostType =
   | "REPORT_WORK"
   | "REPORT_TOURISM";
 
-type Kind = "COMMENT" | "CHALLENGE" | "ACHIEVED";
+type Kind = "COMMENT" | "CHALLENGE" | "ACHIEVEMENT";
 
 export default function CommentComposer({
   postId,
@@ -147,8 +147,8 @@ export default function CommentComposer({
               type="radio"
               name="kind"
               value="ACHIEVED"
-              checked={kind === "ACHIEVED"}
-              onChange={() => setKind("ACHIEVED")}
+              checked={kind === "ACHIEVEMENT"}
+              onChange={() => setKind("ACHIEVEMENT")}
             />
             実現
           </label>
