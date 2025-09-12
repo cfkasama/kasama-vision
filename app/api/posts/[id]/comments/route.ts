@@ -102,6 +102,20 @@ export async function POST(req: Request, { params }: Params) {
       select: { id: true },
     });
 
+// ★ kind に応じて post.status を変更
+if (created.kind === "CHALLENGE") {
+  await prisma.post.update({
+    where: { id },
+    data: { status: "CHALLENGE" }, // Prisma schemaに追加必要
+  });
+}
+if (created.kind === "ACHIEVED") {
+  await prisma.post.update({
+    where: { id },
+    data: { status: "REALIZED" },
+  });
+}
+
     // カウント更新（失敗しても致命ではない）
     prisma.post
       .update({ where: { id }, data: { cmtCount: { increment: 1 } } })
