@@ -67,7 +67,7 @@ export default async function PostDetail({ id,slug }: { id: string ,slug?:string
             </Chip>
         {post.likeCount >= 100 && <Pill color="gold">100いいね</Pill>}
         {post.status === PostStatus.REALIZED && <Pill color="green">実現</Pill>}
-         {post.status === PostStatus.CHALLENGE && <Pill color="orange">挑戦中</Pill>}
+         {post.status === PostStatus.CHALLENGE && <Pill color="gold">挑戦中</Pill>}
       </div>
 
       <h2 className="mt-2 text-xl font-bold">{post.title}</h2>
