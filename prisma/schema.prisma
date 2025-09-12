@@ -230,6 +230,17 @@ model Intent {
   municipalityId  String   // ★ 追加
   kind            IntentKind
   createdAt       DateTime @default(now())
+// schema.prisma の Municipality に追記
+model Municipality {
+  id        String  @id @default(cuid())
+  slug      String  @unique
+  name      String
+  code      String? // 自治体コード（並び替え用）
+
+  // 集計カラム（累計）
+  liveCount     Int   @default(0)
+  workCount     Int   @default(0)
+  tourismCount  Int   @default(0)
 
   identity     Identity      @relation(fields: [identityId], references: [id], onDelete: Cascade)
   municipality Municipality  @relation(fields: [municipalityId], references: [id], onDelete: Cascade)
