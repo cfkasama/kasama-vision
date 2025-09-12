@@ -161,6 +161,20 @@ async function getTopTags(scope: Scope, muni?: Muni) {
   return grouped.map(g => ({ id: g.tagId, name: tags.find(t => t.id === g.tagId)?.name ?? "", count: g._count.tagId }));
 }
 
+async function getIntentCounts(muniId: string) {
+  const rows = await prisma.intent.groupBy({
+    by: ["kind"],
+    where: { municipalityId: muniId },
+    _count: { _all: true },
+  });
+  const map = Object.fromEntries(rows.map((r) => [r.kind, r._count._all]));
+  return {
+    live: (map["LIVE"] ?? 0) as number,
+    work: (map["WORK"] ?? 0) as number,
+    tourism: (map["TOURISM"] ?? 0) as number,
+  };
+}
+
 // タイトル行の後ろに自治体バッジを付ける共通UI
 function MuniBadge({ slug, name }: { slug?: string; name?: string }) {
   if (!slug || !name) return null;
@@ -187,6 +201,7 @@ export default async function HomeSections({ scope, muni }: { scope: Scope; muni
     hundredLikeCount,
     realizedCount,
     challengeCount,
+    intent,
     topTags,
     topMunicipalities,   // ★ GLOBAL だけ中身が入る
   ] = await Promise.all([
@@ -201,6 +216,7 @@ export default async function HomeSections({ scope, muni }: { scope: Scope; muni
     countHundredLikes(scope, muni),
     countRealized(scope, muni),
     countChallenge(scope, muni),
+    getIntentCounts(mId),
     getTopTags(scope, muni),
     getTopMunicipalitiesWeekly(scope, muni, 10, 7),
   ]);
