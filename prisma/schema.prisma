@@ -23,6 +23,11 @@ model Municipality {
   workCount     Int   @default(0)
   tourismCount  Int   @default(0)
 
+  // ★ 月間（当月）
+  liveCountMonthly     Int @default(0)
+  workCountMonthly     Int @default(0)
+  tourismCountMonthly  Int @default(0)
+
   posts     Post[]
   intents   Intent[]
 
