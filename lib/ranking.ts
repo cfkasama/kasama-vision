@@ -1,52 +1,39 @@
 // lib/ranking.ts
 import { prisma } from "@/lib/db";
 
-export type IntentKind = "LIVE" | "WORK" | "TOURISM";
+export type Metric = "live" | "work" | "tourism";
+export type Range = "total" | "monthly";
 
-function monthRange(d = new Date()) {
-  const start = new Date(d.getFullYear(), d.getMonth(), 1);
-  const end = new Date(d.getFullYear(), d.getMonth() + 1, 1);
-  return { start, end };
+function pickField(metric: Metric, range: Range) {
+  if (range === "total") {
+    return metric === "live"
+      ? "liveCount" : metric === "work"
+      ? "workCount" : "tourismCount";
+  }
+  return metric === "live"
+    ? "liveCountMonthly" : metric === "work"
+    ? "workCountMonthly" : "tourismCountMonthly";
 }
 
-export async function getIntentRankingMonthly(
-  kind: IntentKind,
-  limit = 20
+export async function fetchMunicipalityRanking(
+  metric: Metric,
+  range: Range,
+  limit = 100
 ) {
-  const { start, end } = monthRange();
+  const field = pickField(metric, range);
 
-  // intent を自治体別に集計
-  const rows = await prisma.intent.groupBy({
-    by: ["municipalityId"],
-    where: {
-      kind,
-      createdAt: { gte: start, lt: end },
+  return prisma.municipality.findMany({
+    select: { id: true, name: true, slug: true, code: true, 
+      liveCount: true, workCount: true, tourismCount: true,
+      liveCountMonthly: true, workCountMonthly: true, tourismCountMonthly: true,
     },
-    _count: { _all: true },
+    orderBy: [
+      // 主要ソート（降順）
+      { [field]: "desc" as const },
+      // タイブレーク：投稿数（全タイプ総数）や code を使う
+      // ここは code を優先と要望されてたので code 昇順を第2キーに
+      { code: "asc" as const },
+    ],
+    take: limit,
   });
-
-  if (!rows.length) return [];
-
-  // 件数順で降順 → 上位のみ採用
-  const sorted = rows
-    .filter((r) => !!r.municipalityId)
-    .sort((a, b) => b._count._all - a._count._all)
-    .slice(0, limit);
-
-  // 自治体名/slug をまとめて取得
-  const ids = sorted.map((r) => r.municipalityId!) as string[];
-  const muniList = await prisma.municipality.findMany({
-    where: { id: { in: ids } },
-    select: { id: true, name: true, slug: true },
-  });
-
-  // 表示用に合成（件数順を維持）
-  return sorted
-    .map((r) => {
-      const m = muniList.find((mm) => mm.id === r.municipalityId);
-      return m
-        ? { id: m.id, name: m.name, slug: m.slug, count: r._count._all }
-        : null;
-    })
-    .filter(Boolean) as { id: string; name: string; slug: string; count: number }[];
 }
