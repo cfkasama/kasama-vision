@@ -6,39 +6,23 @@ import { Card } from "@/components/ui";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-type Metric = "live" | "work" | "tourism";
-type Range  = "total" | "monthly";
-
-function pickField(metric: Metric, range: Range) {
-  if (range === "total") {
-    return metric === "live" ? "liveCount" : metric === "work" ? "workCount" : "tourismCount";
-  }
-  return metric === "live" ? "liveCountMonthly" : metric === "work" ? "workCountMonthly" : "tourismCountMonthly";
-}
-
 export default async function MuniListPage({
   searchParams,
 }: {
   searchParams: Record<string, string | string[] | undefined>;
 }) {
-  const metric = (searchParams.metric as Metric) ?? "live";
-  const range  = (searchParams.range  as Range)  ?? "total";
-
-  const field = pickField(metric, range);
+  const order = (searchParams.order as Order) ?? "code";
 
   const rows = await prisma.municipality.findMany({
     select: { id: true, slug: true, name: true, code: true,
       liveCount: true, workCount: true, tourismCount: true,
-      liveCountMonthly: true, workCountMonthly: true, tourismCountMonthly: true,
     },
-    orderBy: [{ [field]: "desc" as const }, { code: "asc" as const }],
-    take: 500,
+    orderBy: [{ [order]: "desc" as const }, { code: "asc" as const }],
+    take: 200,
   });
 
   const score = (r: any) =>
-    range === "monthly"
-      ? metric === "live" ? r.liveCountMonthly : metric === "work" ? r.workCountMonthly : r.tourismCountMonthly
-      : metric === "live" ? r.liveCount : metric === "work" ? r.workCount : r.tourismCount;
+    order === "liveCount" ? r.liveCount : order === "workCount" ? r.workCount : r.tourismCount;
 
   const tab = (o: Order, label: string) => {
     const active = order === o;
@@ -57,7 +41,7 @@ export default async function MuniListPage({
     <>
       <section className="mb-4">
         <h1 className="text-2xl font-bold">自治体一覧</h1>
-        <p className="text-sm text-gray-600">並び替え：{range === "monthly" ? "月間" : "累計"} / {metric}</p>
+        <p className="text-sm text-gray-600">並び替え：{order}</p>
       </section>
 
       <div className="mb-4 flex flex-wrap gap-2">
