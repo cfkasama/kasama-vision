@@ -1,61 +1,92 @@
-[16:18:35.697] Running build in Washington, D.C., USA (East) – iad1
-[16:18:35.697] Build machine configuration: 2 cores, 8 GB
-[16:18:35.714] Cloning github.com/cfkasama/kasama-vision (Branch: main, Commit: c3c5f78)
-[16:18:36.392] Cloning completed: 678.000ms
-[16:18:36.555] Restored build cache from previous deployment (Ak4juRLSm5qzaiXbt2RjMNfAD1Cw)
-[16:18:36.893] Running "vercel build"
-[16:18:37.286] Vercel CLI 47.1.1
-[16:18:37.598] Installing dependencies...
-[16:18:38.609] 
-[16:18:38.610] > kasama-future@0.1.0 postinstall
-[16:18:38.611] > prisma generate
-[16:18:38.611] 
-[16:18:39.043] Prisma schema loaded from prisma/schema.prisma
-[16:18:39.610] 
-[16:18:39.611] ✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 253ms
-[16:18:39.611] 
-[16:18:39.611] Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
-[16:18:39.611] 
-[16:18:39.612] Tip: Curious about the SQL queries Prisma ORM generates? Optimize helps you enhance your visibility: https://pris.ly/tip-2-optimize
-[16:18:39.612] 
-[16:18:39.806] 
-[16:18:39.806] up to date in 2s
-[16:18:39.807] 
-[16:18:39.807] 43 packages are looking for funding
-[16:18:39.807]   run `npm fund` for details
-[16:18:39.835] Detected Next.js version: 14.2.5
-[16:18:39.839] Running "npm run build"
-[16:18:39.951] 
-[16:18:39.951] > kasama-future@0.1.0 build
-[16:18:39.951] > next build
-[16:18:39.951] 
-[16:18:40.655]   ▲ Next.js 14.2.5
-[16:18:40.656] 
-[16:18:40.724]    Creating an optimized production build ...
-[16:18:40.866]  ⚠ Found lockfile missing swc dependencies, run next locally to automatically patch
-[16:18:45.225]  ✓ Compiled successfully
-[16:18:45.226]    Linting and checking validity of types ...
-[16:18:45.609] 
-[16:18:45.610]    We detected TypeScript in your project and reconfigured your tsconfig.json file for you. Strict-mode is set to false by default.
-[16:18:45.610]    The following suggested values were added to your tsconfig.json. These values can be changed to fit your project's needs:
-[16:18:45.610] 
-[16:18:45.611]    	- include was updated to add '.next/types/**/*.ts'
-[16:18:45.611]    	- plugins was updated to add { name: 'next' }
-[16:18:45.611] 
-[16:18:45.611]    The following mandatory changes were made to your tsconfig.json:
-[16:18:45.611] 
-[16:18:45.611]    	- isolatedModules was set to true (requirement for SWC / Babel)
-[16:18:45.611] 
-[16:18:51.570] Failed to compile.
-[16:18:51.571] 
-[16:18:51.572] ./lib/ranking.ts:23:25
-[16:18:51.572] Type error: Type 'null' is not assignable to type 'string | NestedStringFilter<"Intent"> | undefined'.
-[16:18:51.572] 
-[16:18:51.572] [0m [90m 21 |[39m     where[33m:[39m {[0m
-[16:18:51.572] [0m [90m 22 |[39m       kind[33m,[39m[0m
-[16:18:51.573] [0m[31m[1m>[22m[39m[90m 23 |[39m       municipalityId[33m:[39m { not[33m:[39m [36mnull[39m }[33m,[39m[0m
-[16:18:51.573] [0m [90m    |[39m                         [31m[1m^[22m[39m[0m
-[16:18:51.573] [0m [90m 24 |[39m       createdAt[33m:[39m { gte[33m:[39m start[33m,[39m lt[33m:[39m end }[33m,[39m[0m
-[16:18:51.573] [0m [90m 25 |[39m     }[33m,[39m[0m
-[16:18:51.573] [0m [90m 26 |[39m     _count[33m:[39m { _all[33m:[39m [36mtrue[39m }[33m,[39m[0m
-[16:18:51.640] Error: Command "npm run build" exited with 1
+[12:02:47.880] Running build in Washington, D.C., USA (East) – iad1
+[12:02:47.881] Build machine configuration: 2 cores, 8 GB
+[12:02:47.903] Cloning github.com/cfkasama/kasama-vision (Branch: main, Commit: 0565422)
+[12:02:48.552] Cloning completed: 649.000ms
+[12:02:48.775] Restored build cache from previous deployment (8USH1RAPEiWkk9dWnYG8DSpS3ymb)
+[12:02:49.134] Running "vercel build"
+[12:02:49.522] Vercel CLI 47.1.1
+[12:02:49.844] Installing dependencies...
+[12:02:51.021] 
+[12:02:51.023] > kasama-future@0.1.0 postinstall
+[12:02:51.023] > prisma generate
+[12:02:51.023] 
+[12:02:51.464] Prisma schema loaded from prisma/schema.prisma
+[12:02:52.034] 
+[12:02:52.034] ✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 261ms
+[12:02:52.034] 
+[12:02:52.034] Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+[12:02:52.034] 
+[12:02:52.035] Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
+[12:02:52.035] 
+[12:02:52.231] 
+[12:02:52.231] up to date in 2s
+[12:02:52.232] 
+[12:02:52.232] 43 packages are looking for funding
+[12:02:52.232]   run `npm fund` for details
+[12:02:52.260] Detected Next.js version: 14.2.5
+[12:02:52.264] Running "npm run build"
+[12:02:52.377] 
+[12:02:52.378] > kasama-future@0.1.0 build
+[12:02:52.379] > next build
+[12:02:52.379] 
+[12:02:53.079]   ▲ Next.js 14.2.5
+[12:02:53.080] 
+[12:02:53.147]    Creating an optimized production build ...
+[12:02:53.281]  ⚠ Found lockfile missing swc dependencies, run next locally to automatically patch
+[12:02:57.025]  ⚠ Compiled with warnings
+[12:02:57.026] 
+[12:02:57.026] ./app/m/page.tsx
+[12:02:57.026] Attempted import error: 'getIntentRankingMonthly' is not exported from '@/lib/ranking' (imported as 'getIntentRankingMonthly').
+[12:02:57.027] 
+[12:02:57.027] Import trace for requested module:
+[12:02:57.027] ./app/m/page.tsx
+[12:02:57.027] 
+[12:02:57.027] ./components/IntentRanking.tsx
+[12:02:57.028] Attempted import error: 'getIntentRankingMonthly' is not exported from '@/lib/ranking' (imported as 'getIntentRankingMonthly').
+[12:02:57.028] 
+[12:02:57.028] Import trace for requested module:
+[12:02:57.028] ./components/IntentRanking.tsx
+[12:02:57.029] ./components/HomeSections.tsx
+[12:02:57.029] ./app/(global)/page.tsx
+[12:02:57.029] 
+[12:02:57.030] ./components/IntentRanking.tsx
+[12:02:57.030] Attempted import error: 'getIntentRankingMonthly' is not exported from '@/lib/ranking' (imported as 'getIntentRankingMonthly').
+[12:02:57.030] 
+[12:02:57.030] Import trace for requested module:
+[12:02:57.030] ./components/IntentRanking.tsx
+[12:02:57.031] ./components/HomeSections.tsx
+[12:02:57.031] ./app/(global)/page.tsx
+[12:02:57.031] 
+[12:02:57.032] ./components/IntentRanking.tsx
+[12:02:57.032] Attempted import error: 'getIntentRankingMonthly' is not exported from '@/lib/ranking' (imported as 'getIntentRankingMonthly').
+[12:02:57.032] 
+[12:02:57.032] Import trace for requested module:
+[12:02:57.033] ./components/IntentRanking.tsx
+[12:02:57.033] ./components/HomeSections.tsx
+[12:02:57.033] ./app/(global)/page.tsx
+[12:02:57.034] 
+[12:02:57.034]    Linting and checking validity of types ...
+[12:02:57.375] 
+[12:02:57.376]    We detected TypeScript in your project and reconfigured your tsconfig.json file for you. Strict-mode is set to false by default.
+[12:02:57.377]    The following suggested values were added to your tsconfig.json. These values can be changed to fit your project's needs:
+[12:02:57.377] 
+[12:02:57.377]    	- include was updated to add '.next/types/**/*.ts'
+[12:02:57.377]    	- plugins was updated to add { name: 'next' }
+[12:02:57.377] 
+[12:02:57.377]    The following mandatory changes were made to your tsconfig.json:
+[12:02:57.377] 
+[12:02:57.378]    	- isolatedModules was set to true (requirement for SWC / Babel)
+[12:02:57.378] 
+[12:03:03.240] Failed to compile.
+[12:03:03.241] 
+[12:03:03.241] ./app/m/page.tsx:5:10
+[12:03:03.241] Type error: Module '"@/lib/ranking"' has no exported member 'getIntentRankingMonthly'.
+[12:03:03.241] 
+[12:03:03.241] [0m [90m 3 |[39m [36mimport[39m { prisma } [36mfrom[39m [32m"@/lib/db"[39m[33m;[39m[0m
+[12:03:03.242] [0m [90m 4 |[39m [36mimport[39m { [33mCard[39m } [36mfrom[39m [32m"@/components/ui"[39m[33m;[39m[0m
+[12:03:03.242] [0m[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { getIntentRankingMonthly } [36mfrom[39m [32m"@/lib/ranking"[39m[33m;[39m[0m
+[12:03:03.242] [0m [90m   |[39m          [31m[1m^[22m[39m[0m
+[12:03:03.242] [0m [90m 6 |[39m[0m
+[12:03:03.242] [0m [90m 7 |[39m [36mexport[39m [36mconst[39m dynamic [33m=[39m [32m"force-dynamic"[39m[33m;[39m[0m
+[12:03:03.242] [0m [90m 8 |[39m [36mexport[39m [36mconst[39m runtime [33m=[39m [32m"nodejs"[39m[33m;[39m[0m
+[12:03:03.310] Error: Command "npm run build" exited with 1
