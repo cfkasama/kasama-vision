@@ -54,7 +54,7 @@ export default async function IntentRanking() {
   );
 
   return (
-    <section className="mt-6 grid gap-4 md:grid-cols-3">
+    <section className="mt-4 grid gap-4 md:grid-cols-3">
       <Block title="住みたい" metric="live" items={live} pillColor="green" />
       <Block title="働きたい" metric="work" items={work} pillColor="gray" />
       <Block title="行きたい" metric="tourism" items={tourism} pillColor="gold" />
