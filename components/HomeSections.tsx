@@ -458,7 +458,7 @@ export default async function HomeSections({ scope, muni }: { scope: Scope; muni
   </section>
 ) : null}
       {scope === "GLOBAL" && (
-    <IntentRanking  />
+    <IntentRanking metric="TOTAL" title="総合ランキング"　limit={20} />
   )}
       
       {/* タグ TOP5 */}
