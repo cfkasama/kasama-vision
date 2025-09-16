@@ -10,8 +10,8 @@ export const runtime = "nodejs";
 type Metric = "live" | "work" | "tourism";
 
 export default async function IntentRanking({
-  metric,
-  title = "月間ランキング",
+  metric=Metric.TOTAL,
+  title = "ランキング",
   limit = 20,
 }: { metric: Metric; title?: string; limit?: number }) {
   // ⬇️ 月間を直接指定
