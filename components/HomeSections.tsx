@@ -486,7 +486,7 @@ export default async function HomeSections({ scope, muni }: { scope: Scope; muni
       <li className="text-sm text-gray-600">データがありません</li>
     )}
   </ul>
-<div class="mt-3">
+<div className="mt-3">
   <Link
     href={scope === "MUNI" && muni ? `/m/${muni.slug}/tags` : `/tags`}
     className="inline-block rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50"
