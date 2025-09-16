@@ -51,7 +51,7 @@ export default async function MuniListPage({ searchParams }: {
     : order === "workCount" ? r.workCount
     : order === "tourismCount" ? r.tourismCount
     : order === "post" ? r._count.posts
-    : r.code ?? ""; // code のときはコード文字列を表示（好きに整形してOK）
+    : r.code ?? r.code; // code のときはコード文字列を表示（好きに整形してOK）
 
   const tab = (o: Order, label: string, href?: string) => {
     const active = order === o;
