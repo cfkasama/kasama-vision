@@ -40,9 +40,9 @@ export default async function MuniListPage({
       ? metric === "live" ? r.liveCountMonthly : metric === "work" ? r.workCountMonthly : r.tourismCountMonthly
       : metric === "live" ? r.liveCount : metric === "work" ? r.workCount : r.tourismCount;
 
-  const tab = (m: Metric, r: Range, label: string) => {
-    const active = metric === m && range === r;
-    const qs = new URLSearchParams({ metric: m, range: r }).toString();
+  const tab = (o: Order, label: string) => {
+    const active = order === o;
+    const qs = new URLSearchParams({ order: o }).toString();
     return (
       <Link
         href={`/m?${qs}`}
@@ -61,12 +61,11 @@ export default async function MuniListPage({
       </section>
 
       <div className="mb-4 flex flex-wrap gap-2">
-        {tab("live", "total", "住みたい（累計）")}
-        {tab("work", "total", "働きたい（累計）")}
-        {tab("tourism", "total", "行きたい（累計）")}
-        {tab("live", "monthly", "住みたい（月間）")}
-        {tab("work", "monthly", "働きたい（月間）")}
-        {tab("tourism", "monthly", "行きたい（月間）")}
+        {tab("liveCount", "住みたいランキング")}
+        {tab("workCount", "働きたいランキング")}
+        {tab("tourismCount", "行きたいランキング")}
+        {tab("code", "自治体コード順")}
+        {tab("post", "投稿数順")}
       </div>
 
       <Card>
