@@ -16,14 +16,13 @@ function pickField(metric: Metric, range: Range) {
 }
 
 export async function getIntentRankingMonthly(
-  kind: Metric,
+  metric: Metric,
   limit = 3
 ) {
   const field = pickField(metric, "monthly");
-  const getTopVisions = (scope: Scope, muni?: Muni) =>
   const rows = await prisma.municipality.findMany({
-    orderBy: { field: "desc" },
-    take: 3,
+    orderBy: { [field]: "desc" },
+    take: limit,
   });
 
   if (!rows.length) return [];
