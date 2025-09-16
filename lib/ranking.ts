@@ -15,6 +15,21 @@ function pickField(metric: Metric, range: Range) {
     ? "workCountMonthly" : "tourismCountMonthly";
 }
 
+export async function getIntentRankingMonthly(
+  kind: Metric,
+  limit = 3
+) {
+  const field = pickField(metric, range);
+  const getTopVisions = (scope: Scope, muni?: Muni) =>
+  const rows = await prisma.municipality.findMany({
+    orderBy: { field: "desc" },
+    take: 3,
+  });
+
+  if (!rows.length) return [];
+  return rows;
+}
+
 export async function fetchMunicipalityRanking(
   metric: Metric,
   range: Range,
