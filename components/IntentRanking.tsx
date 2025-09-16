@@ -8,12 +8,7 @@ export const runtime = "nodejs";
 
 type Metric = "live" | "work" | "tourism";
 
-export default async function IntentRanking({
-  metric,
-  title = "月間ランキング",
-  limit = 4,
-}: { metric: Metric; title?: string; limit?: number }) {
-
+export default async function IntentRanking() {
   const rows = await fetchMunicipalityRanking(metric, "monthly", limit);
 
   return (
