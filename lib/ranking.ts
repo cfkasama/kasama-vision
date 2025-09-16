@@ -1,5 +1,4 @@
 // lib/ranking.ts
-// lib/ranking.ts
 import { prisma } from "@/lib/db";
 
 // 共通型（他ファイルと齟齬が出ないよう統一）
@@ -52,35 +51,6 @@ export async function getIntentRankingMonthly(metric: Metric, limit = 3) {
     slug: r.slug,
     count: (r as any)[field] ?? 0,
   }));
-}
-import { prisma } from "@/lib/db";
-
-export type Metric = "live" | "work" | "tourism";
-export type Range = "total" | "monthly";
-
-function pickField(metric: Metric, range: Range) {
-  if (range === "total") {
-    return metric === "live"
-      ? "liveCount" : metric === "work"
-      ? "workCount" : "tourismCount";
-  }
-  return metric === "live"
-    ? "liveCountMonthly" : metric === "work"
-    ? "workCountMonthly" : "tourismCountMonthly";
-}
-
-export async function getIntentRankingMonthly(
-  metric: Metric,
-  limit = 3
-) {
-  const field = pickField(metric, "monthly");
-  const rows = await prisma.municipality.findMany({
-    orderBy: { [field]: "desc" },
-    take: limit,
-  });
-
-  if (!rows.length) return [];
-  return rows;
 }
 
 export async function fetchMunicipalityRanking(
