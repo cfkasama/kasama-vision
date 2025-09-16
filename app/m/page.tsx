@@ -40,7 +40,7 @@ export default async function MuniListPage({ searchParams }: {
       order === "code"
         ? [{ code: "asc" as const }]
         : order === "post"
-        ? [{ _count: { posts: "desc" as const } }, { code: "asc" as const }]
+        ? [{ posts: { _count: "desc" as const } }, { code: "asc" as const }]
         : [{ [order]: "desc" as const }, { code: "asc" as const }],
     take: 200,
   });
