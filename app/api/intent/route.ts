@@ -53,13 +53,13 @@ export async function POST(req: Request) {
     kind === "LIVE" ? "liveCount" :
     kind === "WORK" ? "workCount" : "tourismCount";
 
-  const field2 =
-    kind === "LIVE" ? "liveCountMonthly" :
-    kind === "WORK" ? "workCountMonthly" : "tourismCountMonthly";
+ // const field2 =
+ //   kind === "LIVE" ? "liveCountMonthly" :
+ //   kind === "WORK" ? "workCountMonthly" : "tourismCountMonthly";
     
   await prisma.municipality.update({
     where: { id: muni.id },
-    data: { [field]: { increment: 1 }, [field2]: { increment: 1 } },
+    data: { [field]: { increment: 1 } },
   });
     
     return NextResponse.json({ ok: true });
