@@ -8,9 +8,9 @@ export const runtime = "nodejs";
 
 export default async function IntentRanking() {
   const [live, work, tourism] = await Promise.all([
-    getIntentRankingMonthly("LIVE", 10),
-    getIntentRankingMonthly("WORK", 10),
-    getIntentRankingMonthly("TOURISM", 10),
+    getIntentRankingMonthly("LIVE", 3),
+    getIntentRankingMonthly("WORK", 3),
+    getIntentRankingMonthly("TOURISM", 3),
   ]);
 
   const Block = ({
