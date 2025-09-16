@@ -49,26 +49,19 @@ export async function POST(req: Request) {
       },
     });
 
-// 例：/api/intent POST
-await prisma.$transaction(async (tx) => {
-  const intent = await tx.intent.create({
-    data: {
-      kind,                // "LIVE" | "WORK" | "TOURISM"
-      municipalityId,      // 必須
-      // 他の項目...
-    },
-  });
-
   const field =
     intent.kind === "LIVE" ? "liveCount" :
     intent.kind === "WORK" ? "workCount" : "tourismCount";
 
+  const field2 =
+    intent.kind === "LIVE" ? "liveCountMonthly" :
+    intent.kind === "WORK" ? "workCountMonthly" : "tourismCountMonthly";
+    
   await tx.municipality.update({
     where: { id: municipalityId },
-    data: { [field]: { increment: 1 } },
+    data: { [field]: { increment: 1 }, [field2]: { increment: 1 } },
   });
-});
-
+    
     return NextResponse.json({ ok: true });
   } catch (e: any) {
     // 一意制約違反（すでに押している）
