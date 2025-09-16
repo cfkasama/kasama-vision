@@ -1,65 +1,63 @@
-[15:28:29.137] Running build in Washington, D.C., USA (East) – iad1
-[15:28:29.137] Build machine configuration: 2 cores, 8 GB
-[15:28:29.154] Cloning github.com/cfkasama/kasama-vision (Branch: main, Commit: 419f28d)
-[15:28:29.426] Cloning completed: 272.000ms
-[15:28:29.958] Restored build cache from previous deployment (CRiTVg2N83nTdPTgLqtfqsK3zN9H)
-[15:28:30.303] Running "vercel build"
-[15:28:30.700] Vercel CLI 47.1.1
-[15:28:31.043] Installing dependencies...
-[15:28:31.915] 
-[15:28:31.916] > kasama-future@0.1.0 postinstall
-[15:28:31.916] > prisma generate
-[15:28:31.917] 
-[15:28:32.365] Prisma schema loaded from prisma/schema.prisma
-[15:28:32.935] 
-[15:28:32.935] ✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 286ms
-[15:28:32.935] 
-[15:28:32.936] Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
-[15:28:32.936] 
-[15:28:32.936] Tip: Easily identify and fix slow SQL queries in your app. Optimize helps you enhance your visibility: https://pris.ly/--optimize
-[15:28:32.936] 
-[15:28:33.131] 
-[15:28:33.132] up to date in 2s
-[15:28:33.133] 
-[15:28:33.133] 43 packages are looking for funding
-[15:28:33.134]   run `npm fund` for details
-[15:28:33.160] Detected Next.js version: 14.2.5
-[15:28:33.165] Running "npm run build"
-[15:28:33.279] 
-[15:28:33.280] > kasama-future@0.1.0 build
-[15:28:33.281] > next build
-[15:28:33.282] 
-[15:28:33.949]   ▲ Next.js 14.2.5
-[15:28:33.950] 
-[15:28:34.020]    Creating an optimized production build ...
-[15:28:34.156]  ⚠ Found lockfile missing swc dependencies, run next locally to automatically patch
-[15:28:38.004]  ✓ Compiled successfully
-[15:28:38.006]    Linting and checking validity of types ...
-[15:28:38.418] 
-[15:28:38.419]    We detected TypeScript in your project and reconfigured your tsconfig.json file for you. Strict-mode is set to false by default.
-[15:28:38.420]    The following suggested values were added to your tsconfig.json. These values can be changed to fit your project's needs:
-[15:28:38.420] 
-[15:28:38.420]    	- include was updated to add '.next/types/**/*.ts'
-[15:28:38.421]    	- plugins was updated to add { name: 'next' }
-[15:28:38.421] 
-[15:28:38.422]    The following mandatory changes were made to your tsconfig.json:
-[15:28:38.422] 
-[15:28:38.422]    	- isolatedModules was set to true (requirement for SWC / Babel)
-[15:28:38.422] 
-[15:28:44.617] Failed to compile.
-[15:28:44.617] 
-[15:28:44.618] ./app/m/page.tsx:43:14
-[15:28:44.618] Type error: Type '({ _count: { posts: "desc"; }; } | { code: "asc"; })[] | ({ [x: string]: "desc"; } | { code: "asc"; })[]' is not assignable to type 'MunicipalityOrderByWithRelationInput | MunicipalityOrderByWithRelationInput[] | undefined'.
-[15:28:44.618]   Type '({ _count: { posts: "desc"; }; } | { code: "asc"; })[]' is not assignable to type 'MunicipalityOrderByWithRelationInput | MunicipalityOrderByWithRelationInput[] | undefined'.
-[15:28:44.618]     Type '({ _count: { posts: "desc"; }; } | { code: "asc"; })[]' is not assignable to type 'MunicipalityOrderByWithRelationInput[]'.
-[15:28:44.618]       Type '{ _count: { posts: "desc"; }; } | { code: "asc"; }' is not assignable to type 'MunicipalityOrderByWithRelationInput'.
-[15:28:44.619]         Object literal may only specify known properties, and '_count' does not exist in type 'MunicipalityOrderByWithRelationInput'.
-[15:28:44.619] 
-[15:28:44.619] [0m [90m 41 |[39m         [33m?[39m [{ code[33m:[39m [32m"asc"[39m [36mas[39m [36mconst[39m }][0m
-[15:28:44.619] [0m [90m 42 |[39m         [33m:[39m order [33m===[39m [32m"post"[39m[0m
-[15:28:44.619] [0m[31m[1m>[22m[39m[90m 43 |[39m         [33m?[39m [{ _count[33m:[39m { posts[33m:[39m [32m"desc"[39m [36mas[39m [36mconst[39m } }[33m,[39m { code[33m:[39m [32m"asc"[39m [36mas[39m [36mconst[39m }][0m
-[15:28:44.619] [0m [90m    |[39m              [31m[1m^[22m[39m[0m
-[15:28:44.620] [0m [90m 44 |[39m         [33m:[39m [{ [order][33m:[39m [32m"desc"[39m [36mas[39m [36mconst[39m }[33m,[39m { code[33m:[39m [32m"asc"[39m [36mas[39m [36mconst[39m }][33m,[39m[0m
-[15:28:44.620] [0m [90m 45 |[39m     take[33m:[39m [35m200[39m[33m,[39m[0m
-[15:28:44.620] [0m [90m 46 |[39m   })[33m;[39m[0m
-[15:28:44.688] Error: Command "npm run build" exited with 1
+[17:25:28.320] Running build in Washington, D.C., USA (East) – iad1
+[17:25:28.321] Build machine configuration: 2 cores, 8 GB
+[17:25:28.333] Cloning github.com/cfkasama/kasama-vision (Branch: main, Commit: 6c01e8b)
+[17:25:28.627] Cloning completed: 292.000ms
+[17:25:29.119] Restored build cache from previous deployment (2QYY87LQgVuZkHdj7b3xK6xQqtSC)
+[17:25:29.445] Running "vercel build"
+[17:25:29.870] Vercel CLI 47.1.1
+[17:25:30.193] Installing dependencies...
+[17:25:31.124] 
+[17:25:31.125] > kasama-future@0.1.0 postinstall
+[17:25:31.126] > prisma generate
+[17:25:31.126] 
+[17:25:31.996] Prisma schema loaded from prisma/schema.prisma
+[17:25:32.600] 
+[17:25:32.601] ✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 298ms
+[17:25:32.601] 
+[17:25:32.602] Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+[17:25:32.602] 
+[17:25:32.602] Help us improve the Prisma ORM for everyone. Share your feedback in a short 2-min survey: https://pris.ly/orm/survey/release-5-22
+[17:25:32.602] 
+[17:25:32.796] 
+[17:25:32.796] up to date in 2s
+[17:25:32.797] 
+[17:25:32.797] 43 packages are looking for funding
+[17:25:32.797]   run `npm fund` for details
+[17:25:32.825] Detected Next.js version: 14.2.5
+[17:25:32.829] Running "npm run build"
+[17:25:32.942] 
+[17:25:32.943] > kasama-future@0.1.0 build
+[17:25:32.943] > next build
+[17:25:32.943] 
+[17:25:33.621]   ▲ Next.js 14.2.5
+[17:25:33.622] 
+[17:25:33.681]    Creating an optimized production build ...
+[17:25:33.808]  ⚠ Found lockfile missing swc dependencies, run next locally to automatically patch
+[17:25:37.002]  ✓ Compiled successfully
+[17:25:37.004]    Linting and checking validity of types ...
+[17:25:37.365] 
+[17:25:37.366]    We detected TypeScript in your project and reconfigured your tsconfig.json file for you. Strict-mode is set to false by default.
+[17:25:37.366]    The following suggested values were added to your tsconfig.json. These values can be changed to fit your project's needs:
+[17:25:37.366] 
+[17:25:37.366]    	- include was updated to add '.next/types/**/*.ts'
+[17:25:37.368]    	- plugins was updated to add { name: 'next' }
+[17:25:37.368] 
+[17:25:37.368]    The following mandatory changes were made to your tsconfig.json:
+[17:25:37.368] 
+[17:25:37.368]    	- isolatedModules was set to true (requirement for SWC / Babel)
+[17:25:37.369] 
+[17:25:43.639] Failed to compile.
+[17:25:43.639] 
+[17:25:43.639] ./lib/ranking.ts:40:26
+[17:25:43.640] Type error: Type '{ _count: { _all: string; }; }' is not assignable to type 'IntentOrderByWithAggregationInput | IntentOrderByWithAggregationInput[] | undefined'.
+[17:25:43.640]   Types of property '_count' are incompatible.
+[17:25:43.640]     Object literal may only specify known properties, and '_all' does not exist in type 'IntentCountOrderByAggregateInput'.
+[17:25:43.641] 
+[17:25:43.641] [0m [90m 38 |[39m     where[33m:[39m { kind[33m:[39m [33mK[39m [36mas[39m any[33m,[39m createdAt[33m:[39m { gte[33m:[39m start[33m,[39m lt[33m:[39m next } }[33m,[39m[0m
+[17:25:43.641] [0m [90m 39 |[39m     _count[33m:[39m { _all[33m:[39m [36mtrue[39m }[33m,[39m[0m
+[17:25:43.642] [0m[31m[1m>[22m[39m[90m 40 |[39m     orderBy[33m:[39m { _count[33m:[39m { _all[33m:[39m [32m"desc"[39m } }[33m,[39m[0m
+[17:25:43.642] [0m [90m    |[39m                          [31m[1m^[22m[39m[0m
+[17:25:43.642] [0m [90m 41 |[39m     take[33m:[39m limit [33m*[39m [35m2[39m[33m,[39m [90m// タイブレーク用に少し多めに取っておくと安心[39m[0m
+[17:25:43.642] [0m [90m 42 |[39m   })[33m;[39m[0m
+[17:25:43.643] [0m [90m 43 |[39m[0m
+[17:25:43.706] Error: Command "npm run build" exited with 1
