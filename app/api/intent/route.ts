@@ -50,15 +50,15 @@ export async function POST(req: Request) {
     });
 
   const field =
-    intent.kind === "LIVE" ? "liveCount" :
-    intent.kind === "WORK" ? "workCount" : "tourismCount";
+    kind === "LIVE" ? "liveCount" :
+    kind === "WORK" ? "workCount" : "tourismCount";
 
   const field2 =
-    intent.kind === "LIVE" ? "liveCountMonthly" :
-    intent.kind === "WORK" ? "workCountMonthly" : "tourismCountMonthly";
+    kind === "LIVE" ? "liveCountMonthly" :
+    kind === "WORK" ? "workCountMonthly" : "tourismCountMonthly";
     
   await tx.municipality.update({
-    where: { id: municipalityId },
+    where: { id: muni.id },
     data: { [field]: { increment: 1 }, [field2]: { increment: 1 } },
   });
     
