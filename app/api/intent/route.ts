@@ -57,7 +57,7 @@ export async function POST(req: Request) {
     kind === "LIVE" ? "liveCountMonthly" :
     kind === "WORK" ? "workCountMonthly" : "tourismCountMonthly";
     
-  await tx.municipality.update({
+  await prisma.municipality.update({
     where: { id: muni.id },
     data: { [field]: { increment: 1 }, [field2]: { increment: 1 } },
   });
