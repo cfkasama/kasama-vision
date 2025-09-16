@@ -1,7 +1,6 @@
 // components/IntentRanking.tsx
 import Link from "next/link";
 import { Card, Pill } from "@/components/ui";
-// ⬇️ これに変更
 import { fetchMunicipalityRanking } from "@/lib/ranking";
 
 export const dynamic = "force-dynamic";
@@ -10,11 +9,11 @@ export const runtime = "nodejs";
 type Metric = "live" | "work" | "tourism";
 
 export default async function IntentRanking({
-  metric=Metric.TOTAL,
-  title = "ランキング",
-  limit = 20,
+  metric,
+  title = "月間ランキング",
+  limit = 4,
 }: { metric: Metric; title?: string; limit?: number }) {
-  // ⬇️ 月間を直接指定
+
   const rows = await fetchMunicipalityRanking(metric, "monthly", limit);
 
   return (
