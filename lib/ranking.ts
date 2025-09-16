@@ -1,4 +1,57 @@
 // lib/ranking.ts
+// lib/ranking.ts
+import { prisma } from "@/lib/db";
+import { getJstMonthRange } from "@/lib/time";
+
+export type Metric = "live" | "work" | "tourism";
+
+function kindOf(metric: Metric) {
+  return metric === "live" ? "LIVE" : metric === "work" ? "WORK" : "TOURISM";
+}
+
+/** 今月（JST）のランキング：{id,name,slug,count}[] を返す */
+export async function getIntentRankingMonthly(metric: Metric, limit = 3) {
+  const { start, next } = getJstMonthRange();
+  const K = kindOf(metric);
+
+  // 1) intent を自治体ごとに集計（今月のみ）
+  const grouped = await prisma.intent.groupBy({
+    by: ["municipalityId"],
+    where: { kind: K as any, createdAt: { gte: start, lt: next } },
+    _count: { _all: true },
+    orderBy: { _count: { _all: "desc" } },
+    take: limit * 2, // タイブレーク用に少し多めに取っておくと安心
+  });
+
+  if (!grouped.length) return [];
+
+  // 2) 自治体メタ（name/slug/code）を取得
+  const ids = grouped.map(g => g.municipalityId);
+  const munis = await prisma.municipality.findMany({
+    where: { id: { in: ids } },
+    select: { id: true, name: true, slug: true, code: true },
+  });
+  const byId = new Map(munis.map(m => [m.id, m]));
+
+  // 3) マージ＆ソート（count desc, code asc）＆上位limit
+  const merged = grouped.map(g => ({
+    id: g.municipalityId,
+    name: byId.get(g.municipalityId)?.name ?? "",
+    slug: byId.get(g.municipalityId)?.slug ?? "",
+    code: byId.get(g.municipalityId)?.code ?? "",
+    count: g._count._all,
+  }));
+
+  merged.sort((a, b) => {
+    if (b.count !== a.count) return b.count - a.count; // 降順
+    const ac = a.code ?? "";
+    const bc = b.code ?? "";
+    return ac < bc ? -1 : ac > bc ? 1 : 0; // 同数なら code 昇順
+  });
+
+  return merged.slice(0, limit).map(({ code, ...rest }) => rest); // UI shape
+}
+
 import { prisma } from "@/lib/db";
 
 // 共通型（他ファイルと齟齬が出ないよう統一）
