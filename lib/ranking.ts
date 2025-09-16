@@ -1,5 +1,4 @@
 // lib/ranking.ts
-// lib/ranking.ts
 import { prisma } from "@/lib/db";
 import { getJstMonthRange } from "@/lib/time";
 
