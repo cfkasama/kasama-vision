@@ -15,10 +15,12 @@ export default async function IntentRanking() {
 
   const Block = ({
     title,
+    metric,            // ← 追加
     items,
     pillColor,
   }: {
     title: string;
+    metric: "live" | "work" | "tourism";
     items: { id: string; name: string; slug: string; count: number }[];
     pillColor?: "green" | "gray" | "gold";
   }) => (
@@ -42,7 +44,7 @@ export default async function IntentRanking() {
       )}
       <div className="mt-3">
         <Link
-          href={`/m?sort=${encodeURIComponent(title)}`}
+          href={`/m?metric=${metric}&range=monthly`} // ← タイトルではなく metric で安定化
           className="inline-block rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50"
         >
           自治体一覧で見る
@@ -53,9 +55,9 @@ export default async function IntentRanking() {
 
   return (
     <section className="mt-6 grid gap-4 md:grid-cols-3">
-      <Block title="住みたい" items={live} pillColor="green" />
-      <Block title="働きたい" items={work} pillColor="gray" />
-      <Block title="行きたい" items={tourism} pillColor="gold" />
+      <Block title="住みたい" metric="live" items={live} pillColor="green" />
+      <Block title="働きたい" metric="work" items={work} pillColor="gray" />
+      <Block title="行きたい" metric="tourism" items={tourism} pillColor="gold" />
     </section>
   );
 }
