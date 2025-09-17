@@ -79,8 +79,7 @@ export async function fetchMunicipalityRanking(
 
   return prisma.municipality.findMany({
     select: { id: true, name: true, slug: true, code: true, 
-      liveCount: true, workCount: true, tourismCount: true,
-      liveCountMonthly: true, workCountMonthly: true, tourismCountMonthly: true,
+      liveCount: true, workCount: true, tourismCount:true,
     },
     orderBy: [
       // 主要ソート（降順）
