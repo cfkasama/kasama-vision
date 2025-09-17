@@ -119,6 +119,7 @@ export default function CommentComposer({
   );
 
   return (
+    <div className="mt-4">
     <div className="rounded-lg border p-3 space-y-2">
       {isProposal ? (
         <div className="flex gap-3 text-sm">
@@ -188,5 +189,6 @@ export default function CommentComposer({
       {msg && <p className="text-xs text-red-600">{msg}</p>}
       <p className="text-[11px] text-gray-500">※ パスワードはハッシュ化して保存します</p>
     </div>
+      </div>
   );
 }
