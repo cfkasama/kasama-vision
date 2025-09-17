@@ -1,6 +1,8 @@
+// app/api/intent/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getOrCreateIdentityId } from "@/lib/identity";
+import { revalidateTag } from "next/cache";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -49,19 +51,20 @@ export async function POST(req: Request) {
       },
     });
 
-  const field =
-    kind === "LIVE" ? "liveCount" :
-    kind === "WORK" ? "workCount" : "tourismCount";
+    const field =
+      kind === "LIVE" ? "liveCount" :
+      kind === "WORK" ? "workCount" : "tourismCount";
 
- // const field2 =
- //   kind === "LIVE" ? "liveCountMonthly" :
- //   kind === "WORK" ? "workCountMonthly" : "tourismCountMonthly";
-    
-  await prisma.municipality.update({
-    where: { id: muni.id },
-    data: { [field]: { increment: 1 } },
-  });
-    
+    // ★ A方式: 月間は保存せず集計で出すため、総合のみインクリメント
+    await prisma.municipality.update({
+      where: { id: muni.id },
+      data: { [field]: { increment: 1 } },
+    });
+
+    // ★ 月間ランキングキャッシュを即失効（対象 metric のみ）
+    const metric = kind === "LIVE" ? "live" : kind === "WORK" ? "work" : "tourism";
+    revalidateTag(`ranking:monthly:${metric}`);
+
     return NextResponse.json({ ok: true });
   } catch (e: any) {
     // 一意制約違反（すでに押している）
@@ -75,6 +78,7 @@ export async function POST(req: Request) {
 
 /** GET /api/intent?mslug=xxx
  *  → { ok:true, counts: { live, work, tourism } }
+ *  （総合カウントの簡易API。月間は A 方式では createdAt 範囲で別集計してね）
  */
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
