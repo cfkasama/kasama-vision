@@ -469,12 +469,12 @@ export default async function HomeSections({ scope, muni }: { scope: Scope; muni
     {topTags.map(t => {
       const tagHref =
         scope === "MUNI" && muni
-          ? `/m/${muni.slug}/tags/${encodeURIComponent(t.name)}`
-          : `/tags/${encodeURIComponent(t.name)}`;
+          ? `/m/${muni.slug}/posts?tag=${encodeURIComponent(t.name)}`
+          : `/posts?tag=${encodeURIComponent(t.name)}`;
       return (
         <li key={t.id}>
           <Link
-            href={tagHref}
+            href={tagHref} prefetch={false}
             className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs"
           >
             {t.name}（{t.count}）
