@@ -141,7 +141,52 @@ export default function NewPostClient({
           </select>
         </label>
 
-        {/* タイトル/本文/タグ/削除キー（省略: そのまま） */}
+        {/* タイトル */}
+        <label className="block text-sm">
+          タイトル
+          <input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+            placeholder="例：雨の日でも楽しい『〇〇パス』を作ろう"
+            className="mt-1 w-full rounded-md border p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+        </label>
+
+        {/* 本文 */}
+        <label className="block text-sm">
+          本文
+          <textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            rows={8}
+            placeholder="背景・困りごと・やりたいこと・協力してほしいこと など"
+            className="mt-1 w-full rounded-md border p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+        </label>
+
+        {/* タグ */}
+        <label className="block text-sm">
+          タグ（カンマ区切り）
+          <input
+            value={tags}
+            onChange={(e) => setTags(e.target.value)}
+            placeholder="子育て, 観光, 移住"
+            className="mt-1 w-full rounded-md border p-2"
+          />
+        </label>
+
+        {/* 削除用パスワード */}
+        <label className="block text-sm">
+          削除用パスワード（必須）
+          <input
+            value={deleteKey}
+            onChange={(e) => setDeleteKey(e.target.value)}
+            required
+            placeholder="自分だけが知る合言葉"
+            className="mt-1 w-full rounded-md border p-2 focus:outline-none focus:ring-2 focus:ring-red-400"
+          />
+        </label>
 
         {error && <p className="text-sm text-red-600">{error}</p>}
         <button
