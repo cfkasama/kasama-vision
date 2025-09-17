@@ -37,7 +37,7 @@ export async function getIntentRankingMonthly(metric: Metric, limit = 3) {
     by: ["municipalityId"],
     where: { kind: K as any, createdAt: { gte: start, lt: next } },
     _count: { _all: true },
-    orderBy: { _count: { _all: "desc" } },
+    orderBy: { _count: { municipalityId: "desc" } },
     take: limit * 2, // タイブレーク用に少し多めに取っておくと安心
   });
 
