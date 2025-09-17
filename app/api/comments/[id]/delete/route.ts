@@ -34,7 +34,7 @@ export async function POST(req: Request, { params }: Params) {
   }
 
   // ★ 引数順を「平文, ハッシュ(or平文)」に
-  const valid = await verifyDeleteKey(deleteKeyPlain, comment.deleteKey);
+  const valid = await verifyDeleteKey(comment.deleteKey,deleteKeyPlain);
   if (!valid) return NextResponse.json({ ok:false, error:"invalid_key" }, { status:403 });
 
   // （任意）レガシー平文で保存されていた場合は、このタイミングで再ハッシュして上書き
