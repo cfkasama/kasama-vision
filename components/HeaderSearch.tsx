@@ -9,14 +9,11 @@ export default function HeaderSearch() {
   const sp = useSearchParams();
   const pathname = usePathname() || "/";
 
-  // ===== state =====
   const [q, setQ] = useState(sp.get("q") ?? "");
   const [open, setOpen] = useState(false);
 
-  // URL→入力値を同期（戻る/進む対応）
   useEffect(() => setQ(sp.get("q") ?? ""), [sp]);
 
-  // 背景スクロールを止める
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
@@ -24,13 +21,11 @@ export default function HeaderSearch() {
     return () => { document.body.style.overflow = prev; };
   }, [open]);
 
-  // スマホ判定
-  const isMobile = useMemo(() => {
-    if (typeof window === "undefined") return false;
-    return window.matchMedia("(max-width: 767px)").matches;
-  }, []);
+  const isMobile = useMemo(
+    () => (typeof window !== "undefined") && window.matchMedia("(max-width: 767px)").matches,
+    []
+  );
 
-  // /m/[slug]/... なら自治体配下の一覧へ、それ以外は全体へ
   const computeListPath = useCallback(() => {
     const segs = pathname.split("/").filter(Boolean);
     if (segs[0] === "m" && segs[1]) return `/m/${segs[1]}/posts`;
@@ -40,9 +35,8 @@ export default function HeaderSearch() {
   const doSearch = useCallback(() => {
     const listPath = computeListPath();
     const next = new URLSearchParams(sp.toString());
-    if (q.trim()) next.set("q", q.trim());
-    else next.delete("q");
-    next.set("page", "1"); // 1ページ目に戻す
+    if (q.trim()) next.set("q", q.trim()); else next.delete("q");
+    next.set("page", "1");
     router.push(`${listPath}?${next.toString()}`);
   }, [computeListPath, q, router, sp]);
 
@@ -52,41 +46,37 @@ export default function HeaderSearch() {
     setOpen(false);
   };
 
-  // フォーカスでモーダルを開く（スマホのみ）
-  const onFocusHeaderInput = () => {
-    if (isMobile) setOpen(true);
-  };
-
-  // Esc で閉じる
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
-
-  // ===== UI =====
+  // --- UI ---
   return (
     <>
-      {/* ヘッダー内の小さめ検索（スマホはフォーカスでモーダルへ） */}
-      <form onSubmit={onSubmit} className="flex items-center gap-2">
+      {/* モバイル：検索アイコンのみ（モーダルを開く） */}
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="md:hidden inline-flex items-center justify-center rounded border px-2 py-1.5 text-sm"
+        aria-label="検索を開く"
+      >
+        🔍
+      </button>
+
+      {/* デスクトップ：コンパクト検索（幅を固定＆縮み許可） */}
+      <form onSubmit={onSubmit} className="hidden md:flex items-center gap-2 shrink-0">
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          onFocus={onFocusHeaderInput}
           placeholder="投稿タイトルで検索"
-          className="rounded border px-3 py-1.5 text-sm min-w-[220px]"
           aria-label="投稿検索"
+          className="min-w-0 w-[240px] lg:w-[320px] max-w-full rounded border px-3 py-1.5 text-sm"
         />
         <button
           type="submit"
-          className="hidden md:inline-flex rounded bg-blue-600 px-3 py-1.5 text-white text-sm"
+          className="rounded bg-blue-600 px-3 py-1.5 text-white text-sm"
         >
           検索
         </button>
       </form>
 
-      {/* フルスクリーン検索モーダル（モバイル優先） */}
+      {/* 全画面モーダル（モバイル専用） */}
       {open && (
         <div
           role="dialog"
@@ -121,9 +111,6 @@ export default function HeaderSearch() {
                 検索
               </button>
             </form>
-
-            {/* 予測や最近の検索を入れるならここに */}
-            {/* <div className="mt-4 text-sm text-gray-500">キーワード例：移住、保育、観光</div> */}
           </div>
         </div>
       )}
