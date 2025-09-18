@@ -49,8 +49,6 @@ export async function GET(_req: Request, { params }: Params) {
 
 // POST /api/posts/:id/comments
 export async function POST(req: Request, { params }: Params) {
-  const identityId = await getOrCreateIdentityId();
-  await assertNotLocked(identityId); // ← ここでロック中なら即 403
   const { id } = params;
   if (!id) {
     return NextResponse.json({ ok: false, error: "bad_request" }, { status: 400 });
@@ -92,7 +90,7 @@ export async function POST(req: Request, { params }: Params) {
 
     // 匿名識別子（存在しなければ作成）
     const identityId = await getOrCreateIdentityId();
-
+  await assertNotLocked(identityId); // ← ここでロック中なら即 403
     // コメント作成
     const created = await prisma.comment.create({
       data: {
