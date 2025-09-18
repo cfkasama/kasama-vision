@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getOrCreateIdentityId } from "@/lib/identity";
 import { prisma } from "@/lib/db";
+import { assertNotLocked } from "@/lib/identity";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -9,6 +10,8 @@ export const revalidate = 0;
 type Params = { params: { id: string } };
 
 export async function POST(_req: Request, { params }: Params) {
+    const identityId = await getOrCreateIdentityId();
+  await assertNotLocked(identityId); // ← ここでロック中なら即 403
   const { id } = params;
   if (!id) return NextResponse.json({ ok: false, error: "bad_request" }, { status: 400 });
 
