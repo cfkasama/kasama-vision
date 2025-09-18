@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getOrCreateIdentityId } from "@/lib/identity";
+import { assertNotLocked } from "@/lib/identity";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -14,6 +15,8 @@ type Params = { params: { id: string } };
  * ・しきい値到達時に「提案(Post)」を自動生成（※同一自治体内で重複タイトルは作らない）
  */
 export async function POST(_req: Request, { params }: Params) {
+    const identityId = await getOrCreateIdentityId();
+  await assertNotLocked(identityId); // ← ここでロック中なら即 403
   const { id } = params;
   if (!id) return NextResponse.json({ ok: false, error: "bad_request" }, { status: 400 });
 
