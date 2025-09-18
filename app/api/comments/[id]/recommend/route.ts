@@ -15,14 +15,12 @@ type Params = { params: { id: string } };
  * ・しきい値到達時に「提案(Post)」を自動生成（※同一自治体内で重複タイトルは作らない）
  */
 export async function POST(_req: Request, { params }: Params) {
-    const identityId = await getOrCreateIdentityId();
-  await assertNotLocked(identityId); // ← ここでロック中なら即 403
   const { id } = params;
   if (!id) return NextResponse.json({ ok: false, error: "bad_request" }, { status: 400 });
 
   try {
     const identityId = await getOrCreateIdentityId();
-
+  await assertNotLocked(identityId); // ← ここでロック中なら即 403
     const result = await prisma.$transaction(async (tx) => {
       // コメント取得 + 親ポストの自治体ID取得
       const comment = await tx.comment.findUnique({
