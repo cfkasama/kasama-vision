@@ -5,8 +5,8 @@ import { useEffect, useMemo, useState } from "react";
 type Row = {
   id: string;
   content: string;
-  status: "PUBLISHED" | "REMOVED";
   createdAt: string;
+  deletedAt: string | null;           // ← ここが基準
   identityId: string | null;
   post: { id: string; title: string };
 };
@@ -44,13 +44,11 @@ export default function CommentsPanel() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action }),
     });
-    if (!res.ok) return; // 簡易
-    await load();
+    if (res.ok) await load();
   }
 
   return (
     <div className="space-y-3">
-      {/* フィルタ */}
       <div className="flex flex-wrap items-center gap-2">
         <label className="text-sm text-gray-600">状態</label>
         <select value={status} onChange={e => { setPage(1); setStatus(e.target.value as any); }} className="rounded border px-2 py-1 text-sm">
@@ -69,7 +67,6 @@ export default function CommentsPanel() {
         </div>
       </div>
 
-      {/* 一覧 */}
       <div className="rounded-xl border bg-white p-3">
         <table className="w-full table-fixed border-separate border-spacing-y-2">
           <thead>
@@ -82,7 +79,7 @@ export default function CommentsPanel() {
           </thead>
           <tbody>
             {rows.map(r => {
-              const isRemoved = r.status === "REMOVED";
+              const isRemoved = !!r.deletedAt;
               return (
                 <tr key={r.id} className="rounded-lg bg-gray-50 align-top">
                   <td className="px-2 text-sm">
@@ -104,6 +101,7 @@ export default function CommentsPanel() {
                   <td className="px-2 text-xs text-gray-600">
                     <div><span className="rounded bg-gray-100 px-1.5 py-0.5 mr-1">ユーザ</span><code>{r.identityId ?? "-"}</code></div>
                     <div className="mt-1">作成: {new Date(r.createdAt).toLocaleString()}</div>
+                    {r.deletedAt && <div className="mt-1">削除: {new Date(r.deletedAt).toLocaleString()}</div>}
                     <div className="mt-1">ID: <code className="text-[11px]">{r.id}</code></div>
                   </td>
 
