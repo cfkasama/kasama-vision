@@ -1,6 +1,7 @@
 // app/api/posts/[id]/like/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { assertNotLocked } from "@/lib/identity";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -9,6 +10,8 @@ type Params = { params: { id: string } };
 
 // POST /api/posts/:id/like
 export async function POST(req: Request, { params }: Params) {
+    const identityId = await getOrCreateIdentityId();
+  await assertNotLocked(identityId); // ← ここでロック中なら即 403
   const { id } = params;
 
   if (!id) {
