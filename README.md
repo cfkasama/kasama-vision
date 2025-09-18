@@ -1,5 +1,4 @@
-# みんなで考える笠間の未来（MVP）
-
+# まちスケッチ
 Next.js App Router + Tailwind + Neon(Postgres) + Prisma + NextAuth(GitHub)
 
 ## セットアップ
