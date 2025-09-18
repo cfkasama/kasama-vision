@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getOrCreateIdentityId } from "@/lib/identity";
 import { revalidateTag } from "next/cache";
+import { assertNotLocked } from "@/lib/identity";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -41,7 +42,7 @@ export async function POST(req: Request) {
   if (!muni) return bad(404, "municipality_not_found");
 
   const identityId = await getOrCreateIdentityId();
-
+  await assertNotLocked(identityId); // ← ここでロック中なら即 403
   try {
     await prisma.intent.create({
       data: {
