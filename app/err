@@ -1,63 +1,55 @@
-[17:25:28.320] Running build in Washington, D.C., USA (East) – iad1
-[17:25:28.321] Build machine configuration: 2 cores, 8 GB
-[17:25:28.333] Cloning github.com/cfkasama/kasama-vision (Branch: main, Commit: 6c01e8b)
-[17:25:28.627] Cloning completed: 292.000ms
-[17:25:29.119] Restored build cache from previous deployment (2QYY87LQgVuZkHdj7b3xK6xQqtSC)
-[17:25:29.445] Running "vercel build"
-[17:25:29.870] Vercel CLI 47.1.1
-[17:25:30.193] Installing dependencies...
-[17:25:31.124] 
-[17:25:31.125] > kasama-future@0.1.0 postinstall
-[17:25:31.126] > prisma generate
-[17:25:31.126] 
-[17:25:31.996] Prisma schema loaded from prisma/schema.prisma
-[17:25:32.600] 
-[17:25:32.601] ✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 298ms
-[17:25:32.601] 
-[17:25:32.602] Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
-[17:25:32.602] 
-[17:25:32.602] Help us improve the Prisma ORM for everyone. Share your feedback in a short 2-min survey: https://pris.ly/orm/survey/release-5-22
-[17:25:32.602] 
-[17:25:32.796] 
-[17:25:32.796] up to date in 2s
-[17:25:32.797] 
-[17:25:32.797] 43 packages are looking for funding
-[17:25:32.797]   run `npm fund` for details
-[17:25:32.825] Detected Next.js version: 14.2.5
-[17:25:32.829] Running "npm run build"
-[17:25:32.942] 
-[17:25:32.943] > kasama-future@0.1.0 build
-[17:25:32.943] > next build
-[17:25:32.943] 
-[17:25:33.621]   ▲ Next.js 14.2.5
-[17:25:33.622] 
-[17:25:33.681]    Creating an optimized production build ...
-[17:25:33.808]  ⚠ Found lockfile missing swc dependencies, run next locally to automatically patch
-[17:25:37.002]  ✓ Compiled successfully
-[17:25:37.004]    Linting and checking validity of types ...
-[17:25:37.365] 
-[17:25:37.366]    We detected TypeScript in your project and reconfigured your tsconfig.json file for you. Strict-mode is set to false by default.
-[17:25:37.366]    The following suggested values were added to your tsconfig.json. These values can be changed to fit your project's needs:
-[17:25:37.366] 
-[17:25:37.366]    	- include was updated to add '.next/types/**/*.ts'
-[17:25:37.368]    	- plugins was updated to add { name: 'next' }
-[17:25:37.368] 
-[17:25:37.368]    The following mandatory changes were made to your tsconfig.json:
-[17:25:37.368] 
-[17:25:37.368]    	- isolatedModules was set to true (requirement for SWC / Babel)
-[17:25:37.369] 
-[17:25:43.639] Failed to compile.
-[17:25:43.639] 
-[17:25:43.639] ./lib/ranking.ts:40:26
-[17:25:43.640] Type error: Type '{ _count: { _all: string; }; }' is not assignable to type 'IntentOrderByWithAggregationInput | IntentOrderByWithAggregationInput[] | undefined'.
-[17:25:43.640]   Types of property '_count' are incompatible.
-[17:25:43.640]     Object literal may only specify known properties, and '_all' does not exist in type 'IntentCountOrderByAggregateInput'.
-[17:25:43.641] 
-[17:25:43.641] [0m [90m 38 |[39m     where[33m:[39m { kind[33m:[39m [33mK[39m [36mas[39m any[33m,[39m createdAt[33m:[39m { gte[33m:[39m start[33m,[39m lt[33m:[39m next } }[33m,[39m[0m
-[17:25:43.641] [0m [90m 39 |[39m     _count[33m:[39m { _all[33m:[39m [36mtrue[39m }[33m,[39m[0m
-[17:25:43.642] [0m[31m[1m>[22m[39m[90m 40 |[39m     orderBy[33m:[39m { _count[33m:[39m { _all[33m:[39m [32m"desc"[39m } }[33m,[39m[0m
-[17:25:43.642] [0m [90m    |[39m                          [31m[1m^[22m[39m[0m
-[17:25:43.642] [0m [90m 41 |[39m     take[33m:[39m limit [33m*[39m [35m2[39m[33m,[39m [90m// タイブレーク用に少し多めに取っておくと安心[39m[0m
-[17:25:43.642] [0m [90m 42 |[39m   })[33m;[39m[0m
-[17:25:43.643] [0m [90m 43 |[39m[0m
-[17:25:43.706] Error: Command "npm run build" exited with 1
+10:03:37.842 Running build in Washington, D.C., USA (East) – iad1
+10:03:37.843 Build machine configuration: 2 cores, 8 GB
+10:03:37.867 Cloning github.com/cfkasama/kasama-vision (Branch: main, Commit: daafd75)
+10:03:38.126 Cloning completed: 259.000ms
+10:03:39.162 Restored build cache from previous deployment (EYdMhAooA7HkAQ2eYzNeWpk5Df5D)
+10:03:39.511 Running "vercel build"
+10:03:40.047 Vercel CLI 48.0.2
+10:03:40.348 Installing dependencies...
+10:03:41.199 
+10:03:41.200 > kasama-future@0.1.0 postinstall
+10:03:41.201 > prisma generate
+10:03:41.201 
+10:03:41.632 Prisma schema loaded from prisma/schema.prisma
+10:03:42.205 
+10:03:42.205 ✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 300ms
+10:03:42.205 
+10:03:42.205 Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+10:03:42.205 
+10:03:42.206 Tip: Want real-time updates to your database without manual polling? Discover how with Pulse: https://pris.ly/tip-0-pulse
+10:03:42.206 
+10:03:42.401 
+10:03:42.402 up to date in 2s
+10:03:42.402 
+10:03:42.402 43 packages are looking for funding
+10:03:42.403   run `npm fund` for details
+10:03:42.429 Detected Next.js version: 14.2.5
+10:03:42.434 Running "npm run build"
+10:03:42.548 
+10:03:42.550 > kasama-future@0.1.0 build
+10:03:42.550 > next build
+10:03:42.550 
+10:03:43.218   ▲ Next.js 14.2.5
+10:03:43.219 
+10:03:43.288    Creating an optimized production build ...
+10:03:43.409  ⚠ Found lockfile missing swc dependencies, run next locally to automatically patch
+10:03:47.556  ✓ Compiled successfully
+10:03:47.559    Linting and checking validity of types ...
+10:03:47.913 
+10:03:47.914    We detected TypeScript in your project and reconfigured your tsconfig.json file for you. Strict-mode is set to false by default.
+10:03:47.914    The following suggested values were added to your tsconfig.json. These values can be changed to fit your project's needs:
+10:03:47.914 
+10:03:47.915    	- include was updated to add '.next/types/**/*.ts'
+10:03:47.915    	- plugins was updated to add { name: 'next' }
+10:03:47.915 
+10:03:47.916    The following mandatory changes were made to your tsconfig.json:
+10:03:47.916 
+10:03:47.916    	- isolatedModules was set to true (requirement for SWC / Babel)
+10:03:47.916 
+10:03:53.924 Failed to compile.
+10:03:53.924 
+10:03:53.925 app/api/auth/[nextauth]/route.ts
+10:03:53.925 Type error: Route "app/api/auth/[nextauth]/route.ts" does not match the required types of a Next.js Route.
+10:03:53.926   "authOptions" is not a valid Route export field.
+10:03:53.926 
+10:03:53.994 Error: Command "npm run build" exited with 1
