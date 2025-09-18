@@ -4,7 +4,14 @@ import { prisma } from "@/lib/db";
 import { verifyRecaptcha } from "@/lib/recaptcha";
 import { hashDeleteKey } from "@/lib/hash";
 import { getOrCreateIdentityId } from "@/lib/identity";
+import { assertNotLocked } from "@/lib/identity";
 
+export async function POST(req: Request) {
+  const identityId = await getOrCreateIdentityId();
+  await assertNotLocked(identityId); // ← ここでロック中なら即 403
+
+  // 通常の投稿処理...
+}
 type CreatePostBody = {
   type:
     | "CATCHPHRASE"
