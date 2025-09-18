@@ -1,7 +1,7 @@
 // app/api/posts/[id]/like/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { assertNotLocked } from "@/lib/identity";
+import { assertNotLocked , getOrCreateIdentityId } from "@/lib/identity";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
