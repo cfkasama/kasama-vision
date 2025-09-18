@@ -24,8 +24,6 @@ type CreatePostBody = {
 };
 
 export async function POST(req: Request) {
-  const identityId = await getOrCreateIdentityId();
-  await assertNotLocked(identityId); // ← ここでロック中なら即 403
   try {
     const body = (await req.json()) as CreatePostBody;
 
@@ -61,7 +59,8 @@ export async function POST(req: Request) {
     // キーのハッシュ化 & 投稿者識別
     const hashed = await hashDeleteKey(deleteKey);
     const identityId = await getOrCreateIdentityId();
-
+  await assertNotLocked(identityId); // ← ここでロック中なら即 403
+    
     // 作成
     const post = await prisma.post.create({
       data: {
