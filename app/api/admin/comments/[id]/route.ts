@@ -1,28 +1,26 @@
 // app/api/admin/comments/[id]/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { z } from "zod";
 
 export const runtime = "nodejs";
 
-const PatchSchema = z.object({
-  action: z.enum(["REMOVE", "RESTORE"]),
-}).strict();
-
 export async function PATCH(req: Request, { params }: { params: { id: string } }) {
-  const body = await req.json().catch(() => ({}));
-  const p = PatchSchema.safeParse(body);
-  if (!p.success) return NextResponse.json({ ok: false, error: "bad_request" }, { status: 400 });
+  let body: any = {};
+  try { body = await req.json(); } catch {}
+  const action = body?.action;
+  if (action !== "REMOVE" && action !== "RESTORE") {
+    return NextResponse.json({ ok:false, error:"bad_request" }, { status:400 });
+  }
 
-  const data = p.data.action === "REMOVE"
-    ? { status: "REMOVED" as const }
-    : { status: "PUBLISHED" as const };
+  const data = action === "REMOVE"
+    ? { deletedAt: new Date() }
+    : { deletedAt: null };
 
   const r = await prisma.comment.update({
     where: { id: params.id },
     data,
-    select: { id: true, status: true },
+    select: { id: true, deletedAt: true },
   });
 
-  return NextResponse.json({ ok: true, comment: r });
+  return NextResponse.json({ ok:true, comment: r });
 }
