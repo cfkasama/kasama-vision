@@ -4,9 +4,6 @@ export const runtime = "nodejs";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/db";
 
-// lib/identity.ts
-import { prisma } from "@/lib/db";
-
 export async function assertNotLocked(identityId: string) {
   const me = await prisma.identity.findUnique({
     where: { id: identityId },
