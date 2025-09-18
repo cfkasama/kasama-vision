@@ -17,6 +17,7 @@
     "next-auth": "^4.24.7",
     "clsx": "^2.1.0",
    "argon2": "^0.31.2", 
+    "zod":"^3.28.8",
     "@prisma/client": "^5.17.0"
   },
   "overrides": {
