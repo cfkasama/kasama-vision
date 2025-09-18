@@ -4,6 +4,17 @@ export const runtime = "nodejs";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/db";
 
+export async function assertNotLocked(identityId: string) {
+  const idt = await prisma.identity.findUnique({
+    where: { id: identityId },
+    select: { locked: true },
+  });
+  if (idt?.locked) {
+    const err = new Error("locked");
+    (err as any).status = 403;
+    throw err;
+  }
+}
 const COOKIE_KEY = "kid"; // Kasama Identity
 
 export async function getOrCreateIdentityId(): Promise<string> {
