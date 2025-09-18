@@ -10,14 +10,12 @@ export const revalidate = 0;
 type Params = { params: { id: string } };
 
 export async function POST(_req: Request, { params }: Params) {
-    const identityId = await getOrCreateIdentityId();
-  await assertNotLocked(identityId); // ← ここでロック中なら即 403
   const { id } = params;
   if (!id) return NextResponse.json({ ok: false, error: "bad_request" }, { status: 400 });
 
   // 匿名 Identity を確保（cookie: kid）
   const identityId = await getOrCreateIdentityId();
-
+  await assertNotLocked(identityId); // ← ここでロック中なら即 403
   try {
     const exists = await prisma.comment.findUnique({ where: { id }, select: { id: true } });
     if (!exists) return NextResponse.json({ ok: false, error: "comment_not_found" }, { status: 404 });
