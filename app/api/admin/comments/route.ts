@@ -14,7 +14,8 @@ export async function GET(req: Request) {
   const skip = Math.max(0, (page - 1) * limit);
 
   const where: any = {};
-  if (status) where.status = status;
+  if (status === "PUBLISHED") where.deletedAt = null;
+  if (status === "REMOVED") where.deletedAt = { not: null };
   if (q) where.content = { contains: q };
   if (user) where.identityId = user;
 
@@ -27,7 +28,7 @@ export async function GET(req: Request) {
       select: {
         id: true,
         content: true,
-        status: true,
+        deletedAt: true,
         createdAt: true,
         identityId: true,
         post: { select: { id: true, title: true } },
