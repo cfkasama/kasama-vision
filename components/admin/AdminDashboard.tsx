@@ -120,7 +120,7 @@ export default function AdminDashboard({
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold">管理ダッシュボード</h1>
         <div className="text-sm text-gray-600">
-          ようこそ、{me?.login ?? "-"} さん
+          管理者
           <button
             onClick={() => signOut()}
             className="ml-3 rounded border px-2 py-1 hover:bg-gray-50"
