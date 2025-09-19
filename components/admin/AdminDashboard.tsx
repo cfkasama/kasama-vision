@@ -50,46 +50,42 @@ export default function AdminDashboard({
   }, [posts]);
   const clearSelect = useCallback(() => setSel({}), []);
 
-  // 投稿アクション（強制削除/実現/復元）
-  async function act(action: "REMOVE" | "REALIZE" | "RESTORE") {
-    if (selectedIds.length === 0) return;
-    const payload = { action, postIds: selectedIds };
+async function act(action: "REMOVE" | "REALIZE" | "RESTORE") {
+  if (selectedIds.length === 0) return;
 
-    // 楽観更新
-    const before = posts;
-    const after = posts.map((p) =>
-      selectedIds.includes(p.id)
-        ? {
-            ...p,
-            status:
-              action === "REMOVE"
-                ? "REMOVED"
-                : action === "REALIZE"
-                ? "REALIZED"
-                : "PUBLISHED",
-            realizedAt:
-              action === "REALIZE"
-                ? new Date().toISOString()
-                : p.realizedAt,
-          }
-        : p
-    );
-    setPosts(after);
-    setSel({});
+  // ① アクション→ステータスの型安全なマップ関数
+  const mapStatus = (a: "REMOVE" | "REALIZE" | "RESTORE"): Post["status"] =>
+    a === "REMOVE" ? "REMOVED" : a === "REALIZE" ? "REALIZED" : "PUBLISHED";
 
-    try {
-      const res = await fetch("/api/admin/moderate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) throw new Error("moderate_failed");
-    } catch {
-      // ロールバック
-      setPosts(before);
-      alert("更新に失敗しました。もう一度お試しください。");
-    }
+  const payload = { action, postIds: selectedIds };
+
+  // ② 楽観更新（status を Post["status"] で確定）
+  const before = posts;
+  const after: Post[] = posts.map((p) =>
+    selectedIds.includes(p.id)
+      ? {
+          ...p,
+          status: mapStatus(action), // ← ここで literal union に固定
+          realizedAt: action === "REALIZE" ? new Date().toISOString() : p.realizedAt,
+        }
+      : p
+  );
+  setPosts(after);
+  setSel({});
+
+  try {
+    const res = await fetch("/api/admin/moderate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error("moderate_failed");
+  } catch {
+    setPosts(before); // ロールバック
+    alert("更新に失敗しました。もう一度お試しください。");
   }
+}
+  
 
   // 追加: 再読込（最新化）
   const refreshPosts = useCallback(async () => {
