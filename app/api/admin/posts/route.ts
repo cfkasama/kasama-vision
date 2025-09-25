@@ -46,7 +46,7 @@ export async function GET(req: Request) {
         realizedAt: true,
         identityId: true,
         municipalityId: true,
-        municipality:{select:{id:true,name:true},},
+        municipality:{select:{id:true,name:true,slug:true},},
       },
     });
 
