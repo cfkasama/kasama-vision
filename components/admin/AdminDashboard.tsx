@@ -272,6 +272,9 @@ async function act(action: "REMOVE" | "REALIZE" | "RESTORE") {
                   </td>
                   <td className="px-2 text-xs text-gray-500">
                     <div><TimeText iso={p.createdAt} /></div>
+                    {p.identityId && (
+                      <div>{p.identityId}</div>
+                    )}                
                     {p.realizedAt && (
                       <div>実現:<TimeText iso={p.realizedAt} /></div>
                     )}
