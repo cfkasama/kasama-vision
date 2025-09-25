@@ -209,7 +209,16 @@ export default function AdminDashboard({ me }: { me: any }) {
                     <a className="mt-1 inline-block text-xs text-blue-600 hover:underline" href={`/posts/${p.id}`} target="_blank" rel="noreferrer">
                       投稿を開く
                     </a>
-                    {/* 自治体名（あれば表示、リンクも可） */}
+                  </td>
+                  <td className="px-2 text-xs">{statusBadge(p.status)}</td>
+                  <td className="px-2 text-xs text-gray-700">👍{p.likeCount} / ⭐{p.recCount} / 💬{p.cmtCount}</td>
+                  <td className="px-2 text-xs text-gray-500">
+                    <div><TimeText iso={p.createdAt} /></div>
+                    {p.realizedAt && <div>実現:<TimeText iso={p.realizedAt} /></div>}
+                  </td>
+                  <td className="px-2 text-xs text-gray-500">
+                    {p.identityId && <div>User:{p.identityId}</div>}
+                     {/* 自治体名（あれば表示、リンクも可） */}
                     <div className="mt-1 text-[11px] text-gray-600">
                       {p.municipality?.name ? (
                         <>
@@ -231,16 +240,6 @@ export default function AdminDashboard({ me }: { me: any }) {
                         <>自治体: 不明</>
                       )}
                     </div>
-                  </td>
-                  <td className="px-2 text-xs">{statusBadge(p.status)}</td>
-                  <td className="px-2 text-xs text-gray-700">👍{p.likeCount} / ⭐{p.recCount} / 💬{p.cmtCount}</td>
-                  <td className="px-2 text-xs text-gray-500">
-                    <div><TimeText iso={p.createdAt} /></div>
-                    {p.realizedAt && <div>実現:<TimeText iso={p.realizedAt} /></div>}
-                  </td>
-                  <td className="px-2 text-xs text-gray-500">
-                    {p.identityId && <div>User:{p.identityId}</div>}
-                    {p.municipalityId && !p.municipality?.name && <div>MuniID:{p.municipalityId}</div>}
                   </td>
                 </tr>
               ))}
