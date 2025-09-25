@@ -1,63 +1,62 @@
-・管理画面確認identityID表示（ユーザ一覧（ロック・ロック解除）、ポスト一覧（削除・復帰）、コメント一覧（削除・復帰）、通報一覧（受付中・削除・却下）
-
-fd9d1056-d76e57cce6379a76.js:1 Uncaught Error: Minified React error #425; visit https://react.dev/errors/425 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
-    at sq (fd9d1056-d76e57cce6379a76.js:1:146765)
-    at co (fd9d1056-d76e57cce6379a76.js:1:158779)
-    at fd9d1056-d76e57cce6379a76.js:1:99416
-    at iu (fd9d1056-d76e57cce6379a76.js:1:103867)
-    at ia (fd9d1056-d76e57cce6379a76.js:1:95223)
-    at fd9d1056-d76e57cce6379a76.js:1:91088
-    at fd9d1056-d76e57cce6379a76.js:1:91095
-    at oZ (fd9d1056-d76e57cce6379a76.js:1:91200)
-    at MessagePort.T (23-85c0bd7c0ba9f55a.js:1:83906)
-sq @ fd9d1056-d76e57cce6379a76.js:1
-co @ fd9d1056-d76e57cce6379a76.js:1
-(anonymous) @ fd9d1056-d76e57cce6379a76.js:1
-iu @ fd9d1056-d76e57cce6379a76.js:1
-ia @ fd9d1056-d76e57cce6379a76.js:1
-(anonymous) @ fd9d1056-d76e57cce6379a76.js:1
-(anonymous) @ fd9d1056-d76e57cce6379a76.js:1
-oZ @ fd9d1056-d76e57cce6379a76.js:1
-T @ 23-85c0bd7c0ba9f55a.js:1Understand this error
-623-85c0bd7c0ba9f55a.js:1 Uncaught Error: Minified React error #425; visit https://react.dev/errors/425 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
-    at sq (fd9d1056-d76e57cce6379a76.js:1:146765)
-    at co (fd9d1056-d76e57cce6379a76.js:1:158779)
-    at fd9d1056-d76e57cce6379a76.js:1:99416
-    at iu (fd9d1056-d76e57cce6379a76.js:1:103867)
-    at ia (fd9d1056-d76e57cce6379a76.js:1:95223)
-    at fd9d1056-d76e57cce6379a76.js:1:91088
-    at fd9d1056-d76e57cce6379a76.js:1:91095
-    at oZ (fd9d1056-d76e57cce6379a76.js:1:91200)
-    at MessagePort.T (23-85c0bd7c0ba9f55a.js:1:83906)
-sq @ fd9d1056-d76e57cce6379a76.js:1
-co @ fd9d1056-d76e57cce6379a76.js:1
-(anonymous) @ fd9d1056-d76e57cce6379a76.js:1
-iu @ fd9d1056-d76e57cce6379a76.js:1
-ia @ fd9d1056-d76e57cce6379a76.js:1
-(anonymous) @ fd9d1056-d76e57cce6379a76.js:1
-(anonymous) @ fd9d1056-d76e57cce6379a76.js:1
-oZ @ fd9d1056-d76e57cce6379a76.js:1
-T @ 23-85c0bd7c0ba9f55a.js:1Understand this error
-fd9d1056-d76e57cce6379a76.js:1 Uncaught Error: Minified React error #418; visit https://react.dev/errors/418 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
-    at t5 (fd9d1056-d76e57cce6379a76.js:1:24670)
-    at iZ (fd9d1056-d76e57cce6379a76.js:1:120535)
-    at ia (fd9d1056-d76e57cce6379a76.js:1:95162)
-    at fd9d1056-d76e57cce6379a76.js:1:91088
-    at fd9d1056-d76e57cce6379a76.js:1:91095
-    at oZ (fd9d1056-d76e57cce6379a76.js:1:91200)
-    at MessagePort.T (23-85c0bd7c0ba9f55a.js:1:83906)
-t5 @ fd9d1056-d76e57cce6379a76.js:1
-iZ @ fd9d1056-d76e57cce6379a76.js:1
-ia @ fd9d1056-d76e57cce6379a76.js:1
-(anonymous) @ fd9d1056-d76e57cce6379a76.js:1
-(anonymous) @ fd9d1056-d76e57cce6379a76.js:1
-oZ @ fd9d1056-d76e57cce6379a76.js:1
-T @ 23-85c0bd7c0ba9f55a.js:1Understand this error
-fd9d1056-d76e57cce6379a76.js:1 Uncaught Error: Minified React error #423; visit https://react.dev/errors/423 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
-    at iZ (fd9d1056-d76e57cce6379a76.js:1:118349)
-    at ia (fd9d1056-d76e57cce6379a76.js:1:95162)
-    at fd9d1056-d76e57cce6379a76.js:1:94984
-    at il (fd9d1056-d76e57cce6379a76.js:1:94991)
-    at oJ (fd9d1056-d76e57cce6379a76.js:1:92347)
-    at oZ (fd9d1056-d76e57cce6379a76.js:1:91766)
-    at MessagePort.T (23-85c0bd7c0ba9f55a.js:1:83906)
+14:52:22.395 Running build in Washington, D.C., USA (East) – iad1
+14:52:22.395 Build machine configuration: 2 cores, 8 GB
+14:52:22.410 Cloning github.com/cfkasama/kasama-vision (Branch: main, Commit: d8e4db2)
+14:52:22.681 Cloning completed: 271.000ms
+14:52:23.420 Restored build cache from previous deployment (6AS1rBNHFjb2mwRJFUwEkv8cXYzk)
+14:52:24.037 Running "vercel build"
+14:52:24.418 Vercel CLI 48.1.6
+14:52:24.828 Installing dependencies...
+14:52:25.895 
+14:52:25.896 > kasama-future@0.1.0 postinstall
+14:52:25.896 > prisma generate
+14:52:25.896 
+14:52:26.329 Prisma schema loaded from prisma/schema.prisma
+14:52:26.872 
+14:52:26.872 ✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 242ms
+14:52:26.872 
+14:52:26.872 Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+14:52:26.872 
+14:52:26.872 Tip: Want real-time updates to your database without manual polling? Discover how with Pulse: https://pris.ly/tip-0-pulse
+14:52:26.872 
+14:52:27.069 
+14:52:27.069 up to date in 2s
+14:52:27.069 
+14:52:27.070 44 packages are looking for funding
+14:52:27.070   run `npm fund` for details
+14:52:27.099 Detected Next.js version: 14.2.5
+14:52:27.105 Running "npm run build"
+14:52:27.205 
+14:52:27.208 > kasama-future@0.1.0 build
+14:52:27.209 > next build
+14:52:27.209 
+14:52:27.830   ▲ Next.js 14.2.5
+14:52:27.831 
+14:52:27.894    Creating an optimized production build ...
+14:52:28.035  ⚠ Found lockfile missing swc dependencies, run next locally to automatically patch
+14:52:32.328  ✓ Compiled successfully
+14:52:32.330    Linting and checking validity of types ...
+14:52:32.666 
+14:52:32.667    We detected TypeScript in your project and reconfigured your tsconfig.json file for you. Strict-mode is set to false by default.
+14:52:32.667    The following suggested values were added to your tsconfig.json. These values can be changed to fit your project's needs:
+14:52:32.667 
+14:52:32.668    	- include was updated to add '.next/types/**/*.ts'
+14:52:32.668    	- plugins was updated to add { name: 'next' }
+14:52:32.668 
+14:52:32.669    The following mandatory changes were made to your tsconfig.json:
+14:52:32.669 
+14:52:32.669    	- isolatedModules was set to true (requirement for SWC / Babel)
+14:52:32.669 
+14:52:39.193 Failed to compile.
+14:52:39.195 
+14:52:39.196 ./app/(global)/admin/page.tsx:16:60
+14:52:39.196 Type error: Type '{ me: { login: any; }; initialPosts: any; }' is not assignable to type 'IntrinsicAttributes & { me: any; }'.
+14:52:39.196   Property 'initialPosts' does not exist on type 'IntrinsicAttributes & { me: any; }'.
+14:52:39.197 
+14:52:39.197 [0m [90m 14 |[39m   })[33m;[39m[0m
+14:52:39.198 [0m [90m 15 |[39m   [36mreturn[39m [33m<[39m[33mdiv[39m className[33m=[39m[32m"py-6"[39m[33m>[39m[0m
+14:52:39.198 [0m[31m[1m>[22m[39m[90m 16 |[39m     [33m<[39m[33mAdminDashboard[39m me[33m=[39m{{ login[33m:[39m (session [36mas[39m any)[33m.[39mlogin }} initialPosts[33m=[39m{[33mJSON[39m[33m.[39mparse([33mJSON[39m[33m.[39mstringify(posts))}[33m/[39m[33m>[39m[0m
+14:52:39.198 [0m [90m    |[39m                                                            [31m[1m^[22m[39m[0m
+14:52:39.198 [0m [90m 17 |[39m   [33m<[39m[33m/[39m[33mdiv[39m[33m>[39m[33m;[39m[0m
+14:52:39.199 [0m [90m 18 |[39m }[0m
+14:52:39.199 [0m [90m 19 |[39m[0m
+14:52:39.263 Error: Command "npm run build" exited with 1
