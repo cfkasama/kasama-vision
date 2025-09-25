@@ -1,1 +1,63 @@
 ・管理画面確認identityID表示（ユーザ一覧（ロック・ロック解除）、ポスト一覧（削除・復帰）、コメント一覧（削除・復帰）、通報一覧（受付中・削除・却下）
+
+fd9d1056-d76e57cce6379a76.js:1 Uncaught Error: Minified React error #425; visit https://react.dev/errors/425 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
+    at sq (fd9d1056-d76e57cce6379a76.js:1:146765)
+    at co (fd9d1056-d76e57cce6379a76.js:1:158779)
+    at fd9d1056-d76e57cce6379a76.js:1:99416
+    at iu (fd9d1056-d76e57cce6379a76.js:1:103867)
+    at ia (fd9d1056-d76e57cce6379a76.js:1:95223)
+    at fd9d1056-d76e57cce6379a76.js:1:91088
+    at fd9d1056-d76e57cce6379a76.js:1:91095
+    at oZ (fd9d1056-d76e57cce6379a76.js:1:91200)
+    at MessagePort.T (23-85c0bd7c0ba9f55a.js:1:83906)
+sq @ fd9d1056-d76e57cce6379a76.js:1
+co @ fd9d1056-d76e57cce6379a76.js:1
+(anonymous) @ fd9d1056-d76e57cce6379a76.js:1
+iu @ fd9d1056-d76e57cce6379a76.js:1
+ia @ fd9d1056-d76e57cce6379a76.js:1
+(anonymous) @ fd9d1056-d76e57cce6379a76.js:1
+(anonymous) @ fd9d1056-d76e57cce6379a76.js:1
+oZ @ fd9d1056-d76e57cce6379a76.js:1
+T @ 23-85c0bd7c0ba9f55a.js:1Understand this error
+623-85c0bd7c0ba9f55a.js:1 Uncaught Error: Minified React error #425; visit https://react.dev/errors/425 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
+    at sq (fd9d1056-d76e57cce6379a76.js:1:146765)
+    at co (fd9d1056-d76e57cce6379a76.js:1:158779)
+    at fd9d1056-d76e57cce6379a76.js:1:99416
+    at iu (fd9d1056-d76e57cce6379a76.js:1:103867)
+    at ia (fd9d1056-d76e57cce6379a76.js:1:95223)
+    at fd9d1056-d76e57cce6379a76.js:1:91088
+    at fd9d1056-d76e57cce6379a76.js:1:91095
+    at oZ (fd9d1056-d76e57cce6379a76.js:1:91200)
+    at MessagePort.T (23-85c0bd7c0ba9f55a.js:1:83906)
+sq @ fd9d1056-d76e57cce6379a76.js:1
+co @ fd9d1056-d76e57cce6379a76.js:1
+(anonymous) @ fd9d1056-d76e57cce6379a76.js:1
+iu @ fd9d1056-d76e57cce6379a76.js:1
+ia @ fd9d1056-d76e57cce6379a76.js:1
+(anonymous) @ fd9d1056-d76e57cce6379a76.js:1
+(anonymous) @ fd9d1056-d76e57cce6379a76.js:1
+oZ @ fd9d1056-d76e57cce6379a76.js:1
+T @ 23-85c0bd7c0ba9f55a.js:1Understand this error
+fd9d1056-d76e57cce6379a76.js:1 Uncaught Error: Minified React error #418; visit https://react.dev/errors/418 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
+    at t5 (fd9d1056-d76e57cce6379a76.js:1:24670)
+    at iZ (fd9d1056-d76e57cce6379a76.js:1:120535)
+    at ia (fd9d1056-d76e57cce6379a76.js:1:95162)
+    at fd9d1056-d76e57cce6379a76.js:1:91088
+    at fd9d1056-d76e57cce6379a76.js:1:91095
+    at oZ (fd9d1056-d76e57cce6379a76.js:1:91200)
+    at MessagePort.T (23-85c0bd7c0ba9f55a.js:1:83906)
+t5 @ fd9d1056-d76e57cce6379a76.js:1
+iZ @ fd9d1056-d76e57cce6379a76.js:1
+ia @ fd9d1056-d76e57cce6379a76.js:1
+(anonymous) @ fd9d1056-d76e57cce6379a76.js:1
+(anonymous) @ fd9d1056-d76e57cce6379a76.js:1
+oZ @ fd9d1056-d76e57cce6379a76.js:1
+T @ 23-85c0bd7c0ba9f55a.js:1Understand this error
+fd9d1056-d76e57cce6379a76.js:1 Uncaught Error: Minified React error #423; visit https://react.dev/errors/423 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
+    at iZ (fd9d1056-d76e57cce6379a76.js:1:118349)
+    at ia (fd9d1056-d76e57cce6379a76.js:1:95162)
+    at fd9d1056-d76e57cce6379a76.js:1:94984
+    at il (fd9d1056-d76e57cce6379a76.js:1:94991)
+    at oJ (fd9d1056-d76e57cce6379a76.js:1:92347)
+    at oZ (fd9d1056-d76e57cce6379a76.js:1:91766)
+    at MessagePort.T (23-85c0bd7c0ba9f55a.js:1:83906)
