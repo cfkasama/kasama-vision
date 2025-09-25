@@ -10,18 +10,11 @@ import { signOut } from "next-auth/react";
 import { TimeText } from "./TimeText";
 
 type Post = {
-  id: string;
-  title: string;
-  content: string;
-  type: string; // "VISION" など
+  id: string; title: string; content: string; type: string;
   status: "PUBLISHED" | "REMOVED" | "REALIZED";
-  likeCount: number;
-  recCount: number;
-  cmtCount: number;
-  createdAt: string;
-  realizedAt?: string | null;
-  identityId: string | null;
-  municipalityId: string | null;
+  likeCount: number; recCount: number; cmtCount: number;
+  createdAt: string; realizedAt?: string | null;
+  identityId: string | null; municipalityId: string | null;
   municipality?: { id: string; name: string; slug?: string } | null;
 };
 
@@ -31,44 +24,48 @@ export default function AdminDashboard({ me }: { me: any }) {
   const [err, setErr] = useState<string>("");
 
   const [sel, setSel] = useState<Record<string, boolean>>({});
-  const selectedIds = useMemo(
-    () => Object.entries(sel).filter(([, v]) => v).map(([k]) => k),
-    [sel]
-  );
+  const selectedIds = useMemo(() => Object.entries(sel).filter(([, v]) => v).map(([k]) => k), [sel]);
 
   const [tab, setTab] = useState<"posts" | "reports" | "comments" | "users" | "audit">("posts");
 
-  // APIから投稿取得（status=ALL/PUBLISHED/REMOVED/REALIZED）
-  const fetchPosts = useCallback(
-    async (status: "ALL" | "PUBLISHED" | "REMOVED" | "REALIZED" = "ALL") => {
-      setLoading(true);
-      setErr("");
-      try {
-        const q = new URLSearchParams({ limit: "200" });
-        if (status !== "ALL") q.set("status", status);
-        const r = await fetch(`/api/admin/posts?${q.toString()}`, { cache: "no-store" });
-        if (!r.ok) {
-          if (r.status === 401) throw new Error("未ログインまたは権限がありません。");
-          throw new Error("取得に失敗しました。");
-        }
-        const j = await r.json();
-        setPosts(j.posts || []);
-        setSel({});
-      } catch (e: any) {
-        setErr(e?.message || "取得に失敗しました。");
-      } finally {
-        setLoading(false);
+  // ★ ページネーション用
+  const [page, setPage] = useState(1);
+  const [limit] = useState(50); // 1ページ件数（必要ならUIで変更可能に）
+  const [total, setTotal] = useState(0);
+  const [statusFilter, setStatusFilter] =
+    useState<"ALL" | "PUBLISHED" | "REMOVED" | "REALIZED">("ALL");
+
+  const pageMax = Math.max(1, Math.ceil(total / limit));
+  const canPrev = page > 1;
+  const canNext = page < pageMax;
+
+  const fetchPosts = useCallback(async (opts?: { page?: number; status?: typeof statusFilter }) => {
+    setLoading(true);
+    setErr("");
+    try {
+      const p = opts?.page ?? page;
+      const s = opts?.status ?? statusFilter;
+      const q = new URLSearchParams({ limit: String(limit), page: String(p) });
+      if (s !== "ALL") q.set("status", s);
+      const r = await fetch(`/api/admin/posts?${q.toString()}`, { cache: "no-store" });
+      if (!r.ok) {
+        if (r.status === 401) throw new Error("未ログインまたは権限がありません。");
+        throw new Error("取得に失敗しました。");
       }
-    },
-    []
-  );
+      const j = await r.json();
+      setPosts(j.posts || []);
+      setTotal(j.total || 0);
+      setSel({});
+      setPage(j.page || 1);
+    } catch (e: any) {
+      setErr(e?.message || "取得に失敗しました。");
+    } finally {
+      setLoading(false);
+    }
+  }, [limit, page, statusFilter]);
 
-  // 初回ロード
-  useEffect(() => {
-    fetchPosts();
-  }, [fetchPosts]);
+  useEffect(() => { fetchPosts({ page: 1 }); }, []); // 初回ロードは1ページ目
 
-  // 一括選択/解除
   const selectAll = useCallback(() => {
     setSel((s) => {
       const next = { ...s };
@@ -78,22 +75,15 @@ export default function AdminDashboard({ me }: { me: any }) {
   }, [posts]);
   const clearSelect = useCallback(() => setSel({}), []);
 
-  // 一括操作（削除/実現/復元）
   async function act(action: "REMOVE" | "REALIZE" | "RESTORE") {
     if (selectedIds.length === 0) return;
-
     const mapStatus = (a: "REMOVE" | "REALIZE" | "RESTORE"): Post["status"] =>
       a === "REMOVE" ? "REMOVED" : a === "REALIZE" ? "REALIZED" : "PUBLISHED";
 
-    // 楽観更新
     const before = posts;
     const after: Post[] = posts.map((p) =>
       selectedIds.includes(p.id)
-        ? {
-            ...p,
-            status: mapStatus(action),
-            realizedAt: action === "REALIZE" ? new Date().toISOString() : p.realizedAt,
-          }
+        ? { ...p, status: mapStatus(action), realizedAt: action === "REALIZE" ? new Date().toISOString() : p.realizedAt }
         : p
     );
     setPosts(after);
@@ -107,19 +97,15 @@ export default function AdminDashboard({ me }: { me: any }) {
       });
       if (!res.ok) throw new Error("moderate_failed");
     } catch {
-      setPosts(before); // ロールバック
+      setPosts(before);
       alert("更新に失敗しました。もう一度お試しください。");
     }
   }
 
   const statusBadge = (s: Post["status"]) =>
-    s === "PUBLISHED" ? (
-      <span className="rounded bg-blue-100 px-2 py-0.5">公開</span>
-    ) : s === "REMOVED" ? (
-      <span className="rounded bg-red-100 px-2 py-0.5">削除</span>
-    ) : (
-      <span className="rounded bg-green-100 px-2 py-0.5">実現</span>
-    );
+    s === "PUBLISHED" ? <span className="rounded bg-blue-100 px-2 py-0.5">公開</span>
+    : s === "REMOVED" ? <span className="rounded bg-red-100 px-2 py-0.5">削除</span>
+    : <span className="rounded bg-green-100 px-2 py-0.5">実現</span>;
 
   return (
     <div className="space-y-4">
@@ -128,19 +114,19 @@ export default function AdminDashboard({ me }: { me: any }) {
         <h1 className="text-xl font-bold">管理ダッシュボード</h1>
         <div className="text-sm text-gray-600">
           管理者
-          <button onClick={() => signOut()} className="ml-3 rounded border px-2 py-1 hover:bg-gray-50">
-            ログアウト
-          </button>
+          <button onClick={() => signOut()} className="ml-3 rounded border px-2 py-1 hover:bg-gray-50">ログアウト</button>
         </div>
       </div>
 
       {/* タブ */}
       <div className="flex flex-wrap gap-2">
-        <button onClick={() => setTab("posts")}   className={`rounded border px-3 py-1.5 ${tab === "posts" ? "bg-white" : ""}`}>投稿レビュー</button>
-        <button onClick={() => setTab("reports")} className={`rounded border px-3 py-1.5 ${tab === "reports" ? "bg-white" : ""}`}>通報</button>
-        <button onClick={() => setTab("comments")}className={`rounded border px-3 py-1.5 ${tab === "comments" ? "bg-white" : ""}`}>コメント</button>
-        <button onClick={() => setTab("users")}   className={`rounded border px-3 py-1.5 ${tab === "users" ? "bg-white" : ""}`}>ユーザー</button>
-        <button onClick={() => setTab("audit")}   className={`rounded border px-3 py-1.5 ${tab === "audit" ? "bg-white" : ""}`}>監査ログ</button>
+        {["posts","reports","comments","users","audit"].map(t => (
+          <button key={t}
+            onClick={() => setTab(t as any)}
+            className={`rounded border px-3 py-1.5 ${tab === t ? "bg-white" : ""}`}>
+            {t==="posts"?"投稿レビュー":t==="reports"?"通報":t==="comments"?"コメント":t==="users"?"ユーザー":"監査ログ"}
+          </button>
+        ))}
       </div>
 
       {/* POST 一覧 */}
@@ -156,8 +142,11 @@ export default function AdminDashboard({ me }: { me: any }) {
               {/* ステータス絞り込み */}
               <select
                 className="rounded border px-2 py-1 text-sm"
-                onChange={(e) => fetchPosts(e.target.value as any)}
-                defaultValue="ALL"
+                onChange={(e) => {
+                  setStatusFilter(e.target.value as any);
+                  fetchPosts({ page: 1, status: e.target.value as any }); // 絞り込み時は1ページ目へ
+                }}
+                value={statusFilter}
                 aria-label="ステータス絞り込み"
               >
                 <option value="ALL">すべて</option>
@@ -168,7 +157,7 @@ export default function AdminDashboard({ me }: { me: any }) {
 
               <button onClick={selectAll}  className="rounded border px-2 py-1 text-sm hover:bg-gray-50" title="この一覧の全行を選択">全選択</button>
               <button onClick={clearSelect}className="rounded border px-2 py-1 text-sm hover:bg-gray-50">解除</button>
-              <button onClick={() => fetchPosts()} className="rounded border px-2 py-1 text-sm hover:bg-gray-50" title="最新の状態に更新">更新</button>
+              <button onClick={() => fetchPosts({ page })} className="rounded border px-2 py-1 text-sm hover:bg-gray-50" title="最新の状態に更新">更新</button>
               <span className="text-sm text-gray-500">選択: {selectedIds.length}件</span>
             </div>
           </div>
@@ -193,22 +182,23 @@ export default function AdminDashboard({ me }: { me: any }) {
               {posts.map((p) => (
                 <tr key={p.id} className="rounded-lg bg-gray-50 align-top">
                   <td className="px-2">
-                    <input
-                      type="checkbox"
-                      checked={!!sel[p.id]}
+                    <input type="checkbox" checked={!!sel[p.id]}
                       onChange={(e) => setSel((s) => ({ ...s, [p.id]: e.target.checked }))}
-                      aria-label="選択"
-                    />
+                      aria-label="選択" />
                   </td>
-                  <td className="px-2 text-xs">
-                    <span className="rounded bg-gray-200 px-2 py-0.5">{p.type}</span>
-                  </td>
+                  <td className="px-2 text-xs"><span className="rounded bg-gray-200 px-2 py-0.5">{p.type}</span></td>
                   <td className="px-2">
                     <div className="font-medium">{p.title}</div>
                     <div className="line-clamp-2 text-xs text-gray-600">{p.content}</div>
-                    <a className="mt-1 inline-block text-xs text-blue-600 hover:underline" href={`/posts/${p.id}`} target="_blank" rel="noreferrer">
-                      投稿を開く
-                    </a>
+                    <a className="mt-1 inline-block text-xs text-blue-600 hover:underline"
+                       href={`/posts/${p.id}`} target="_blank" rel="noreferrer">投稿を開く</a>
+                    <div className="mt-1 text-[11px] text-gray-600">
+                      {p.municipality?.name ? <>自治体: {p.municipality.name}
+                        {p.municipality.slug && (
+                          <a className="ml-1 underline hover:no-underline" href={`/m/${p.municipality.slug}`} target="_blank" rel="noreferrer">（ページ）</a>
+                        )}</>
+                        : p.municipalityId ? <>自治体ID: {p.municipalityId}</> : <>自治体: 不明</>}
+                    </div>
                   </td>
                   <td className="px-2 text-xs">{statusBadge(p.status)}</td>
                   <td className="px-2 text-xs text-gray-700">👍{p.likeCount} / ⭐{p.recCount} / 💬{p.cmtCount}</td>
@@ -218,28 +208,36 @@ export default function AdminDashboard({ me }: { me: any }) {
                   </td>
                   <td className="px-2 text-xs text-gray-500">
                     {p.identityId && <div>User:{p.identityId}</div>}
-                     {/* 自治体名（あれば表示、リンクも可） */}
-                    <div className="mt-1 text-[11px] text-gray-600">
-                      {p.municipality?.name ? (
-                        <>
-                          自治体: {p.municipality.name}
-                        </>
-                      ) : p.municipalityId ? (
-                        <>自治体ID: {p.municipalityId}</>
-                      ) : (
-                        <>自治体: 不明</>
-                      )}
-                    </div>
+                    {p.municipalityId && !p.municipality?.name && <div>MuniID:{p.municipalityId}</div>}
                   </td>
                 </tr>
               ))}
               {posts.length === 0 && !loading && (
-                <tr>
-                  <td colSpan={7} className="py-6 text-center text-sm text-gray-500">対象の投稿がありません。</td>
-                </tr>
+                <tr><td colSpan={7} className="py-6 text-center text-sm text-gray-500">対象の投稿がありません。</td></tr>
               )}
             </tbody>
           </table>
+
+          {/* ★ ページネーションUI */}
+          <div className="mt-3 flex items-center justify-center gap-2 text-sm">
+            <button
+              className="rounded border px-2 py-1 disabled:opacity-50"
+              disabled={!canPrev}
+              onClick={() => fetchPosts({ page: page - 1 })}
+            >
+              ← 前へ
+            </button>
+            <span>
+              {page} / {pageMax}（全 {total} 件）
+            </span>
+            <button
+              className="rounded border px-2 py-1 disabled:opacity-50"
+              disabled={!canNext}
+              onClick={() => fetchPosts({ page: page + 1 })}
+            >
+              次へ →
+            </button>
+          </div>
         </div>
       ) : tab === "reports" ? (
         <ReportsPanel />
