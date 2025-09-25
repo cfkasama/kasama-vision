@@ -7,6 +7,7 @@ import CommentsPanel from "./CommentsPanel";
 import UsersPanel from "./UsersPanel";
 import AuditPanel from "./AuditPanel";
 import { signOut } from "next-auth/react";
+import { TimeText } from "./TimeText";
 
 type Post = {
   id: string;
@@ -270,9 +271,9 @@ async function act(action: "REMOVE" | "REALIZE" | "RESTORE") {
                     👍{p.likeCount} / ⭐{p.recCount} / 💬{p.cmtCount}
                   </td>
                   <td className="px-2 text-xs text-gray-500">
-                    <div>{new Date(p.createdAt).toLocaleString()}</div>
+                    <div><TimeText iso={p.createdAt} /></div>
                     {p.realizedAt && (
-                      <div>実現:{new Date(p.realizedAt).toLocaleDateString()}</div>
+                      <div>実現:<TimeText iso={p.realizedAt} /></div>
                     )}
                   </td>
                 </tr>
