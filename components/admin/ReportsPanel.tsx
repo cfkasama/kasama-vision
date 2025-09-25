@@ -1,6 +1,7 @@
 // components/admin/ReportsPanel.tsx（抜粋差し替え）
 "use client";
 import { useEffect, useMemo, useState } from "react";
+import { TimeText } from "./TimeText";
 
 type Report = {
   id: string;
@@ -118,8 +119,8 @@ export default function ReportsPanel() {
 
                   <td className="px-2 text-xs text-gray-500">
                     <div className="mb-1 text-gray-700">👍{r.post.likeCount} / ⭐{r.post.recCount} / 💬{r.post.cmtCount}</div>
-                    <div>通報: {new Date(r.createdAt).toLocaleString()}</div>
-                    <div>投稿: {new Date(r.post.createdAt).toLocaleDateString()}</div>
+                    <div>通報: <TimeText iso={r.createdAt} /></div>
+                    <div>投稿: <TimeText iso={r.post.createdAt} /></div>
                     {/* ▼ 追加: ユーザID（通報者・投稿者） */}
                     <div className="mt-1">
                       <span className="rounded bg-gray-100 px-1.5 py-0.5 mr-1">通報者</span>
