@@ -284,7 +284,7 @@ async function act(action: "REMOVE" | "REALIZE" | "RESTORE") {
                       <div>User:{p.identityId}</div>
                     )}                
                     {p.municipalityId && (
-                      <div>Muni:{p.municipalityId</div>
+                      <div>Muni:{p.municipalityId}</div>
                     )}
                   </td>
                 </tr>
@@ -292,7 +292,7 @@ async function act(action: "REMOVE" | "REALIZE" | "RESTORE") {
               {posts.length === 0 && (
                 <tr>
                   <td
-                    colSpan={6}
+                    colSpan={7}
                     className="py-6 text-center text-sm text-gray-500"
                   >
                     対象の投稿がありません。
