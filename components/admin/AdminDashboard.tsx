@@ -229,12 +229,12 @@ async function act(action: "REMOVE" | "REALIZE" | "RESTORE") {
             <thead>
               <tr className="text-left text-xs text-gray-500">
                 <th className="w-10 px-2">選</th>
-                <th className="w-24 px-2">種別</th>
+                <th className="w-30 px-2">種別</th>
                 <th className="px-2">タイトル</th>
                 <th className="w-24 px-2">状態</th>
                 <th className="w-36 px-2">指標</th>
                 <th className="w-36 px-2">日時</th>
-                <th className="w-36 px-2">ID</th>
+                <th className="w-50 px-2">ID</th>
               </tr>
             </thead>
             <tbody>
