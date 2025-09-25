@@ -10,7 +10,7 @@ export const runtime = "nodejs";
 const ORDER_KEYS = ["liveCount", "workCount", "tourismCount", "code", "post"] as const;
 type Order = typeof ORDER_KEYS[number];
 
-const PAGE_SIZE = 50;
+const PAGE_SIZE = 200;
 
 // metric/range → order マッピング
 function resolveOrder(searchParams: Record<string, any>): Order {
@@ -212,7 +212,7 @@ export default async function MuniListPage({
         ) : (
           <>
                         {pager}
-            <ol className="list-decimal pl-5 text-sm">
+            <ol className="list pl-5 text-sm">
               {rows.map((r) => (
                 <li key={r.id} className="mb-1">
                   <Link href={`/m/${r.slug}`} className="hover:underline">
