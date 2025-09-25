@@ -284,7 +284,7 @@ async function act(action: "REMOVE" | "REALIZE" | "RESTORE") {
                     {p.identityId && (
                       <div>User:{p.identityId}</div>
                     )}                
-                    {p.municipalityId && (
+                    {p.municipality?.name && (
                       <div>Muni:{p.municipality.name}</div>
                     )}
                   </td>
