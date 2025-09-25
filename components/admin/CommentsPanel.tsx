@@ -100,8 +100,8 @@ export default function CommentsPanel() {
 
                   <td className="px-2 text-xs text-gray-600">
                     <div><span className="rounded bg-gray-100 px-1.5 py-0.5 mr-1">ユーザ</span><code>{r.identityId ?? "-"}</code></div>
-                    <div className="mt-1">作成: {new Date(r.createdAt).toLocaleString()}</div>
-                    {r.deletedAt && <div className="mt-1">削除: {new Date(r.deletedAt).toLocaleString()}</div>}
+                    <div className="mt-1">作成: <TimeText iso={r.createdAt} /></div>
+                    {r.deletedAt && <div className="mt-1">削除: <TimeText iso={r.deletedAt} /></div>}
                     <div className="mt-1">ID: <code className="text-[11px]">{r.id}</code></div>
                   </td>
 
