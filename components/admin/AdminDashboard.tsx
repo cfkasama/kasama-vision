@@ -223,16 +223,6 @@ export default function AdminDashboard({ me }: { me: any }) {
                       {p.municipality?.name ? (
                         <>
                           自治体: {p.municipality.name}
-                          {p.municipality?.slug && (
-                            <a
-                              className="ml-1 underline hover:no-underline"
-                              href={`/m/${p.municipality.slug}`}
-                              target="_blank"
-                              rel="noreferrer"
-                            >
-                              （ページ）
-                            </a>
-                          )}
                         </>
                       ) : p.municipalityId ? (
                         <>自治体ID: {p.municipalityId}</>
