@@ -7,6 +7,7 @@ import UsersPanel from "./UsersPanel";
 import AuditPanel from "./AuditPanel";
 import { signOut } from "next-auth/react";
 import { TimeText } from "./TimeText";
+import { useEffect } from "react";
 
 type Post = {
   id: string;
@@ -23,6 +24,20 @@ type Post = {
   municipalityId: string | null;
   municipality?: { id: string; name: string; slug?: string } | null;
 };
+
+useEffect(() => {
+  (async () => {
+    try {
+      const r = await fetch("/api/admin/posts?limit=200", { cache: "no-store" });
+      if (!r.ok) throw new Error();
+      const j = await r.json();
+      setPosts(j.posts || []);
+      setSel({});
+    } catch {
+      alert("投稿の読み込みに失敗しました。ログイン状態やAPIを確認してください。");
+    }
+  })();
+}, []);
 
 export default function AdminDashboard({ me }: { me: any }) {
   const [posts, setPosts] = useState<Post[]>([]);
