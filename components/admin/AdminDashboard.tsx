@@ -232,6 +232,7 @@ async function act(action: "REMOVE" | "REALIZE" | "RESTORE") {
                 <th className="w-24 px-2">状態</th>
                 <th className="w-36 px-2">指標</th>
                 <th className="w-36 px-2">日時</th>
+                <th className="w-36 px-2">ID</th>
               </tr>
             </thead>
             <tbody>
@@ -271,12 +272,17 @@ async function act(action: "REMOVE" | "REALIZE" | "RESTORE") {
                     👍{p.likeCount} / ⭐{p.recCount} / 💬{p.cmtCount}
                   </td>
                   <td className="px-2 text-xs text-gray-500">
-                    <div><TimeText iso={p.createdAt} /></div>
-                    {p.identityId && (
-                      <div>{p.identityId}</div>
-                    )}                
+                    <div><TimeText iso={p.createdAt} /></div>             
                     {p.realizedAt && (
                       <div>実現:<TimeText iso={p.realizedAt} /></div>
+                    )}
+                  </td>
+                      <td className="px-2 text-xs text-gray-500">
+                    {p.identityId && (
+                      <div>User:{p.identityId}</div>
+                    )}                
+                    {p.municipalityId && (
+                      <div>Muni:{p.municipalityId</div>
                     )}
                   </td>
                 </tr>
