@@ -1,3 +1,4 @@
+// components/admin/AdminDashboard.tsx
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -7,7 +8,6 @@ import UsersPanel from "./UsersPanel";
 import AuditPanel from "./AuditPanel";
 import { signOut } from "next-auth/react";
 import { TimeText } from "./TimeText";
-import { useEffect } from "react";
 
 type Post = {
   id: string;
@@ -25,20 +25,6 @@ type Post = {
   municipality?: { id: string; name: string; slug?: string } | null;
 };
 
-useEffect(() => {
-  (async () => {
-    try {
-      const r = await fetch("/api/admin/posts?limit=200", { cache: "no-store" });
-      if (!r.ok) throw new Error();
-      const j = await r.json();
-      setPosts(j.posts || []);
-      setSel({});
-    } catch {
-      alert("投稿の読み込みに失敗しました。ログイン状態やAPIを確認してください。");
-    }
-  })();
-}, []);
-
 export default function AdminDashboard({ me }: { me: any }) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
@@ -52,27 +38,37 @@ export default function AdminDashboard({ me }: { me: any }) {
 
   const [tab, setTab] = useState<"posts" | "reports" | "comments" | "users" | "audit">("posts");
 
-  const fetchPosts = useCallback(async (status: "ALL" | "PUBLISHED" | "REMOVED" | "REALIZED" = "ALL") => {
-    setLoading(true);
-    setErr("");
-    try {
-      const r = await fetch(`/api/admin/posts?limit=200&status=${status}`, { cache: "no-store" });
-      if (!r.ok) {
-        if (r.status === 401) throw new Error("未ログインまたは権限がありません。");
-        throw new Error("取得に失敗しました。");
+  // APIから投稿取得（status=ALL/PUBLISHED/REMOVED/REALIZED）
+  const fetchPosts = useCallback(
+    async (status: "ALL" | "PUBLISHED" | "REMOVED" | "REALIZED" = "ALL") => {
+      setLoading(true);
+      setErr("");
+      try {
+        const q = new URLSearchParams({ limit: "200" });
+        if (status !== "ALL") q.set("status", status);
+        const r = await fetch(`/api/admin/posts?${q.toString()}`, { cache: "no-store" });
+        if (!r.ok) {
+          if (r.status === 401) throw new Error("未ログインまたは権限がありません。");
+          throw new Error("取得に失敗しました。");
+        }
+        const j = await r.json();
+        setPosts(j.posts || []);
+        setSel({});
+      } catch (e: any) {
+        setErr(e?.message || "取得に失敗しました。");
+      } finally {
+        setLoading(false);
       }
-      const j = await r.json();
-      setPosts(j.posts || []);
-      setSel({});
-    } catch (e: any) {
-      setErr(e?.message || "取得に失敗しました。");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    },
+    []
+  );
 
-  useEffect(() => { fetchPosts(); }, [fetchPosts]);
+  // 初回ロード
+  useEffect(() => {
+    fetchPosts();
+  }, [fetchPosts]);
 
+  // 一括選択/解除
   const selectAll = useCallback(() => {
     setSel((s) => {
       const next = { ...s };
@@ -82,12 +78,14 @@ export default function AdminDashboard({ me }: { me: any }) {
   }, [posts]);
   const clearSelect = useCallback(() => setSel({}), []);
 
+  // 一括操作（削除/実現/復元）
   async function act(action: "REMOVE" | "REALIZE" | "RESTORE") {
     if (selectedIds.length === 0) return;
 
     const mapStatus = (a: "REMOVE" | "REALIZE" | "RESTORE"): Post["status"] =>
       a === "REMOVE" ? "REMOVED" : a === "REALIZE" ? "REALIZED" : "PUBLISHED";
 
+    // 楽観更新
     const before = posts;
     const after: Post[] = posts.map((p) =>
       selectedIds.includes(p.id)
@@ -109,7 +107,7 @@ export default function AdminDashboard({ me }: { me: any }) {
       });
       if (!res.ok) throw new Error("moderate_failed");
     } catch {
-      setPosts(before);
+      setPosts(before); // ロールバック
       alert("更新に失敗しました。もう一度お試しください。");
     }
   }
@@ -155,7 +153,7 @@ export default function AdminDashboard({ me }: { me: any }) {
             <button onClick={() => act("RESTORE")} className="rounded border px-3 py-1.5 hover:bg-gray-50">復元</button>
 
             <div className="ml-auto flex items-center gap-2">
-              {/* 簡易フィルタ */}
+              {/* ステータス絞り込み */}
               <select
                 className="rounded border px-2 py-1 text-sm"
                 onChange={(e) => fetchPosts(e.target.value as any)}
