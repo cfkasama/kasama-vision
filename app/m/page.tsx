@@ -211,6 +211,7 @@ export default async function MuniListPage({
           <p className="p-3 text-sm text-gray-600">データがありません。</p>
         ) : (
           <>
+                        {pager}
             <ol className="list-decimal pl-5 text-sm">
               {rows.map((r) => (
                 <li key={r.id} className="mb-1">
