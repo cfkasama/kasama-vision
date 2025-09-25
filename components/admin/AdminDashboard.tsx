@@ -22,6 +22,7 @@ type Post = {
   realizedAt?: string | null;
   identityId: string | null;
   municipalityId: string | null;
+  municipality?:{id:string;name:string;}|null;
 };
 
 export default function AdminDashboard({
