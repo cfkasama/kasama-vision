@@ -20,6 +20,8 @@ type Post = {
   cmtCount: number;
   createdAt: string;
   realizedAt?: string | null;
+  identityId: string | null;
+  municipalityId: string | null;
 };
 
 export default function AdminDashboard({
