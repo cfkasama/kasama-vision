@@ -11,7 +11,7 @@ type Comment = {
   recCount?: number;
   postId: string;
   identityId: string | null;
-  kind?: Kind; // ← バッジ表示用に追加（APIが返さない場合はundefined）
+  kind?: Kind; // バッジ表示用
 };
 
 const LIKE_KEY = (id: string) => `c_like_${id}`;
@@ -35,7 +35,6 @@ export default function CommentList({ postId }: { postId: string }) {
       const j = await r.json();
       if (!r.ok || !j?.ok) throw new Error("fetch_failed");
 
-      // APIの recCount を尊重。なければ 0 を初期。
       const list: Comment[] = (j.comments || []).map((c: any) => ({
         recCount: 0,
         ...c,
@@ -50,7 +49,8 @@ export default function CommentList({ postId }: { postId: string }) {
       });
       setPressedLike(likeMap);
       setPressedRec(recMap);
-    } catch {
+    } catch (e) {
+      console.error("load comments failed:", e);
       showToast("コメント取得に失敗しました");
     }
   }
@@ -60,10 +60,9 @@ export default function CommentList({ postId }: { postId: string }) {
     load();
   }, [postId]);
 
-  // ✅ Composer からの投稿完了イベントで再読込
+  // 投稿完了イベントで再読込
   useEffect(() => {
     const onCreated = (e: Event) => {
-      // postId が一致する時のみ再読込
       const detail = (e as CustomEvent).detail as { postId?: string } | undefined;
       if (!detail || !detail.postId || detail.postId === postId) {
         load();
@@ -82,7 +81,7 @@ export default function CommentList({ postId }: { postId: string }) {
     if (acting[id]) return;
     setActing((m) => ({ ...m, [id]: true }));
 
-    // 楽観的更新
+    // 楽観更新
     setComments((prev) =>
       prev.map((c) => (c.id === id ? { ...c, likeCount: c.likeCount + 1 } : c))
     );
@@ -101,7 +100,8 @@ export default function CommentList({ postId }: { postId: string }) {
         setPressedLike((m) => ({ ...m, [id]: true }));
         showToast("いいねしました");
       }
-    } catch {
+    } catch (e) {
+      console.error("like failed:", e);
       setComments((prev) =>
         prev.map((c) => (c.id === id ? { ...c, likeCount: Math.max(c.likeCount - 1, 0) } : c))
       );
@@ -120,7 +120,7 @@ export default function CommentList({ postId }: { postId: string }) {
     if (acting[id]) return;
     setActing((m) => ({ ...m, [id]: true }));
 
-    // 楽観的更新
+    // 楽観更新
     setComments((prev) =>
       prev.map((c) => (c.id === id ? { ...c, recCount: (c.recCount ?? 0) + 1 } : c))
     );
@@ -141,7 +141,8 @@ export default function CommentList({ postId }: { postId: string }) {
         setPressedRec((m) => ({ ...m, [id]: true }));
         showToast("推薦しました");
       }
-    } catch {
+    } catch (e) {
+      console.error("recommend failed:", e);
       setComments((prev) =>
         prev.map((c) =>
           c.id === id ? { ...c, recCount: Math.max((c.recCount ?? 1) - 1, 0) } : c
@@ -156,7 +157,7 @@ export default function CommentList({ postId }: { postId: string }) {
   // 通報
   const report = async (c: Comment) => {
     const reason = prompt("通報理由を入力してください（任意）", "");
-    if (reason === null) return; // キャンセル
+    if (reason === null) return;
 
     try {
       const r = await fetch(`/api/report`, {
@@ -175,7 +176,8 @@ export default function CommentList({ postId }: { postId: string }) {
       } else {
         showToast("通報しました。ご協力ありがとうございます");
       }
-    } catch {
+    } catch (e) {
+      console.error("report failed:", e);
       showToast("通報でエラーが発生しました");
     }
   };
@@ -199,7 +201,8 @@ export default function CommentList({ postId }: { postId: string }) {
         showToast("削除しました");
         await load();
       }
-    } catch {
+    } catch (e) {
+      console.error("delete failed:", e);
       showToast("削除でエラーが発生しました");
     }
   }
@@ -242,17 +245,18 @@ export default function CommentList({ postId }: { postId: string }) {
                 >
                   👍 {c.likeCount}
                 </button>
-      {c.kind === "COMMENT" && (
-                <button
-                  onClick={() => recommend(c.id)}
-                  disabled={!!acting[c.id] || !!pressedRec[c.id]}
-                  className="rounded-full border px-2 py-0.5 text-xs hover:bg-gray-50 disabled:opacity-60"
-                  aria-label="推薦"
-                  title={pressedRec[c.id] ? "この端末では既に推薦済み" : "推薦"}
-                >
-                  ⭐ {c.recCount ?? 0}
-                </button>  
-      )}
+                {/* kind 未指定(undefined) も含めてコメント扱いにする */}
+                {(!c.kind || c.kind === "COMMENT") && (
+                  <button
+                    onClick={() => recommend(c.id)}
+                    disabled={!!acting[c.id] || !!pressedRec[c.id]}
+                    className="rounded-full border px-2 py-0.5 text-xs hover:bg-gray-50 disabled:opacity-60"
+                    aria-label="推薦"
+                    title={pressedRec[c.id] ? "この端末では既に推薦済み" : "推薦"}
+                  >
+                    ⭐ {c.recCount ?? 0}
+                  </button>
+                )}
                 <button
                   onClick={() => report(c)}
                   className="rounded-full border px-2 py-0.5 text-xs hover:bg-gray-50"
@@ -274,7 +278,6 @@ export default function CommentList({ postId }: { postId: string }) {
         ))}
       </ul>
 
-      {/* 簡易トースト */}
       {toast && (
         <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-black/80 px-3 py-2 text-xs text-white">
           {toast}
