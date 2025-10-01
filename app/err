@@ -1,1 +1,45 @@
-Error: This action with HTTP GET is not supported by NextAuth.js
+17:22:03.090 Running build in Washington, D.C., USA (East) – iad1
+17:22:03.090 Build machine configuration: 2 cores, 8 GB
+17:22:03.126 Cloning github.com/cfkasama/kasama-vision (Branch: main, Commit: a20b53a)
+17:22:03.675 Cloning completed: 548.000ms
+17:22:03.863 Restored build cache from previous deployment (9Yumo89cMzWgL8jpLT1at2xZ2zXB)
+17:22:04.219 Running "vercel build"
+17:22:04.593 Vercel CLI 48.1.6
+17:22:04.888 Installing dependencies...
+17:22:05.998 
+17:22:05.999 > kasama-future@0.1.0 postinstall
+17:22:05.999 > prisma generate
+17:22:05.999 
+17:22:06.426 Prisma schema loaded from prisma/schema.prisma
+17:22:06.958 
+17:22:06.959 ✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 236ms
+17:22:06.960 
+17:22:06.960 Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+17:22:06.960 
+17:22:06.961 Tip: Want real-time updates to your database without manual polling? Discover how with Pulse: https://pris.ly/tip-0-pulse
+17:22:06.961 
+17:22:07.155 
+17:22:07.156 up to date in 2s
+17:22:07.156 
+17:22:07.157 44 packages are looking for funding
+17:22:07.157   run `npm fund` for details
+17:22:07.184 Detected Next.js version: 14.2.5
+17:22:07.188 Running "npm run build"
+17:22:07.288 
+17:22:07.290 > kasama-future@0.1.0 build
+17:22:07.291 > next build
+17:22:07.291 
+17:22:07.919   ▲ Next.js 14.2.5
+17:22:07.921 
+17:22:07.971    Creating an optimized production build ...
+17:22:08.122  ⚠ Found lockfile missing swc dependencies, run next locally to automatically patch
+17:22:10.699 Failed to compile.
+17:22:10.699 
+17:22:10.699 ./app/api/auth/[...nextauth]/route.ts
+17:22:10.699 Module not found: Can't resolve '@next-auth/prisma-adapter'
+17:22:10.700 
+17:22:10.700 https://nextjs.org/docs/messages/module-not-found
+17:22:10.700 
+17:22:10.701 
+17:22:10.702 > Build failed because of webpack errors
+17:22:10.728 Error: Command "npm run build" exited with 1
