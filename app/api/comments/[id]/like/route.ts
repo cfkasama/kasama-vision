@@ -1,44 +1,36 @@
 import { NextResponse } from "next/server";
-import { getOrCreateIdentityId } from "@/lib/identity";
 import { prisma } from "@/lib/db";
-import { assertNotLocked } from "@/lib/identity";
-
 export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
-type Params = { params: { id: string } };
-
-export async function POST(_req: Request, { params }: Params) {
-  const { id } = params;
-  if (!id) return NextResponse.json({ ok: false, error: "bad_request" }, { status: 400 });
-
-  // 匿名 Identity を確保（cookie: kid）
-  const identityId = await getOrCreateIdentityId();
-  await assertNotLocked(identityId); // ← ここでロック中なら即 403
+export async function POST(_req: Request, ctx: { params: { id: string } }) {
   try {
-    const exists = await prisma.comment.findUnique({ where: { id }, select: { id: true } });
-    if (!exists) return NextResponse.json({ ok: false, error: "comment_not_found" }, { status: 404 });
+    const id = ctx?.params?.id;
+    if (!id) {
+      return NextResponse.json({ ok: false, error: "bad_id" }, { status: 400 });
+    }
 
-    await prisma.$transaction(async (tx) => {
-      let created = false;
-      try {
-        await tx.commentAction.create({
-          data: { commentId: id, identityId, type: "LIKE" },
-        });
-        created = true;
-      } catch (e: any) {
-        // P2002 = unique violation（すでに押してる）
-        if (e?.code !== "P2002") throw e;
-      }
-      if (created) {
-        await tx.comment.update({ where: { id }, data: { likeCount: { increment: 1 } } });
-      }
+    // 1) 先に存在チェック（ソフトデリート除外）
+    const c = await prisma.comment.findUnique({
+      where: { id },
+      select: { id: true, deletedAt: true, likeCount: true },
+    });
+    if (!c || c.deletedAt) {
+      return NextResponse.json({ ok: false, error: "not_found" }, { status: 404 });
+    }
+
+    // 2) NULL を踏まえて安全にインクリメント
+    //    likeCount が nullable の場合は COALESCE 的に 0 にしてから +1
+    const updated = await prisma.comment.update({
+      where: { id },
+      data: {
+        likeCount: c.likeCount === null ? 1 : { increment: 1 },
+      },
+      select: { id: true, likeCount: true },
     });
 
-    return NextResponse.json({ ok: true });
-  } catch (e: any) {
-    console.error("[POST /comments/:id/like] error:", e);
-    return NextResponse.json({ ok: false, error: "server_error" }, { status: 500 });
+    return NextResponse.json({ ok: true, likeCount: updated.likeCount });
+  } catch (e) {
+    console.error("[POST /api/comments/:id/like] error", e);
+    return NextResponse.json({ ok: false, error: "internal_error" }, { status: 500 });
   }
 }
